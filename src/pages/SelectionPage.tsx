@@ -66,7 +66,7 @@ export function SelectionPage() {
         <h1 className="font-serif text-2xl font-bold text-text-primary">
           选择执政基调
         </h1>
-        <p className="text-sm text-text-tertiary max-w-md mx-auto leading-relaxed">
+        <p className="text-sm text-text-tertiary max-w-sm mx-auto leading-relaxed">
           不同的基调将带来截然不同的历史剧本与挑战
         </p>
       </div>
@@ -91,7 +91,7 @@ export function SelectionPage() {
           <p className="text-sm text-text-secondary">正在生成剧本...</p>
         </div>
       ) : (
-        <div className="grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-2">
           {PLAY_STYLES.map((style, idx) => {
             const Icon = STYLE_ICONS[style.id];
             const colors = STYLE_COLORS[style.id];
@@ -99,27 +99,25 @@ export function SelectionPage() {
               <button
                 key={style.id}
                 onClick={() => handleSelect(style.id)}
-                className={`group card-interactive p-6 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
+                className={`group card-interactive px-5 py-5 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-xl ${colors.bg} border ${colors.border}`}
+                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}
                   >
-                    <Icon size={18} className={colors.text} />
+                    <Icon size={16} className={colors.text} />
                   </div>
-                  <h2
-                    className={`text-lg font-serif font-bold text-text-primary group-hover:${colors.text} transition-colors`}
-                  >
+                  <h2 className="text-base font-serif font-bold text-text-primary">
                     {style.name}
                   </h2>
                 </div>
 
-                <p className="font-serif text-sm italic text-text-secondary mb-3 leading-relaxed">
+                <p className="font-serif text-xs italic leading-relaxed text-text-secondary mb-3">
                   &ldquo;{style.quote}&rdquo;
                 </p>
 
-                <p className="text-sm text-text-tertiary leading-relaxed">
+                <p className="text-xs text-text-tertiary leading-relaxed">
                   {style.description}
                 </p>
               </button>
@@ -131,7 +129,7 @@ export function SelectionPage() {
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-xl border border-red-900/30 bg-red-900/10 px-5 py-3 text-sm text-red-400"
+          className="mt-6 rounded-lg border border-red-900/30 bg-red-900/10 px-5 py-3 text-sm text-red-400"
         >
           {error}
         </div>

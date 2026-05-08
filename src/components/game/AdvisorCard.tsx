@@ -66,7 +66,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
 
   return (
     <div
-      className={`rounded-xl border ${config.borderColor} ${config.bgColor} p-4 transition-all hover:brightness-110`}
+      className={`rounded-lg border ${config.borderColor} ${config.bgColor} p-4 transition-all hover:brightness-110`}
     >
       <div className="mb-3 flex items-center gap-3">
         <div

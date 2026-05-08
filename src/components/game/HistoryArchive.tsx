@@ -47,7 +47,7 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
           </h2>
           <button
             onClick={onClose}
-            className="touch-target flex items-center justify-center rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
+            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
             aria-label="关闭"
           >
             <X size={18} />
@@ -60,11 +60,11 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
               暂无历史记录
             </div>
           ) : (
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {records.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-xl border border-border bg-bg-card p-4"
+                  className="rounded-lg border border-border bg-bg-card px-4 py-3.5"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-text-primary">

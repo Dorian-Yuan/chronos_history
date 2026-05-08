@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useSettingsStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getAIProviders } from "@/config";
-import { getProviderDefaultConfig } from "@/lib/ai";
+import { getProviderDefaultConfig, createProvider } from "@/lib/ai";
 import type { AIProviderSetting } from "@/types";
-import { Check } from "lucide-react";
+import { Check, Loader2, AlertCircle } from "lucide-react";
+
+type TestStatus = "idle" | "testing" | "success" | "error";
 
 export function AIProviderConfig() {
   const { t } = useTranslation();
@@ -18,16 +20,19 @@ export function AIProviderConfig() {
   const [apiKey, setApiKey] = useState(aiProvider?.apiKey || "");
   const [baseUrl, setBaseUrl] = useState(aiProvider?.baseUrl || "");
   const [model, setModel] = useState(aiProvider?.model || "");
-  const [saved, setSaved] = useState(false);
+  const [testStatus, setTestStatus] = useState<TestStatus>("idle");
+  const [testError, setTestError] = useState<string | null>(null);
 
   const handleProviderChange = (id: string) => {
     setProviderId(id);
     const defaults = getProviderDefaultConfig(id);
     setBaseUrl(defaults.baseUrl || "");
     setModel(defaults.model || "");
+    setTestStatus("idle");
+    setTestError(null);
   };
 
-  const handleSave = () => {
+  const handleSaveAndTest = async () => {
     const setting: AIProviderSetting = {
       providerId,
       apiKey,
@@ -35,14 +40,54 @@ export function AIProviderConfig() {
       model,
     };
     setAIProvider(setting);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+
+    setTestStatus("testing");
+    setTestError(null);
+
+    try {
+      const provider = createProvider(setting);
+      if (!provider.validateConfig()) {
+        setTestStatus("error");
+        setTestError("配置不完整，请检查 API Key 和 Base URL");
+        return;
+      }
+
+      const response = await provider.sendMessage(
+        [
+          {
+            role: "user",
+            content: "请回复：连接测试成功",
+          },
+        ],
+        {
+          maxTokens: 20,
+          temperature: 0,
+        },
+      );
+
+      if (response.content) {
+        setTestStatus("success");
+      } else {
+        setTestStatus("error");
+        setTestError("API 返回了空响应");
+      }
+    } catch (e) {
+      setTestStatus("error");
+      setTestError(e instanceof Error ? e.message : "连接测试失败，请检查配置");
+    }
   };
 
   const selectedProvider = providers.find((p) => p.id === providerId);
 
+  const getBaseUrlHint = (): string => {
+    if (selectedProvider?.type === "gemini") {
+      return "例：https://generativelanguage.googleapis.com/v1beta";
+    }
+    return "例：https://api.openai.com/v1（需包含到 /v1）";
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="section-label">{t("settings.apiConfig")}</div>
 
       <div>
@@ -65,11 +110,15 @@ export function AIProviderConfig() {
       <div>
         <label className="mb-2 block text-sm font-medium text-text-secondary">
           {t("settings.apiKey")}
+          <span className="text-accent-danger ml-1">*</span>
         </label>
         <input
           type="password"
           value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
+          onChange={(e) => {
+            setApiKey(e.target.value);
+            setTestStatus("idle");
+          }}
           placeholder={
             selectedProvider?.apiKeyPlaceholder || t("settings.enterApiKey")
           }
@@ -84,10 +133,18 @@ export function AIProviderConfig() {
         <input
           type="text"
           value={baseUrl}
-          onChange={(e) => setBaseUrl(e.target.value)}
-          placeholder={t("settings.enterBaseUrl")}
+          onChange={(e) => {
+            setBaseUrl(e.target.value);
+            setTestStatus("idle");
+          }}
+          placeholder={getBaseUrlHint()}
           className="input-field"
         />
+        <p className="mt-1.5 text-[11px] text-text-tertiary leading-relaxed">
+          {selectedProvider?.type === "gemini"
+            ? "Gemini API 地址通常到 /v1beta 即可"
+            : "OpenAI 兼容接口地址需包含到 /v1，无需包含 /chat/completions"}
+        </p>
       </div>
 
       <div>
@@ -97,25 +154,55 @@ export function AIProviderConfig() {
         <input
           type="text"
           value={model}
-          onChange={(e) => setModel(e.target.value)}
+          onChange={(e) => {
+            setModel(e.target.value);
+            setTestStatus("idle");
+          }}
           placeholder={t("settings.selectModel")}
           className="input-field"
         />
       </div>
 
-      <button
-        onClick={handleSave}
-        className={`touch-target w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
-          saved
-            ? "bg-accent-success text-text-inverse"
-            : "bg-accent-primary text-text-inverse hover:opacity-90"
-        }`}
-      >
-        <span className="flex items-center justify-center gap-2">
-          {saved && <Check size={14} />}
-          {saved ? t("common.saved") || "Saved" : t("settings.save")}
-        </span>
-      </button>
+      <div className="pt-2">
+        <button
+          onClick={handleSaveAndTest}
+          disabled={!apiKey.trim() || testStatus === "testing"}
+          className={`touch-target w-full rounded-lg px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
+            testStatus === "success"
+              ? "bg-accent-success text-text-inverse"
+              : testStatus === "error"
+                ? "bg-accent-danger text-text-inverse"
+                : "bg-accent-primary text-text-inverse hover:opacity-90"
+          } disabled:opacity-40 disabled:cursor-not-allowed`}
+        >
+          <span className="flex items-center justify-center gap-2">
+            {testStatus === "testing" && (
+              <Loader2 size={14} className="animate-spin" />
+            )}
+            {testStatus === "success" && <Check size={14} />}
+            {testStatus === "error" && <AlertCircle size={14} />}
+            {testStatus === "testing"
+              ? "测试中..."
+              : testStatus === "success"
+                ? "连接成功"
+                : testStatus === "error"
+                  ? "保存并重试"
+                  : "保存并测试"}
+          </span>
+        </button>
+
+        {testStatus === "error" && testError && (
+          <div className="mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 leading-relaxed">
+            {testError}
+          </div>
+        )}
+
+        {testStatus === "success" && (
+          <div className="mt-3 rounded-lg border border-green-900/30 bg-green-900/10 px-4 py-2.5 text-xs text-green-400">
+            API 连接测试通过，配置已保存
+          </div>
+        )}
+      </div>
     </div>
   );
 }

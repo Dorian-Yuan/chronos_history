@@ -31,7 +31,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
         {factions.map((faction, idx) => (
           <li
             key={`${faction.name}-${idx}`}
-            className={`rounded-xl border border-border bg-bg-card p-4 transition-all ${
+            className={`rounded-lg border border-border bg-bg-card px-4 py-4 transition-all ${
               faction.is_destroyed ? "opacity-40" : ""
             } ${faction.is_new ? "ring-1 ring-accent-primary/30" : ""}`}
           >

@@ -31,7 +31,7 @@ export function SettingsPanel() {
         onClick={() => setSettingsOpen(false)}
       />
       <div
-        className={`relative w-full max-w-lg rounded-t-2xl md:rounded-2xl border border-border bg-bg-secondary shadow-lg animate-slide-in-up md:animate-scale-in ${
+        className={`relative w-full max-w-lg rounded-t-xl md:rounded-xl border border-border bg-bg-secondary shadow-lg animate-slide-in-up md:animate-scale-in ${
           isMobile ? "max-h-[85vh]" : ""
         }`}
       >
@@ -41,7 +41,7 @@ export function SettingsPanel() {
           </h2>
           <button
             onClick={() => setSettingsOpen(false)}
-            className="touch-target flex items-center justify-center rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary active:scale-95 transition-all"
+            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary active:scale-95 transition-all"
           >
             <X size={18} />
           </button>

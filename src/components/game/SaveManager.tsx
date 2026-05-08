@@ -105,37 +105,37 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
           </h2>
           <button
             onClick={onClose}
-            className="touch-target flex items-center justify-center rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
+            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
             aria-label="关闭"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="modal-body space-y-2.5">
+        <div className="modal-body space-y-3">
           {Array.from({ length: 5 }, (_, i) => {
             const save = saves.find((s) => s.slotIndex === i);
             return (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-4"
+                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-4 py-3.5"
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-text-primary">
                     存档 {i + 1}
                   </div>
                   {save ? (
-                    <div className="text-xs text-text-tertiary mt-0.5 truncate">
+                    <div className="text-xs text-text-tertiary mt-1 truncate">
                       {save.data.metadata.scenarioTitle} ·{" "}
                       {save.data.metadata.nationName} · 第
                       {save.data.metadata.turnCount}回合 ·{" "}
                       {new Date(save.data.metadata.timestamp).toLocaleString()}
                     </div>
                   ) : (
-                    <div className="text-xs text-text-tertiary mt-0.5">空</div>
+                    <div className="text-xs text-text-tertiary mt-1">空</div>
                   )}
                 </div>
-                <div className="flex gap-1.5 shrink-0">
+                <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => handleSave(i)}
                     className="btn-ghost p-2"
@@ -169,7 +169,7 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
           {importError && (
             <div
               role="alert"
-              className="rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400"
+              className="rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400"
             >
               {importError}
             </div>
@@ -178,10 +178,10 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
 
         <div className="modal-footer flex gap-2.5">
           <button onClick={handleExport} className="btn-secondary flex-1">
-            <Download size={13} /> 导出存档
+            <Download size={13} /> 导出
           </button>
           <button onClick={handleImport} className="btn-secondary flex-1">
-            <Upload size={13} /> 导入存档
+            <Upload size={13} /> 导入
           </button>
         </div>
       </div>

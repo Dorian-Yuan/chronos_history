@@ -65,7 +65,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-bg-card p-5">
+      <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
         <div className="text-xl font-serif font-bold text-text-primary mb-2">
           {analysis.persona_title}
         </div>
@@ -74,7 +74,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className={`rounded-xl border p-5 ${outcomeConfig.bg}`}>
+      <div className={`rounded-lg border px-5 py-5 ${outcomeConfig.bg}`}>
         <div className="text-sm font-semibold text-accent-primary mb-3">
           真实历史：{analysis.real_event_title}
         </div>
@@ -94,7 +94,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-bg-card p-5">
+      <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
         <div className="section-label">对比分析</div>
         <div className="font-serif text-sm leading-relaxed text-text-secondary">
           {analysis.comparison_text}
@@ -107,7 +107,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-bg-card p-5">
+      <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
         <div className="section-label">统治者画像</div>
         <div className="space-y-3">
           {analysis.radar_stats.map((stat) => (
@@ -130,7 +130,7 @@ export function EndGameReport({
       </div>
 
       {analysis.turn_reviews.length > 0 && (
-        <div className="rounded-xl border border-border bg-bg-card p-5">
+        <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
           <div className="section-label">决策复盘</div>
           <div className="space-y-4">
             {analysis.turn_reviews.map((review) => (

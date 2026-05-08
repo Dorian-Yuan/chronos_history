@@ -2,9 +2,17 @@ import { useState } from "react";
 import { useSettingsStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getAIProviders } from "@/config";
-import { getProviderDefaultConfig } from "@/lib/ai";
+import { getProviderDefaultConfig, createProvider } from "@/lib/ai";
 import type { AIProviderSetting } from "@/types";
-import { Check, ChevronRight, Sparkles } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  Sparkles,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
+
+type TestStatus = "idle" | "testing" | "success" | "error";
 
 interface WelcomeSetupProps {
   onComplete: () => void;
@@ -20,6 +28,8 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
   const [apiKey, setApiKey] = useState("");
   const [baseUrl, setBaseUrl] = useState("");
   const [model, setModel] = useState("");
+  const [testStatus, setTestStatus] = useState<TestStatus>("idle");
+  const [testError, setTestError] = useState<string | null>(null);
 
   const selectedProvider = providers.find((p) => p.id === providerId);
 
@@ -28,9 +38,11 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
     const defaults = getProviderDefaultConfig(id);
     setBaseUrl(defaults.baseUrl || "");
     setModel(defaults.model || "");
+    setTestStatus("idle");
+    setTestError(null);
   };
 
-  const handleSave = () => {
+  const handleSaveAndTest = async () => {
     const setting: AIProviderSetting = {
       providerId,
       apiKey,
@@ -38,39 +50,70 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
       model,
     };
     setAIProvider(setting);
-    onComplete();
+
+    setTestStatus("testing");
+    setTestError(null);
+
+    try {
+      const provider = createProvider(setting);
+      if (!provider.validateConfig()) {
+        setTestStatus("error");
+        setTestError("配置不完整，请检查 API Key 和 Base URL");
+        return;
+      }
+
+      const response = await provider.sendMessage(
+        [{ role: "user", content: "请回复：连接测试成功" }],
+        { maxTokens: 20, temperature: 0 },
+      );
+
+      if (response.content) {
+        setTestStatus("success");
+        setTimeout(() => onComplete(), 600);
+      } else {
+        setTestStatus("error");
+        setTestError("API 返回了空响应");
+      }
+    } catch (e) {
+      setTestStatus("error");
+      setTestError(e instanceof Error ? e.message : "连接测试失败，请检查配置");
+    }
   };
 
-  const canProceed = step === 0 || (step === 1 && apiKey.trim().length > 0);
+  const getBaseUrlHint = (): string => {
+    if (selectedProvider?.type === "gemini") {
+      return "例：https://generativelanguage.googleapis.com/v1beta";
+    }
+    return "例：https://api.openai.com/v1（需包含到 /v1）";
+  };
 
   return (
     <div className="flex h-full flex-col items-center justify-center bg-bg-primary px-6 noise-bg">
       <div className="absolute inset-0 ink-wash pointer-events-none" />
 
-      <div className="relative w-full max-w-md animate-fade-in">
+      <div className="relative w-full max-w-sm animate-fade-in">
         {step === 0 && (
-          <div className="text-center space-y-8">
-            <div className="space-y-4">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-bg-tertiary border border-border mb-2">
-                <Sparkles size={36} className="text-accent-primary" />
+          <div className="text-center space-y-10">
+            <div className="space-y-5">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-bg-tertiary border border-border">
+                <Sparkles size={30} className="text-accent-primary" />
               </div>
-              <h1 className="font-display text-5xl font-bold tracking-wide text-text-primary">
+              <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">
                 CHRONOS
               </h1>
-              <p className="font-serif text-lg text-text-secondary">
+              <div className="w-10 h-0.5 bg-accent-primary/40 mx-auto rounded-full" />
+              <p className="font-serif text-base text-text-secondary">
                 {t("app.subtitle")}
               </p>
             </div>
 
-            <div className="space-y-3 text-left">
-              <p className="text-sm text-text-secondary leading-relaxed">
-                {t("setup.welcomeDescription")}
-              </p>
-            </div>
+            <p className="text-sm text-text-tertiary leading-relaxed max-w-xs mx-auto">
+              {t("setup.welcomeDescription")}
+            </p>
 
             <button
               onClick={() => setStep(1)}
-              className="btn-primary w-full text-base py-3.5"
+              className="btn-primary w-full max-w-[15rem] mx-auto text-base py-3"
             >
               {t("setup.getStarted")}
               <ChevronRight size={18} />
@@ -115,7 +158,10 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
                 <input
                   type="password"
                   value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    setTestStatus("idle");
+                  }}
                   placeholder={
                     selectedProvider?.apiKeyPlaceholder ||
                     t("settings.enterApiKey")
@@ -131,10 +177,18 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
                 <input
                   type="text"
                   value={baseUrl}
-                  onChange={(e) => setBaseUrl(e.target.value)}
-                  placeholder={t("settings.enterBaseUrl")}
+                  onChange={(e) => {
+                    setBaseUrl(e.target.value);
+                    setTestStatus("idle");
+                  }}
+                  placeholder={getBaseUrlHint()}
                   className="input-field"
                 />
+                <p className="mt-1.5 text-[11px] text-text-tertiary leading-relaxed">
+                  {selectedProvider?.type === "gemini"
+                    ? "Gemini API 地址通常到 /v1beta 即可"
+                    : "OpenAI 兼容接口地址需包含到 /v1，无需包含 /chat/completions"}
+                </p>
               </div>
 
               <div>
@@ -144,21 +198,56 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
                 <input
                   type="text"
                   value={model}
-                  onChange={(e) => setModel(e.target.value)}
+                  onChange={(e) => {
+                    setModel(e.target.value);
+                    setTestStatus("idle");
+                  }}
                   placeholder={t("settings.selectModel")}
                   className="input-field"
                 />
               </div>
             </div>
 
-            <button
-              onClick={handleSave}
-              disabled={!canProceed}
-              className="btn-primary w-full text-base py-3.5"
-            >
-              <Check size={18} />
-              {t("setup.startJourney")}
-            </button>
+            <div className="pt-1">
+              <button
+                onClick={handleSaveAndTest}
+                disabled={!apiKey.trim() || testStatus === "testing"}
+                className={`touch-target w-full rounded-lg px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
+                  testStatus === "success"
+                    ? "bg-accent-success text-text-inverse"
+                    : testStatus === "error"
+                      ? "bg-accent-danger text-text-inverse"
+                      : "bg-accent-primary text-text-inverse hover:opacity-90"
+                } disabled:opacity-40 disabled:cursor-not-allowed`}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  {testStatus === "testing" && (
+                    <Loader2 size={14} className="animate-spin" />
+                  )}
+                  {testStatus === "success" && <Check size={14} />}
+                  {testStatus === "error" && <AlertCircle size={14} />}
+                  {testStatus === "testing"
+                    ? "测试中..."
+                    : testStatus === "success"
+                      ? "连接成功"
+                      : testStatus === "error"
+                        ? "保存并重试"
+                        : t("setup.startJourney")}
+                </span>
+              </button>
+
+              {testStatus === "error" && testError && (
+                <div className="mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 leading-relaxed">
+                  {testError}
+                </div>
+              )}
+
+              {testStatus === "success" && (
+                <div className="mt-3 rounded-lg border border-green-900/30 bg-green-900/10 px-4 py-2.5 text-xs text-green-400">
+                  API 连接测试通过，即将进入...
+                </div>
+              )}
+            </div>
 
             <button
               onClick={() => setStep(0)}

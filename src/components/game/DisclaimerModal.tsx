@@ -45,7 +45,7 @@ export function DisclaimerModal() {
               localStorage.setItem(DISCLAIMER_KEY, "true");
               setVisible(false);
             }}
-            className="btn-primary w-full"
+            className="btn-primary w-full max-w-[15rem] mx-auto"
             autoFocus
           >
             我已了解，进入游戏
