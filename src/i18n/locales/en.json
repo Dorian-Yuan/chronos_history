@@ -10,6 +10,13 @@
     "settings": "Settings",
     "history": "History"
   },
+  "setup": {
+    "welcomeDescription": "Welcome to Chronos. This system requires an AI service connection to generate historical simulation scenarios. Please configure your AI provider and API key first.",
+    "getStarted": "Get Started",
+    "configureAI": "Configure AI Service",
+    "configureAIDescription": "Select your AI provider and enter your API key. This is required to start the simulation.",
+    "startJourney": "Complete Setup & Begin"
+  },
   "scenario": {
     "select": "Select Scenario",
     "start": "Start Game",
@@ -108,6 +115,7 @@
     "cancel": "Cancel",
     "close": "Close",
     "save": "Save",
+    "saved": "Saved",
     "delete": "Delete",
     "edit": "Edit",
     "back": "Back",

@@ -3,6 +3,44 @@ import { useGameDispatch } from "@/lib/game";
 import { generateScenario } from "@/lib/game";
 import type { PlayStyle } from "@/types";
 import { PLAY_STYLES } from "@/types";
+import { Swords, Coins, BookOpen, Shield } from "lucide-react";
+
+const STYLE_ICONS: Record<PlayStyle, typeof Swords> = {
+  Conquest: Swords,
+  Prosperity: Coins,
+  Reform: BookOpen,
+  Survival: Shield,
+};
+
+const STYLE_COLORS: Record<
+  PlayStyle,
+  { border: string; bg: string; text: string; glow: string }
+> = {
+  Conquest: {
+    border: "border-red-800/40",
+    bg: "bg-red-900/10",
+    text: "text-red-400",
+    glow: "group-hover:shadow-red-900/20",
+  },
+  Prosperity: {
+    border: "border-amber-800/40",
+    bg: "bg-amber-900/10",
+    text: "text-amber-400",
+    glow: "group-hover:shadow-amber-900/20",
+  },
+  Reform: {
+    border: "border-blue-800/40",
+    bg: "bg-blue-900/10",
+    text: "text-blue-400",
+    glow: "group-hover:shadow-blue-900/20",
+  },
+  Survival: {
+    border: "border-emerald-800/40",
+    bg: "bg-emerald-900/10",
+    text: "text-emerald-400",
+    glow: "group-hover:shadow-emerald-900/20",
+  },
+};
 
 export function SelectionPage() {
   const dispatch = useGameDispatch();
@@ -23,59 +61,77 @@ export function SelectionPage() {
   };
 
   return (
-    <main className="flex h-full flex-col items-center justify-center bg-zinc-950 px-4">
-      <div className="mb-8 text-center">
-        <h1 className="mb-2 text-2xl font-serif font-bold text-zinc-100">
+    <main className="flex h-full flex-col items-center justify-center px-6">
+      <div className="mb-10 text-center space-y-3 animate-fade-in">
+        <h1 className="font-serif text-2xl font-bold text-text-primary">
           选择执政基调
         </h1>
-        <p className="text-sm text-zinc-400">
-          不同的基调将带来截然不同的历史剧本
+        <p className="text-sm text-text-tertiary max-w-md mx-auto leading-relaxed">
+          不同的基调将带来截然不同的历史剧本与挑战
         </p>
       </div>
 
       {generating ? (
         <div
-          className="flex flex-col items-center gap-4"
+          className="flex flex-col items-center gap-5 animate-fade-in"
           role="status"
           aria-live="polite"
         >
-          <div className="flex gap-2">
-            <div className="h-3 w-3 animate-pulse rounded-full bg-amber-500" />
+          <div className="flex gap-2.5">
+            <div className="h-3 w-3 animate-pulse rounded-full bg-accent-primary" />
             <div
-              className="h-3 w-3 animate-pulse rounded-full bg-amber-500"
+              className="h-3 w-3 animate-pulse rounded-full bg-accent-primary"
               style={{ animationDelay: "0.2s" }}
             />
             <div
-              className="h-3 w-3 animate-pulse rounded-full bg-amber-500"
+              className="h-3 w-3 animate-pulse rounded-full bg-accent-primary"
               style={{ animationDelay: "0.4s" }}
             />
           </div>
-          <p className="text-sm text-zinc-400">正在生成剧本...</p>
+          <p className="text-sm text-text-secondary">正在生成剧本...</p>
         </div>
       ) : (
         <div className="grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
-          {PLAY_STYLES.map((style) => (
-            <button
-              key={style.id}
-              onClick={() => handleSelect(style.id)}
-              className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-left transition-all hover:border-amber-700/50 hover:bg-zinc-800/50"
-            >
-              <h2 className="mb-1 text-lg font-serif font-bold text-zinc-200 group-hover:text-amber-400 transition-colors">
-                {style.name}
-              </h2>
-              <p className="mb-3 font-serif text-sm italic text-zinc-400">
-                &ldquo;{style.quote}&rdquo;
-              </p>
-              <p className="text-xs text-zinc-400">{style.description}</p>
-            </button>
-          ))}
+          {PLAY_STYLES.map((style, idx) => {
+            const Icon = STYLE_ICONS[style.id];
+            const colors = STYLE_COLORS[style.id];
+            return (
+              <button
+                key={style.id}
+                onClick={() => handleSelect(style.id)}
+                className={`group card-interactive p-6 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
+                style={{ animationDelay: `${idx * 80}ms` }}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl ${colors.bg} border ${colors.border}`}
+                  >
+                    <Icon size={18} className={colors.text} />
+                  </div>
+                  <h2
+                    className={`text-lg font-serif font-bold text-text-primary group-hover:${colors.text} transition-colors`}
+                  >
+                    {style.name}
+                  </h2>
+                </div>
+
+                <p className="font-serif text-sm italic text-text-secondary mb-3 leading-relaxed">
+                  &ldquo;{style.quote}&rdquo;
+                </p>
+
+                <p className="text-sm text-text-tertiary leading-relaxed">
+                  {style.description}
+                </p>
+              </button>
+            );
+          })}
         </div>
       )}
 
       {error && (
         <div
           role="alert"
-          className="mt-4 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2 text-sm text-red-400"
+          className="mt-6 rounded-xl border border-red-900/30 bg-red-900/10 px-5 py-3 text-sm text-red-400"
         >
           {error}
         </div>

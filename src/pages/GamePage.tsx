@@ -158,8 +158,8 @@ export function GamePage() {
 
   if (!scenario) {
     return (
-      <main className="flex h-full items-center justify-center bg-zinc-950">
-        <p className="text-zinc-500" role="status">
+      <main className="flex h-full items-center justify-center">
+        <p className="text-text-tertiary" role="status">
           加载中...
         </p>
       </main>
@@ -167,30 +167,30 @@ export function GamePage() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-zinc-950">
-      <header className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+    <div className="flex h-full flex-col">
+      <header className="flex items-center justify-between border-b border-border px-5 py-3 glass">
         <div className="flex items-center gap-3">
-          <span className="font-serif text-sm font-medium text-zinc-300">
+          <span className="font-serif text-sm font-medium text-text-primary">
             {scenario.title}
           </span>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-text-tertiary">
             {scenario.player_context.nation_name} · 第{state.turnCount}回合
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setShowSaveManager(true)}
-            className="rounded p-2 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+            className="btn-ghost p-2"
             aria-label="存档管理"
           >
-            <Save size={14} />
+            <Save size={15} />
           </button>
           <button
             onClick={() => setSettingsOpen(true)}
-            className="rounded p-2 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+            className="btn-ghost p-2"
             aria-label="设置"
           >
-            <Settings size={14} />
+            <Settings size={15} />
           </button>
         </div>
       </header>
@@ -225,9 +225,9 @@ export function GamePage() {
             )}
           </div>
 
-          <div className="hidden md:flex w-72 flex-col border-l border-zinc-800">
+          <div className="hidden md:flex w-80 flex-col border-l border-border bg-bg-secondary/50">
             <div
-              className="flex border-b border-zinc-800"
+              className="flex border-b border-border"
               role="tablist"
               aria-label="侧边栏"
             >
@@ -236,10 +236,10 @@ export function GamePage() {
                 role="tab"
                 aria-selected={sideTab === "cabinet"}
                 aria-controls="panel-cabinet"
-                className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
                   sideTab === "cabinet"
-                    ? "text-amber-400 border-b-2 border-amber-500"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "text-accent-primary border-b-2 border-accent-primary"
+                    : "text-text-tertiary hover:text-text-secondary"
                 }`}
               >
                 内阁
@@ -249,10 +249,10 @@ export function GamePage() {
                 role="tab"
                 aria-selected={sideTab === "intelligence"}
                 aria-controls="panel-intelligence"
-                className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
                   sideTab === "intelligence"
-                    ? "text-amber-400 border-b-2 border-amber-500"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "text-accent-primary border-b-2 border-accent-primary"
+                    : "text-text-tertiary hover:text-text-secondary"
                 }`}
               >
                 情报
@@ -279,35 +279,35 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-zinc-800"
+        className="flex md:hidden border-t border-border glass"
         aria-label="游戏面板"
       >
         <button
           onClick={() => setMobileTab("chronicle")}
-          className={`flex-1 px-3 py-2.5 text-xs font-medium transition-colors ${
+          className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "chronicle"
-              ? "text-amber-400 border-t-2 border-amber-500"
-              : "text-zinc-400"
+              ? "text-accent-primary border-t-2 border-accent-primary"
+              : "text-text-tertiary"
           }`}
         >
           编年史
         </button>
         <button
           onClick={() => setMobileTab("cabinet")}
-          className={`flex-1 px-3 py-2.5 text-xs font-medium transition-colors ${
+          className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "cabinet"
-              ? "text-amber-400 border-t-2 border-amber-500"
-              : "text-zinc-400"
+              ? "text-accent-primary border-t-2 border-accent-primary"
+              : "text-text-tertiary"
           }`}
         >
           内阁
         </button>
         <button
           onClick={() => setMobileTab("intelligence")}
-          className={`flex-1 px-3 py-2.5 text-xs font-medium transition-colors ${
+          className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "intelligence"
-              ? "text-amber-400 border-t-2 border-amber-500"
-              : "text-zinc-400"
+              ? "text-accent-primary border-t-2 border-accent-primary"
+              : "text-text-tertiary"
           }`}
         >
           情报

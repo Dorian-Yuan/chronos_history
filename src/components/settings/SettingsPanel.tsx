@@ -25,9 +25,9 @@ export function SettingsPanel() {
   const themes = getAvailableThemes();
 
   return (
-    <div className="fixed inset-0 z-modal flex items-end md:items-center justify-center animate-fade-in">
+    <div className="modal-overlay animate-fade-in">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0"
         onClick={() => setSettingsOpen(false)}
       />
       <div
@@ -35,7 +35,7 @@ export function SettingsPanel() {
           isMobile ? "max-h-[85vh]" : ""
         }`}
       >
-        <div className="flex items-center justify-between border-b border-border p-4">
+        <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
             {t("settings.title")}
           </h2>
@@ -47,9 +47,9 @@ export function SettingsPanel() {
           </button>
         </div>
 
-        <div className="overflow-auto p-4 space-y-5 safe-bottom">
+        <div className="modal-body space-y-6 safe-bottom">
           <div>
-            <label className="mb-2 block text-sm font-medium text-text-secondary">
+            <label className="mb-2.5 block text-sm font-medium text-text-secondary">
               {t("settings.language")}
             </label>
             <select
@@ -58,7 +58,7 @@ export function SettingsPanel() {
                 setLocale(e.target.value);
                 setLocaleHook(e.target.value);
               }}
-              className="w-full rounded-xl border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
+              className="input-field"
             >
               {availableLocales.map((l) => (
                 <option key={l} value={l}>
@@ -69,7 +69,7 @@ export function SettingsPanel() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-text-secondary">
+            <label className="mb-2.5 block text-sm font-medium text-text-secondary">
               {t("settings.theme")}
             </label>
             <select
@@ -78,7 +78,7 @@ export function SettingsPanel() {
                 setTheme(e.target.value);
                 setCurrentTheme(e.target.value);
               }}
-              className="w-full rounded-xl border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
+              className="input-field"
             >
               {themes.map((th) => (
                 <option key={th.name} value={th.name}>
@@ -88,9 +88,11 @@ export function SettingsPanel() {
             </select>
           </div>
 
+          <div className="divider" />
+
           <AIProviderConfig />
 
-          <div className="text-right text-[10px] text-text-tertiary">
+          <div className="text-right text-[10px] text-text-tertiary pt-2">
             {t("app.version")}: {appConfig.version}
           </div>
         </div>

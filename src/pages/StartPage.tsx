@@ -6,12 +6,15 @@ import {
   SaveManager,
   HistoryArchive,
 } from "@/components/game";
+import { Settings, Archive, Save } from "lucide-react";
+import { useUIStore } from "@/stores";
 
 export function StartPage() {
   const dispatch = useGameDispatch();
   const state = useGameState();
   const [showSaveManager, setShowSaveManager] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
 
   const canContinue = hasAutoSave();
 
@@ -27,22 +30,26 @@ export function StartPage() {
   };
 
   return (
-    <main className="flex h-full flex-col items-center justify-center bg-zinc-950 px-4">
+    <main className="flex h-full flex-col items-center justify-center px-6">
       <DisclaimerModal />
 
-      <div className="mb-12 text-center">
-        <h1 className="mb-2 text-5xl font-mono font-bold tracking-widest text-zinc-100">
+      <div className="mb-16 text-center space-y-4 animate-fade-in">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-bg-tertiary/60 border border-border mb-4">
+          <span className="text-2xl">⏳</span>
+        </div>
+        <h1 className="font-display text-6xl font-bold tracking-[0.15em] text-text-primary">
           CHRONOS
         </h1>
-        <p className="font-serif text-lg text-zinc-400">
+        <div className="w-12 h-0.5 bg-accent-primary/40 mx-auto rounded-full" />
+        <p className="font-serif text-lg text-text-secondary tracking-wide">
           历史的回响 / 决策推演
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 w-full max-w-sm">
+      <div className="flex flex-col gap-3 w-full max-w-sm animate-slide-up">
         <button
           onClick={handleEnter}
-          className="w-full rounded-lg bg-amber-600 px-6 py-3 text-sm font-medium text-white hover:bg-amber-500 transition-colors"
+          className="btn-primary w-full text-base py-3.5"
         >
           进入历史
         </button>
@@ -50,24 +57,35 @@ export function StartPage() {
         {canContinue && (
           <button
             onClick={handleContinue}
-            className="w-full rounded-lg border border-zinc-700 px-6 py-3 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+            className="btn-secondary w-full text-base py-3.5"
           >
             继续游戏
           </button>
         )}
 
+        <div className="h-px bg-border my-2" />
+
         <div className="flex gap-2">
           <button
             onClick={() => setShowSaveManager(true)}
-            className="flex-1 rounded-lg border border-zinc-800 px-4 py-2.5 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+            className="btn-ghost flex-1 py-3"
           >
+            <Save size={14} />
             存档管理
           </button>
           <button
             onClick={() => setShowHistory(true)}
-            className="flex-1 rounded-lg border border-zinc-800 px-4 py-2.5 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+            className="btn-ghost flex-1 py-3"
           >
+            <Archive size={14} />
             历史档案
+          </button>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="btn-ghost flex-1 py-3"
+          >
+            <Settings size={14} />
+            设置
           </button>
         </div>
       </div>

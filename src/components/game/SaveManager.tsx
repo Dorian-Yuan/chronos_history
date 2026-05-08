@@ -9,7 +9,7 @@ import {
   importSave,
 } from "@/lib/game";
 import type { GameState } from "@/types";
-import { Download, Upload, Trash2, Save } from "lucide-react";
+import { Download, Upload, Trash2, Save, X } from "lucide-react";
 
 interface SaveManagerProps {
   gameState: GameState;
@@ -93,61 +93,52 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="save-manager-title"
+      className="modal-overlay animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        ref={modalRef}
-        className="w-full max-w-lg rounded-xl border border-zinc-800 bg-zinc-900 p-6"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2
-            id="save-manager-title"
-            className="text-lg font-serif font-bold text-zinc-100"
-          >
+      <div ref={modalRef} className="modal-content max-w-lg">
+        <div className="modal-header">
+          <h2 className="font-serif text-lg font-semibold text-text-primary">
             存档管理
           </h2>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-200 p-1"
+            className="touch-target flex items-center justify-center rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
             aria-label="关闭"
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
 
-        <ul className="space-y-2 mb-4">
+        <div className="modal-body space-y-2.5">
           {Array.from({ length: 5 }, (_, i) => {
             const save = saves.find((s) => s.slotIndex === i);
             return (
-              <li
+              <div
                 key={i}
-                className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-800/50 p-3"
+                className="flex items-center gap-3 rounded-xl border border-border bg-bg-card p-4"
               >
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-zinc-300">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-text-primary">
                     存档 {i + 1}
                   </div>
                   {save ? (
-                    <div className="text-xs text-zinc-400">
+                    <div className="text-xs text-text-tertiary mt-0.5 truncate">
                       {save.data.metadata.scenarioTitle} ·{" "}
                       {save.data.metadata.nationName} · 第
                       {save.data.metadata.turnCount}回合 ·{" "}
                       {new Date(save.data.metadata.timestamp).toLocaleString()}
                     </div>
                   ) : (
-                    <div className="text-xs text-zinc-500">空</div>
+                    <div className="text-xs text-text-tertiary mt-0.5">空</div>
                   )}
                 </div>
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5 shrink-0">
                   <button
                     onClick={() => handleSave(i)}
-                    className="rounded p-2 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
+                    className="btn-ghost p-2"
                     aria-label={`保存到存档 ${i + 1}`}
                   >
                     <Save size={14} />
@@ -156,14 +147,14 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
                     <>
                       <button
                         onClick={() => handleLoad(i)}
-                        className="rounded p-2 text-zinc-400 hover:bg-zinc-700 hover:text-amber-400"
+                        className="btn-ghost p-2 text-accent-primary"
                         aria-label={`读取存档 ${i + 1}`}
                       >
                         <Upload size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(i)}
-                        className="rounded p-2 text-zinc-400 hover:bg-zinc-700 hover:text-red-400"
+                        className="btn-ghost p-2 text-accent-danger"
                         aria-label={`删除存档 ${i + 1}`}
                       >
                         <Trash2 size={14} />
@@ -171,32 +162,26 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
                     </>
                   )}
                 </div>
-              </li>
+              </div>
             );
           })}
-        </ul>
 
-        {importError && (
-          <div
-            role="alert"
-            className="mb-3 rounded-lg border border-red-900/30 bg-red-900/10 px-3 py-2 text-xs text-red-400"
-          >
-            {importError}
-          </div>
-        )}
+          {importError && (
+            <div
+              role="alert"
+              className="rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400"
+            >
+              {importError}
+            </div>
+          )}
+        </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800"
-          >
-            <Download size={12} /> 导出存档
+        <div className="modal-footer flex gap-2.5">
+          <button onClick={handleExport} className="btn-secondary flex-1">
+            <Download size={13} /> 导出存档
           </button>
-          <button
-            onClick={handleImport}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800"
-          >
-            <Upload size={12} /> 导入存档
+          <button onClick={handleImport} className="btn-secondary flex-1">
+            <Upload size={13} /> 导入存档
           </button>
         </div>
       </div>

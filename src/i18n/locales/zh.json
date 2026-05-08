@@ -10,6 +10,13 @@
     "settings": "设置",
     "history": "历史"
   },
+  "setup": {
+    "welcomeDescription": "欢迎来到 Chronos。本系统需要连接 AI 服务来生成历史推演剧本。请先配置您的 AI 服务提供商和 API 密钥。",
+    "getStarted": "开始配置",
+    "configureAI": "配置 AI 服务",
+    "configureAIDescription": "选择您的 AI 服务提供商并填写 API 密钥，这是开始推演的必要步骤。",
+    "startJourney": "完成配置，开始推演"
+  },
   "scenario": {
     "select": "选择场景",
     "start": "开始游戏",
@@ -108,6 +115,7 @@
     "cancel": "取消",
     "close": "关闭",
     "save": "保存",
+    "saved": "已保存",
     "delete": "删除",
     "edit": "编辑",
     "back": "返回",

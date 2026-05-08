@@ -18,23 +18,15 @@ export function DisclaimerModal() {
   if (!visible) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="disclaimer-title"
-    >
-      <div
-        ref={modalRef}
-        className="w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-900 p-6"
-      >
-        <h2
-          id="disclaimer-title"
-          className="mb-4 text-lg font-serif font-bold text-zinc-100"
-        >
-          免责声明
-        </h2>
-        <div className="space-y-3 text-sm text-zinc-300 leading-relaxed">
+    <div className="modal-overlay animate-fade-in">
+      <div ref={modalRef} className="modal-content max-w-md">
+        <div className="modal-header">
+          <h2 className="font-serif text-lg font-semibold text-text-primary">
+            免责声明
+          </h2>
+        </div>
+
+        <div className="modal-body space-y-3.5 text-sm text-text-secondary leading-relaxed">
           <p>
             本游戏为虚构的历史决策推演模拟，所有剧情、人物、国家均为AI生成，不代表任何真实观点或立场。
           </p>
@@ -46,16 +38,19 @@ export function DisclaimerModal() {
           </p>
           <p>本游戏禁止用于任何政治宣传或违法行为。</p>
         </div>
-        <button
-          onClick={() => {
-            localStorage.setItem(DISCLAIMER_KEY, "true");
-            setVisible(false);
-          }}
-          className="mt-6 w-full rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-amber-500 transition-colors"
-          autoFocus
-        >
-          我已了解，进入游戏
-        </button>
+
+        <div className="modal-footer">
+          <button
+            onClick={() => {
+              localStorage.setItem(DISCLAIMER_KEY, "true");
+              setVisible(false);
+            }}
+            className="btn-primary w-full"
+            autoFocus
+          >
+            我已了解，进入游戏
+          </button>
+        </div>
       </div>
     </div>
   );

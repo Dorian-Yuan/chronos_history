@@ -1,15 +1,16 @@
 import { HashRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GameProvider, useGameState } from "@/lib/game";
 import { StartPage } from "@/pages/StartPage";
 import { SelectionPage } from "@/pages/SelectionPage";
 import { GamePage } from "@/pages/GamePage";
 import { EndPage } from "@/pages/EndPage";
-import { SettingsPanel } from "@/components/settings";
+import { SettingsPanel, WelcomeSetup } from "@/components/settings";
 import { initLocale } from "@/i18n";
 import { registerServiceWorker } from "@/lib/sw-register";
 import { usePWA } from "@/hooks/usePWA";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useSettingsStore } from "@/stores";
 import { WifiOff, RefreshCw, Download } from "lucide-react";
 
 function PWABanner() {
@@ -19,8 +20,8 @@ function PWABanner() {
 
   if (isOffline) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-4 py-2 text-center text-xs text-amber-400">
-        <WifiOff size={12} />
+      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-2.5 text-center text-xs text-amber-400 border-b border-amber-900/20">
+        <WifiOff size={13} />
         {t("pwa.offlineNotice")}
       </div>
     );
@@ -28,12 +29,12 @@ function PWABanner() {
 
   if (isUpdateAvailable) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-blue-900/20 px-4 py-2 text-center text-xs text-blue-400">
-        <RefreshCw size={12} />
+      <div className="flex items-center justify-center gap-2 bg-blue-900/20 px-5 py-2.5 text-center text-xs text-blue-400 border-b border-blue-900/20">
+        <RefreshCw size={13} />
         {t("pwa.updateAvailable")}
         <button
           onClick={updateApp}
-          className="font-medium underline underline-offset-2"
+          className="font-semibold underline underline-offset-2 hover:text-blue-300 transition-colors"
         >
           {t("pwa.updateNow")}
         </button>
@@ -43,12 +44,12 @@ function PWABanner() {
 
   if (canInstall) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-4 py-2 text-center text-xs text-amber-400">
-        <Download size={12} />
+      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-2.5 text-center text-xs text-amber-400 border-b border-amber-900/20">
+        <Download size={13} />
         {t("pwa.installPrompt")}
         <button
           onClick={installApp}
-          className="font-medium underline underline-offset-2"
+          className="font-semibold underline underline-offset-2 hover:text-amber-300 transition-colors"
         >
           {t("pwa.install")}
         </button>
@@ -90,21 +91,47 @@ function GameRouter() {
   );
 }
 
+function AppContent() {
+  const aiProvider = useSettingsStore((s) => s.aiProvider);
+  const [setupComplete, setSetupComplete] = useState(
+    () => !!aiProvider?.apiKey,
+  );
+
+  useSettingsStore.subscribe((state) => {
+    if (state.aiProvider?.apiKey) {
+      setSetupComplete(true);
+    }
+  });
+
+  if (!setupComplete) {
+    return (
+      <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary">
+        <WelcomeSetup onComplete={() => setSetupComplete(true)} />
+      </div>
+    );
+  }
+
+  return (
+    <HashRouter>
+      <GameProvider>
+        <PWABanner />
+        <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg">
+          <div className="absolute inset-0 ink-wash pointer-events-none" />
+          <div className="relative z-10 h-full">
+            <GameRouter />
+          </div>
+        </div>
+        <SettingsPanel />
+      </GameProvider>
+    </HashRouter>
+  );
+}
+
 export default function App() {
   useEffect(() => {
     initLocale();
     registerServiceWorker();
   }, []);
 
-  return (
-    <HashRouter>
-      <GameProvider>
-        <PWABanner />
-        <div className="h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100">
-          <GameRouter />
-        </div>
-        <SettingsPanel />
-      </GameProvider>
-    </HashRouter>
-  );
+  return <AppContent />;
 }

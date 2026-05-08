@@ -6,10 +6,30 @@ interface StatBarsProps {
 }
 
 const STAT_CONFIG = [
-  { key: "stability" as const, label: "稳定性", icon: "⚖️" },
-  { key: "economy" as const, label: "经济", icon: "💰" },
-  { key: "military" as const, label: "军事", icon: "⚔️" },
-  { key: "international_standing" as const, label: "国际声望", icon: "🌍" },
+  {
+    key: "stability" as const,
+    label: "稳定性",
+    icon: "⚖️",
+    colorClass: "bg-accent-info",
+  },
+  {
+    key: "economy" as const,
+    label: "经济",
+    icon: "💰",
+    colorClass: "bg-accent-success",
+  },
+  {
+    key: "military" as const,
+    label: "军事",
+    icon: "⚔️",
+    colorClass: "bg-accent-danger",
+  },
+  {
+    key: "international_standing" as const,
+    label: "国际声望",
+    icon: "🌍",
+    colorClass: "bg-accent-primary",
+  },
 ];
 
 function getBarColor(value: number): string {
@@ -27,7 +47,7 @@ function getTextColor(value: number): string {
 export function StatBars({ stats, delta }: StatBarsProps) {
   return (
     <div
-      className="grid grid-cols-2 sm:grid-cols-4 gap-2 px-4 py-2"
+      className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 py-4 border-b border-border bg-bg-secondary/30"
       role="group"
       aria-label="国家属性"
     >
@@ -36,20 +56,20 @@ export function StatBars({ stats, delta }: StatBarsProps) {
         const deltaValue = delta?.[key] ?? 0;
 
         return (
-          <div key={key} className="flex flex-col gap-0.5">
+          <div key={key} className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs font-medium text-text-secondary">
                 <span aria-hidden="true">{icon}</span> {label}
               </span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <span
-                  className={`font-mono text-xs font-medium ${getTextColor(value)}`}
+                  className={`font-mono text-xs font-semibold ${getTextColor(value)}`}
                 >
                   {value}
                 </span>
                 {deltaValue !== 0 && (
                   <span
-                    className={`font-mono text-xs ${deltaValue > 0 ? "text-green-400" : "text-red-400"}`}
+                    className={`font-mono text-xs font-medium ${deltaValue > 0 ? "text-green-400" : "text-red-400"}`}
                   >
                     {deltaValue > 0 ? `+${deltaValue}` : deltaValue}
                   </span>
@@ -57,7 +77,7 @@ export function StatBars({ stats, delta }: StatBarsProps) {
               </div>
             </div>
             <div
-              className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800"
+              className="h-2 w-full overflow-hidden rounded-full bg-bg-tertiary"
               role="progressbar"
               aria-valuenow={value}
               aria-valuemin={0}

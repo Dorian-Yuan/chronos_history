@@ -42,19 +42,17 @@ export function AIProviderConfig() {
   const selectedProvider = providers.find((p) => p.id === providerId);
 
   return (
-    <div className="space-y-3">
-      <h3 className="font-serif text-sm font-medium text-accent-primary decorative-line">
-        {t("settings.apiConfig")}
-      </h3>
+    <div className="space-y-4">
+      <div className="section-label">{t("settings.apiConfig")}</div>
 
       <div>
-        <label className="mb-2 block text-xs text-text-tertiary">
+        <label className="mb-2 block text-sm font-medium text-text-secondary">
           {t("settings.aiProvider")}
         </label>
         <select
           value={providerId}
           onChange={(e) => handleProviderChange(e.target.value)}
-          className="w-full rounded-xl border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
+          className="input-field"
         >
           {providers.map((p) => (
             <option key={p.id} value={p.id}>
@@ -65,7 +63,7 @@ export function AIProviderConfig() {
       </div>
 
       <div>
-        <label className="mb-2 block text-xs text-text-tertiary">
+        <label className="mb-2 block text-sm font-medium text-text-secondary">
           {t("settings.apiKey")}
         </label>
         <input
@@ -75,12 +73,12 @@ export function AIProviderConfig() {
           placeholder={
             selectedProvider?.apiKeyPlaceholder || t("settings.enterApiKey")
           }
-          className="w-full rounded-xl border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-2 block text-xs text-text-tertiary">
+        <label className="mb-2 block text-sm font-medium text-text-secondary">
           {t("settings.baseUrl")}
         </label>
         <input
@@ -88,12 +86,12 @@ export function AIProviderConfig() {
           value={baseUrl}
           onChange={(e) => setBaseUrl(e.target.value)}
           placeholder={t("settings.enterBaseUrl")}
-          className="w-full rounded-xl border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
+          className="input-field"
         />
       </div>
 
       <div>
-        <label className="mb-2 block text-xs text-text-tertiary">
+        <label className="mb-2 block text-sm font-medium text-text-secondary">
           {t("settings.model")}
         </label>
         <input
@@ -101,13 +99,13 @@ export function AIProviderConfig() {
           value={model}
           onChange={(e) => setModel(e.target.value)}
           placeholder={t("settings.selectModel")}
-          className="w-full rounded-xl border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
+          className="input-field"
         />
       </div>
 
       <button
         onClick={handleSave}
-        className={`touch-target w-full rounded-xl px-4 py-2.5 text-sm font-medium transition-all active:scale-[0.98] ${
+        className={`touch-target w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
           saved
             ? "bg-accent-success text-text-inverse"
             : "bg-accent-primary text-text-inverse hover:opacity-90"
