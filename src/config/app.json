@@ -1,15 +1,12 @@
 {
-  "version": "0.2.1",
+  "version": "1.0.0",
   "defaultLocale": "zh",
   "defaultTheme": "dark",
   "appName": "Chronos: 历史的回响",
   "appNameEn": "Chronos: Echoes of History",
-  "maxSuggestedActions": 5,
-  "minSuggestedActions": 3,
-  "autoSaveIntervalMs": 5000,
-  "maxHistoryPoints": 1000,
-  "maxSessions": 50,
-  "streamingChunkDelay": 30,
-  "fallbackSystemPrompt": "You are the Chronos history simulation engine. Current world state:\n{worldState}\n\nSimulate the historical progression based on the player's strategy input. Return JSON format.",
-  "intelligenceKeywords": "侦查|情报|探听|间谍|侦察|investigat|spy|recon|scout|intelligence"
+  "maxTurns": 28,
+  "minTurnsBeforeEnd": 8,
+  "earlyGameProtectionTurns": 4,
+  "maxHistoryRecords": 50,
+  "saveSlots": 5
 }

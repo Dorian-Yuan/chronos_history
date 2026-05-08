@@ -4,7 +4,6 @@ export interface AIProviderConfig {
   type: "openai-compatible" | "gemini";
   defaultBaseUrl: string;
   defaultModel: string;
-  supportsStreaming: boolean;
   apiKeyPlaceholder: string;
 }
 
@@ -15,11 +14,8 @@ export interface AIProvider {
     messages: AIMessage[],
     options?: AISendOptions,
   ): Promise<AIResponse>;
-  streamMessage(
-    messages: AIMessage[],
-    options?: AISendOptions,
-  ): AsyncIterable<string>;
   validateConfig(): boolean;
+  parseJSONResponse(content: string): unknown;
 }
 
 export interface AIMessage {
@@ -32,6 +28,7 @@ export interface AISendOptions {
   temperature?: number;
   maxTokens?: number;
   responseFormat?: "text" | "json";
+  responseSchema?: Record<string, unknown>;
 }
 
 export interface AIResponse {

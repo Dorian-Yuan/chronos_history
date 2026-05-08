@@ -1,79 +1,93 @@
-import type { AdvisorOpinion } from "@/types";
-import { useTranslation } from "@/hooks/useTranslation";
-import { Landmark, Shield, Globe, Users } from "lucide-react";
+import type { AdvisorData, AdvisorRole } from "@/types";
+import { Shield, Scroll, Eye, BookOpen, Coins } from "lucide-react";
 
 interface AdvisorCardProps {
-  opinion: AdvisorOpinion;
+  advisor: AdvisorData;
 }
 
-const roleConfig: Record<string, { color: string; icon: typeof Landmark }> = {
-  economist: { color: "var(--color-economy)", icon: Landmark },
-  military: { color: "var(--color-military)", icon: Shield },
-  diplomat: { color: "var(--color-diplomacy)", icon: Globe },
-  public_sentiment: { color: "var(--color-culture)", icon: Users },
+const ROLE_CONFIG: Record<
+  AdvisorRole,
+  {
+    label: string;
+    icon: typeof Shield;
+    borderColor: string;
+    bgColor: string;
+    textColor: string;
+  }
+> = {
+  General: {
+    label: "将军",
+    icon: Shield,
+    borderColor: "border-red-900/30",
+    bgColor: "bg-red-900/10",
+    textColor: "text-red-400",
+  },
+  Diplomat: {
+    label: "外交官",
+    icon: Scroll,
+    borderColor: "border-blue-900/30",
+    bgColor: "bg-blue-900/10",
+    textColor: "text-blue-400",
+  },
+  Intel: {
+    label: "密探",
+    icon: Eye,
+    borderColor: "border-emerald-900/30",
+    bgColor: "bg-emerald-900/10",
+    textColor: "text-emerald-400",
+  },
+  Scholar: {
+    label: "学者",
+    icon: BookOpen,
+    borderColor: "border-purple-900/30",
+    bgColor: "bg-purple-900/10",
+    textColor: "text-purple-400",
+  },
+  Merchant: {
+    label: "商人",
+    icon: Coins,
+    borderColor: "border-amber-900/30",
+    bgColor: "bg-amber-900/10",
+    textColor: "text-amber-400",
+  },
 };
 
-export function AdvisorCard({ opinion }: AdvisorCardProps) {
-  const { t } = useTranslation();
-  const config = roleConfig[opinion.advisor] || {
-    color: "var(--color-accent-primary)",
-    icon: Landmark,
-  };
+export function AdvisorCard({ advisor }: AdvisorCardProps) {
+  const config = ROLE_CONFIG[advisor.role];
+  if (!config) return null;
+
   const Icon = config.icon;
 
   return (
-    <div className="rounded-xl border border-border bg-bg-card p-4 transition-all hover:border-border-hover">
-      <div className="mb-3 flex items-center justify-between">
+    <div
+      className={`rounded-lg border ${config.borderColor} ${config.bgColor} p-3 transition-all hover:brightness-110`}
+    >
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg"
-            style={{
-              backgroundColor: `${config.color}20`,
-              color: config.color,
-            }}
+            className={`flex h-7 w-7 items-center justify-center rounded-md ${config.bgColor}`}
           >
-            <Icon size={14} />
+            <Icon size={13} className={config.textColor} aria-hidden="true" />
           </div>
-          <span className="text-xs font-medium" style={{ color: config.color }}>
-            {t(`advisor.${opinion.advisor}`)}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-14 overflow-hidden rounded-full bg-bg-tertiary">
+          <div>
             <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${opinion.confidence}%`,
-                backgroundColor: config.color,
-              }}
-            />
+              className={`font-mono text-xs uppercase tracking-wider ${config.textColor}`}
+            >
+              {config.label}
+            </div>
+            <div className="text-xs font-medium text-zinc-200">
+              {advisor.name}
+            </div>
           </div>
-          <span className="font-mono text-[10px] text-text-tertiary">
-            {opinion.confidence}%
-          </span>
         </div>
       </div>
-      <div className="space-y-2">
-        <div>
-          <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
-            {t("advisor.intervention")}
-          </span>
-          <p className="text-xs text-text-primary">{opinion.intervention}</p>
-        </div>
-        <div>
-          <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
-            {t("advisor.reasoning")}
-          </span>
-          <p className="text-xs text-text-secondary">{opinion.reasoning}</p>
-        </div>
-        <div>
-          <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
-            {t("advisor.riskAssessment")}
-          </span>
-          <p className="text-xs text-accent-warning">
-            {opinion.riskAssessment}
-          </p>
-        </div>
+
+      <p className="font-serif text-xs italic leading-relaxed text-zinc-300">
+        &ldquo;{advisor.advice}&rdquo;
+      </p>
+
+      <div className="mt-2 flex items-center justify-end">
+        <span className={`text-xs ${config.textColor}`}>{advisor.bias}</span>
       </div>
     </div>
   );

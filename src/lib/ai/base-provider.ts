@@ -23,20 +23,9 @@ export abstract class BaseAIProvider implements AIProvider {
     messages: AIMessage[],
     options?: AISendOptions,
   ): Promise<AIResponse>;
-  abstract streamMessage(
-    messages: AIMessage[],
-    options?: AISendOptions,
-  ): AsyncIterable<string>;
   abstract validateConfig(): boolean;
 
-  protected buildSystemPrompt(
-    scenarioPrompt: string,
-    worldState: string,
-  ): string {
-    return scenarioPrompt.replace("{worldState}", worldState);
-  }
-
-  protected parseJSONResponse(content: string): unknown {
+  parseJSONResponse(content: string): unknown {
     let cleaned = content.trim();
     if (cleaned.startsWith("```json")) {
       cleaned = cleaned.slice(7);

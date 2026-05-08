@@ -1,46 +1,53 @@
-import type { WorldState } from "./world-state";
+import type { PlayStyle } from "./play-style";
 
-export interface ScenarioConfig {
-  id: string;
-  name: string;
-  nameEn: string;
-  description: string;
-  descriptionEn: string;
-  startYear: number;
-  coverImage: string;
-  initialWorldState: WorldState;
-  historicalEvents: HistoricalEvent[];
-  keyFigures: KeyFigure[];
-  factions: FactionDefinition[];
-  promptTemplate: string;
+export interface PlayerContext {
+  nation_name: string;
+  leader_title: string;
+  background_summary: string;
 }
 
-export interface HistoricalEvent {
+export interface InitialStats {
+  stability: number;
+  economy: number;
+  military: number;
+  international_standing: number;
+}
+
+export type AdvisorRole =
+  | "General"
+  | "Diplomat"
+  | "Intel"
+  | "Scholar"
+  | "Merchant";
+
+export interface AdvisorData {
+  role: AdvisorRole;
+  name: string;
+  advice: string;
+  bias: string;
+  hidden_motive?: string;
+}
+
+export interface FactionData {
+  name: string;
+  description: string;
+  strength: string;
+  weakness: string;
+  needs: string;
+  attitude: string;
+  is_new?: boolean;
+  is_destroyed?: boolean;
+}
+
+export interface ScenarioData {
   id: string;
-  year: number;
   title: string;
-  titleEn: string;
   description: string;
-  descriptionEn: string;
-  impact: Partial<WorldState>;
-}
-
-export interface KeyFigure {
-  id: string;
-  name: string;
-  nameEn: string;
-  role: string;
-  roleEn: string;
-  factionId: string;
-  traits: string[];
-}
-
-export interface FactionDefinition {
-  id: string;
-  name: string;
-  nameEn: string;
-  description: string;
-  descriptionEn: string;
-  initialPower: number;
-  initialInfluence: number;
+  player_context: PlayerContext;
+  initial_stats: InitialStats;
+  hidden_real_event: string;
+  play_style: PlayStyle;
+  start_date: string;
+  initial_advisors: AdvisorData[];
+  factions: FactionData[];
 }

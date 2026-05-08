@@ -1,13 +1,13 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { AppShell } from "@/components/layout";
-import { HomePage } from "@/pages/HomePage";
+import { GameProvider, useGameState } from "@/lib/game";
+import { StartPage } from "@/pages/StartPage";
+import { SelectionPage } from "@/pages/SelectionPage";
 import { GamePage } from "@/pages/GamePage";
+import { EndPage } from "@/pages/EndPage";
 import { SettingsPanel } from "@/components/settings";
 import { initLocale } from "@/i18n";
 import { registerServiceWorker } from "@/lib/sw-register";
-import { getAllSessions } from "@/lib/db";
-import { useSessionStore } from "@/stores";
 import { usePWA } from "@/hooks/usePWA";
 import { useTranslation } from "@/hooks/useTranslation";
 import { WifiOff, RefreshCw, Download } from "lucide-react";
@@ -19,7 +19,7 @@ function PWABanner() {
 
   if (isOffline) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-accent-warning/15 px-4 py-2 text-center text-xs text-accent-warning">
+      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-4 py-2 text-center text-xs text-amber-400">
         <WifiOff size={12} />
         {t("pwa.offlineNotice")}
       </div>
@@ -28,12 +28,12 @@ function PWABanner() {
 
   if (isUpdateAvailable) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-accent-info/15 px-4 py-2 text-center text-xs text-accent-info">
+      <div className="flex items-center justify-center gap-2 bg-blue-900/20 px-4 py-2 text-center text-xs text-blue-400">
         <RefreshCw size={12} />
         {t("pwa.updateAvailable")}
         <button
           onClick={updateApp}
-          className="font-medium underline underline-offset-2 active:scale-95 transition-transform"
+          className="font-medium underline underline-offset-2"
         >
           {t("pwa.updateNow")}
         </button>
@@ -43,12 +43,12 @@ function PWABanner() {
 
   if (canInstall) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-accent-primary/15 px-4 py-2 text-center text-xs text-accent-primary">
+      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-4 py-2 text-center text-xs text-amber-400">
         <Download size={12} />
         {t("pwa.installPrompt")}
         <button
           onClick={installApp}
-          className="font-medium underline underline-offset-2 active:scale-95 transition-transform"
+          className="font-medium underline underline-offset-2"
         >
           {t("pwa.install")}
         </button>
@@ -59,33 +59,52 @@ function PWABanner() {
   return null;
 }
 
-export default function App() {
-  const loadSessions = async () => {
-    try {
-      const sessions = await getAllSessions();
-      useSessionStore.getState().setSessions(sessions);
-    } catch (e) {
-      console.warn("Failed to load sessions:", e);
-    }
-  };
+function GameRouter() {
+  const state = useGameState();
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    switch (state.phase) {
+      case "start":
+        navigate("/");
+        break;
+      case "selection":
+        navigate("/selection");
+        break;
+      case "playing":
+        navigate("/game");
+        break;
+      case "ended":
+        navigate("/end");
+        break;
+    }
+  }, [state.phase, navigate]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<StartPage />} />
+      <Route path="/selection" element={<SelectionPage />} />
+      <Route path="/game" element={<GamePage />} />
+      <Route path="/end" element={<EndPage />} />
+    </Routes>
+  );
+}
+
+export default function App() {
   useEffect(() => {
     initLocale();
     registerServiceWorker();
-    loadSessions();
   }, []);
 
   return (
     <HashRouter>
-      <PWABanner />
-      <AppShell>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/game/:scenarioId" element={<GamePage />} />
-          <Route path="/game" element={<GamePage />} />
-        </Routes>
-      </AppShell>
-      <SettingsPanel />
+      <GameProvider>
+        <PWABanner />
+        <div className="h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100">
+          <GameRouter />
+        </div>
+        <SettingsPanel />
+      </GameProvider>
     </HashRouter>
   );
 }
