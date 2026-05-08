@@ -49,7 +49,7 @@ export function StartPage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 w-full max-w-[15rem] animate-slide-up">
+      <div className="flex flex-col gap-4 w-full max-w-[15rem] animate-slide-up">
         <button
           onClick={handleEnter}
           className="btn-primary w-full text-base py-3"
@@ -68,7 +68,7 @@ export function StartPage() {
 
         <div className="h-px bg-border my-3" />
 
-        <div className="flex gap-2 justify-center">
+        <div className="flex gap-3 justify-center">
           <button
             onClick={() => setShowSaveManager(true)}
             className="btn-ghost py-2.5"

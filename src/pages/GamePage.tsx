@@ -14,12 +14,40 @@ import {
   GameInput,
   SaveManager,
 } from "@/components/game";
-import type { TurnResult } from "@/types";
+import type { TurnResult, ScenarioData, FactionData } from "@/types";
 import { determineOutcome, checkGameOver } from "@/types";
 import { Settings, Save } from "lucide-react";
 import { useUIStore } from "@/stores";
 
 type SideTab = "cabinet" | "intelligence";
+
+function safeGetAdvisors(
+  scenario: ScenarioData | null,
+  turnResults: TurnResult[],
+) {
+  if (!scenario) return [];
+  if (turnResults.length > 0) {
+    const last = turnResults[turnResults.length - 1];
+    if (Array.isArray(last?.advisors) && last.advisors.length > 0) {
+      return last.advisors;
+    }
+  }
+  return Array.isArray(scenario.initial_advisors)
+    ? scenario.initial_advisors
+    : [];
+}
+
+function safeGetFactions(scenario: ScenarioData | null): FactionData[] {
+  if (!scenario) return [];
+  return Array.isArray(scenario.factions) ? scenario.factions : [];
+}
+
+function safeGetDelta(turnResults: TurnResult[]) {
+  if (turnResults.length > 0) {
+    return turnResults[turnResults.length - 1].stats_delta;
+  }
+  return undefined;
+}
 
 export function GamePage() {
   const state = useGameState();
@@ -36,15 +64,13 @@ export function GamePage() {
 
   const scenario = state.scenario;
 
-  const currentAdvisors =
-    scenario && turnResults.length > 0
-      ? turnResults[turnResults.length - 1].advisors
-      : scenario?.initial_advisors || [];
+  const currentAdvisors = safeGetAdvisors(scenario, turnResults);
+  const currentFactions = safeGetFactions(scenario);
+  const currentDelta = safeGetDelta(turnResults);
 
-  const currentDelta =
-    turnResults.length > 0
-      ? turnResults[turnResults.length - 1].stats_delta
-      : undefined;
+  const nationName = scenario?.player_context?.nation_name || "未知国家";
+  const leaderTitle = scenario?.player_context?.leader_title || "统治者";
+  const scenarioTitle = scenario?.title || "未知剧本";
 
   useEffect(() => {
     if (state.turnCount > 1 && scenario) {
@@ -180,16 +206,16 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-5 py-3 glass">
+      <header className="flex items-center justify-between border-b border-border px-5 py-4 glass">
         <div className="flex items-center gap-3">
           <span className="font-serif text-sm font-medium text-text-primary">
-            {scenario.title}
+            {scenarioTitle}
           </span>
           <span className="text-xs text-text-tertiary">
-            {scenario.player_context.nation_name} · 第{state.turnCount}回合
+            {nationName} · 第{state.turnCount}回合
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setShowSaveManager(true)}
             className="btn-ghost p-2"
@@ -234,7 +260,7 @@ export function GamePage() {
             <GameInput
               onSubmit={handleSubmit}
               disabled={isLoading || state.phase === "ended"}
-              placeholder={`阁下，作为${scenario.player_context.leader_title}，您的决策是...`}
+              placeholder={`阁下，作为${leaderTitle}，您的决策是...`}
             />
           </div>
 
@@ -244,58 +270,58 @@ export function GamePage() {
             {mobileTab === "cabinet" ? (
               <CabinetPanel advisors={currentAdvisors} />
             ) : (
-              <IntelligencePanel factions={scenario.factions} />
+              <IntelligencePanel factions={currentFactions} />
             )}
           </div>
+        </div>
 
-          <div className="hidden md:flex w-80 flex-col border-l border-border bg-bg-secondary/50">
-            <div
-              className="flex border-b border-border"
-              role="tablist"
-              aria-label="侧边栏"
+        <div className="hidden md:flex w-80 shrink-0 flex-col border-l border-border bg-bg-secondary/50">
+          <div
+            className="flex border-b border-border"
+            role="tablist"
+            aria-label="侧边栏"
+          >
+            <button
+              onClick={() => setSideTab("cabinet")}
+              role="tab"
+              aria-selected={sideTab === "cabinet"}
+              aria-controls="panel-cabinet"
+              className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+                sideTab === "cabinet"
+                  ? "text-accent-primary border-b-2 border-accent-primary"
+                  : "text-text-tertiary hover:text-text-secondary"
+              }`}
             >
-              <button
-                onClick={() => setSideTab("cabinet")}
-                role="tab"
-                aria-selected={sideTab === "cabinet"}
-                aria-controls="panel-cabinet"
-                className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
-                  sideTab === "cabinet"
-                    ? "text-accent-primary border-b-2 border-accent-primary"
-                    : "text-text-tertiary hover:text-text-secondary"
-                }`}
-              >
-                内阁
-              </button>
-              <button
-                onClick={() => setSideTab("intelligence")}
-                role="tab"
-                aria-selected={sideTab === "intelligence"}
-                aria-controls="panel-intelligence"
-                className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
-                  sideTab === "intelligence"
-                    ? "text-accent-primary border-b-2 border-accent-primary"
-                    : "text-text-tertiary hover:text-text-secondary"
-                }`}
-              >
-                情报
-              </button>
+              内阁
+            </button>
+            <button
+              onClick={() => setSideTab("intelligence")}
+              role="tab"
+              aria-selected={sideTab === "intelligence"}
+              aria-controls="panel-intelligence"
+              className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+                sideTab === "intelligence"
+                  ? "text-accent-primary border-b-2 border-accent-primary"
+                  : "text-text-tertiary hover:text-text-secondary"
+              }`}
+            >
+              情报
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <div
+              id="panel-cabinet"
+              role="tabpanel"
+              className={sideTab === "cabinet" ? "" : "hidden"}
+            >
+              <CabinetPanel advisors={currentAdvisors} />
             </div>
-            <div className="flex-1 overflow-y-auto">
-              <div
-                id="panel-cabinet"
-                role="tabpanel"
-                className={sideTab === "cabinet" ? "" : "hidden"}
-              >
-                <CabinetPanel advisors={currentAdvisors} />
-              </div>
-              <div
-                id="panel-intelligence"
-                role="tabpanel"
-                className={sideTab === "intelligence" ? "" : "hidden"}
-              >
-                <IntelligencePanel factions={scenario.factions} />
-              </div>
+            <div
+              id="panel-intelligence"
+              role="tabpanel"
+              className={sideTab === "intelligence" ? "" : "hidden"}
+            >
+              <IntelligencePanel factions={currentFactions} />
             </div>
           </div>
         </div>

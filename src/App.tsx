@@ -6,6 +6,7 @@ import { SelectionPage } from "@/pages/SelectionPage";
 import { GamePage } from "@/pages/GamePage";
 import { EndPage } from "@/pages/EndPage";
 import { SettingsPanel, WelcomeSetup } from "@/components/settings";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { initLocale } from "@/i18n";
 import { registerServiceWorker } from "@/lib/sw-register";
 import { usePWA } from "@/hooks/usePWA";
@@ -118,7 +119,9 @@ function AppContent() {
         <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg">
           <div className="absolute inset-0 ink-wash pointer-events-none" />
           <div className="relative z-10 h-full">
-            <GameRouter />
+            <ErrorBoundary>
+              <GameRouter />
+            </ErrorBoundary>
           </div>
         </div>
         <SettingsPanel />

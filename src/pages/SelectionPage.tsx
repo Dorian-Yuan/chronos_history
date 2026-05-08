@@ -71,7 +71,7 @@ export function SelectionPage() {
 
   return (
     <main className="flex h-full flex-col items-center justify-center px-6">
-      <div className="mb-10 text-center space-y-3 animate-fade-in">
+      <div className="mb-10 text-center space-y-4 animate-fade-in">
         <h1 className="font-serif text-2xl font-bold text-text-primary">
           选择执政基调
         </h1>
@@ -100,7 +100,7 @@ export function SelectionPage() {
           <p className="text-sm text-text-secondary">正在生成剧本...</p>
         </div>
       ) : (
-        <div className="grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid w-full max-w-lg grid-cols-1 gap-5 sm:grid-cols-2">
           {PLAY_STYLES.map((style, idx) => {
             const Icon = STYLE_ICONS[style.id];
             const colors = STYLE_COLORS[style.id];
@@ -111,7 +111,7 @@ export function SelectionPage() {
                 className={`group card-interactive px-5 py-5 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-4">
                   <div
                     className={`flex h-9 w-9 items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}
                   >
@@ -122,7 +122,7 @@ export function SelectionPage() {
                   </h2>
                 </div>
 
-                <p className="font-serif text-xs italic leading-relaxed text-text-secondary mb-3">
+                <p className="font-serif text-xs italic leading-relaxed text-text-secondary mb-4">
                   &ldquo;{style.quote}&rdquo;
                 </p>
 
@@ -138,7 +138,7 @@ export function SelectionPage() {
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-lg border border-red-900/30 bg-red-900/10 px-5 py-3 text-sm text-red-400"
+          className="mt-6 rounded-lg border border-red-900/30 bg-red-900/10 px-5 py-4 text-sm text-red-400"
         >
           {error}
         </div>

@@ -33,20 +33,20 @@ export function ChroniclePanel({
       {turnCount === 1 && turnResults.length === 0 && (
         <div className="space-y-4 animate-fade-in">
           <div className="text-xs font-medium text-accent-primary/80 tracking-wider uppercase">
-            {scenario.start_date}
+            {scenario.start_date || "元年"}
           </div>
           <div className="text-sm font-serif leading-relaxed text-text-primary">
-            {scenario.player_context.background_summary}
+            {scenario.player_context?.background_summary || ""}
           </div>
           <div className="text-sm font-serif leading-relaxed text-text-secondary">
-            {scenario.description}
+            {scenario.description || ""}
           </div>
           <div className="mt-6 rounded-xl border border-accent-primary/20 bg-accent-primary/5 px-5 py-4">
             <div className="text-xs font-semibold text-accent-primary tracking-wider uppercase mb-2">
               当前危机
             </div>
             <div className="font-serif text-sm text-accent-primary/80 leading-relaxed">
-              阁下，作为{scenario.player_context.leader_title}
+              阁下，作为{scenario.player_context?.leader_title || "统治者"}
               ，您的第一道政令是什么？
             </div>
           </div>
