@@ -42,10 +42,12 @@ export function YearOdometer({ year }: YearOdometerProps) {
       : `${displayYear}`;
 
   return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-xs text-text-tertiary">{t("game.yearFormat")}</span>
+    <div className="flex items-center gap-2 rounded-lg bg-bg-tertiary/50 px-3 py-1.5">
+      <span className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">
+        {t("game.yearFormat")}
+      </span>
       <span
-        className={`font-mono text-xl font-bold tabular-nums tracking-wider ${
+        className={`font-serif text-lg font-bold tabular-nums tracking-wider ${
           isAnimating ? "text-accent-primary" : "text-text-primary"
         } transition-colors duration-300`}
       >

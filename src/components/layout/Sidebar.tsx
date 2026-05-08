@@ -79,67 +79,91 @@ export function Sidebar() {
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-border bg-bg-secondary">
-      <div className="flex items-center justify-between p-4">
-        <h2 className="text-sm font-medium text-text-secondary">
+      <div className="flex items-center justify-between border-b border-border p-4">
+        <h2 className="font-serif text-sm font-medium text-accent-primary decorative-line">
           {t("session.title")}
         </h2>
-        <button className="p-1 text-text-tertiary hover:text-accent-primary transition-colors">
+        <button className="touch-target flex items-center justify-center rounded-xl p-2 text-text-tertiary hover:bg-bg-hover hover:text-accent-primary active:scale-95 transition-all">
           <Plus size={16} />
         </button>
       </div>
 
       <div className="flex-1 overflow-auto">
         {sessions.length === 0 ? (
-          <div className="p-4 text-center text-sm text-text-tertiary">
-            {t("session.newSession")}
+          <div className="flex flex-col items-center justify-center gap-3 p-8 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-bg-tertiary">
+              <Clock size={22} className="text-text-tertiary" />
+            </div>
+            <p className="text-sm text-text-tertiary">
+              {t("session.newSession")}
+            </p>
           </div>
         ) : (
-          sessions.map((session) => (
-            <button
-              key={session.id}
-              onClick={() => handleSelectSession(session.id)}
-              className={`w-full flex items-start gap-3 p-3 text-left hover:bg-bg-hover transition-colors ${
-                session.id === currentSessionId
-                  ? "bg-bg-active border-l-2 border-accent-primary"
-                  : ""
-              }`}
-            >
-              <Clock size={14} className="mt-0.5 shrink-0 text-text-tertiary" />
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm text-text-primary">
-                  {session.title}
-                </div>
-                <div className="text-xs text-text-tertiary">
-                  {session.year} ·{" "}
-                  {new Date(session.lastUpdated).toLocaleDateString()}
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
+          <div className="space-y-1 p-3">
+            {sessions.map((session) => {
+              const isActive = session.id === currentSessionId;
+              return (
                 <button
-                  onClick={(e) => handleExport(e, session.id)}
-                  className="p-0.5 text-text-tertiary hover:text-accent-primary transition-colors"
+                  key={session.id}
+                  onClick={() => handleSelectSession(session.id)}
+                  className={`group w-full flex items-start gap-3 rounded-xl p-3 text-left transition-all active:scale-[0.98] ${
+                    isActive
+                      ? "bg-accent-primary/10 border border-accent-primary/20"
+                      : "border border-transparent hover:bg-bg-hover"
+                  }`}
                 >
-                  <Download size={12} />
+                  <div
+                    className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                      isActive
+                        ? "bg-accent-primary/20 text-accent-primary"
+                        : "bg-bg-tertiary text-text-tertiary"
+                    }`}
+                  >
+                    <Clock size={14} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div
+                      className={`truncate text-sm ${
+                        isActive
+                          ? "font-medium text-text-primary"
+                          : "text-text-secondary"
+                      }`}
+                    >
+                      {session.title}
+                    </div>
+                    <div className="text-xs text-text-tertiary">
+                      {session.year} ·{" "}
+                      {new Date(session.lastUpdated).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => handleExport(e, session.id)}
+                      className="touch-target flex items-center justify-center rounded-lg p-1 text-text-tertiary hover:text-accent-primary active:scale-95 transition-all"
+                    >
+                      <Download size={12} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSession(session.id);
+                      }}
+                      className="touch-target flex items-center justify-center rounded-lg p-1 text-text-tertiary hover:text-accent-danger active:scale-95 transition-all"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeSession(session.id);
-                  }}
-                  className="p-0.5 text-text-tertiary hover:text-accent-danger transition-colors"
-                >
-                  <Trash2 size={12} />
-                </button>
-              </div>
-            </button>
-          ))
+              );
+            })}
+          </div>
         )}
       </div>
 
       <div className="border-t border-border p-3">
         <button
           onClick={handleImport}
-          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-text-secondary hover:bg-bg-hover transition-colors"
+          className="touch-target flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-hover hover:text-text-primary active:scale-[0.98] transition-all"
         >
           <Upload size={14} />
           {t("session.importSession")}

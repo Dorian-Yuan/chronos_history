@@ -26,18 +26,18 @@ export function SuggestedActions() {
   if (actions.length === 0) return null;
 
   return (
-    <div className="border-t border-border bg-bg-secondary px-4 py-2">
-      <div className="flex items-center gap-2 mb-2">
-        <Lightbulb size={14} className="text-accent-warning" />
-        <span className="text-xs text-text-secondary">
+    <div className="border-t border-border bg-bg-secondary/30 px-4 py-3">
+      <div className="mb-2 flex items-center gap-2">
+        <Lightbulb size={13} className="text-accent-warning" />
+        <span className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">
           {t("game.suggestedActions")}
         </span>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {actions.map((action, i) => (
           <button
             key={i}
-            className="rounded-full border border-border bg-bg-tertiary px-3 py-1 text-xs text-text-secondary hover:text-text-primary hover:border-accent-primary transition-colors"
+            className="rounded-lg border border-border bg-bg-tertiary/60 px-3 py-1.5 text-xs text-text-secondary transition-all hover:border-accent-primary/40 hover:text-text-primary hover:bg-accent-primary/8 active:scale-95"
           >
             {action}
           </button>

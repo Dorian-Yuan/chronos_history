@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Send } from "lucide-react";
 import { useChatStore, useSettingsStore, useWorldStateStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -17,6 +17,18 @@ export function ChatInput() {
   const updateWorldState = useWorldStateStore((s) => s.updateWorldState);
   const aiProvider = useSettingsStore((s) => s.aiProvider);
 
+  const adjustHeight = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    adjustHeight();
+  }, [input, adjustHeight]);
+
   const handleSubmit = useCallback(async () => {
     if (!input.trim() || isStreaming) return;
 
@@ -30,6 +42,10 @@ export function ChatInput() {
     addMessage(userMessage);
     setInput("");
     setIsStreaming(true);
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
 
     const aiMessageId = `msg_${Date.now() + 1}`;
     addMessage({
@@ -101,7 +117,7 @@ export function ChatInput() {
   };
 
   return (
-    <div className="border-t border-border bg-bg-secondary p-4">
+    <div className="border-t border-border bg-bg-secondary/80 px-4 py-3 safe-bottom backdrop-blur-md">
       <div className="flex items-end gap-2">
         <textarea
           ref={textareaRef}
@@ -110,15 +126,15 @@ export function ChatInput() {
           onKeyDown={handleKeyDown}
           placeholder={t("game.inputPlaceholder")}
           rows={1}
-          className="flex-1 resize-none rounded-lg border border-border bg-bg-tertiary px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent-primary focus:outline-none transition-colors"
+          className="flex-1 resize-none rounded-xl border border-border bg-bg-tertiary/80 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent-primary/50 focus:outline-none focus:ring-1 focus:ring-accent-primary/20 transition-all"
           disabled={isStreaming}
         />
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || isStreaming}
-          className="rounded-lg bg-accent-primary p-2.5 text-text-inverse disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all hover:opacity-90"
         >
-          <Send size={18} />
+          <Send size={16} />
         </button>
       </div>
     </div>

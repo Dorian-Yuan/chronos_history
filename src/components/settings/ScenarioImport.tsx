@@ -43,7 +43,7 @@ export function ScenarioImport() {
       />
       <button
         onClick={() => fileInputRef.current?.click()}
-        className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-3 text-sm text-text-tertiary hover:border-accent-primary hover:text-accent-primary transition-colors"
+        className="touch-target flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border px-4 py-4 text-sm text-text-tertiary transition-all hover:border-accent-primary/50 hover:bg-accent-primary/5 hover:text-accent-primary active:scale-[0.98]"
       >
         <Upload size={16} />
         {t("scenario.import")}

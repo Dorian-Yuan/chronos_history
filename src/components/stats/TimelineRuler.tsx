@@ -47,11 +47,11 @@ export function TimelineRuler() {
 
   return (
     <div className="p-4">
-      <h3 className="text-sm font-medium text-text-secondary mb-3">
+      <h3 className="font-serif text-sm font-medium text-accent-primary decorative-line mb-4">
         {t("game.timeline")}
       </h3>
-      <div className="relative h-16">
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-border" />
+      <div className="relative h-20">
+        <div className="absolute bottom-4 left-0 right-0 h-px bg-border" />
         {points.map((point, i) => {
           const left = ((point.year - minYear) / range) * 100;
           const isSelected = selectedYear === point.year;
@@ -60,20 +60,32 @@ export function TimelineRuler() {
             <button
               key={i}
               onClick={() => handlePointClick(point.year)}
-              className={`absolute bottom-0 -translate-x-1/2 cursor-pointer transition-all duration-200 hover:scale-125 ${
-                isSelected ? "scale-125" : ""
+              className={`touch-target absolute bottom-4 -translate-x-1/2 cursor-pointer transition-all duration-200 hover:scale-110 active:scale-95 ${
+                isSelected ? "scale-110" : ""
               }`}
               style={{ left: `${left}%` }}
             >
               <div
-                className={`h-2 w-px ${isSelected ? "bg-accent-warning w-0.5 h-3" : isCurrent ? "bg-accent-success" : "bg-accent-primary"}`}
+                className={`mx-auto rounded-full transition-all ${
+                  isSelected
+                    ? "h-3 w-3 bg-accent-warning shadow-lg"
+                    : isCurrent
+                      ? "h-2.5 w-2.5 bg-accent-primary shadow-md"
+                      : "h-2 w-2 bg-accent-primary/50"
+                }`}
+                style={{
+                  boxShadow:
+                    isSelected || isCurrent
+                      ? `0 0 8px ${isSelected ? "var(--color-accent-warning)" : "var(--color-accent-primary)"}60`
+                      : "none",
+                }}
               />
               <span
-                className={`text-[10px] mt-1 block whitespace-nowrap ${
+                className={`mt-1.5 block whitespace-nowrap text-center font-mono text-[10px] ${
                   isSelected
-                    ? "text-accent-warning font-bold"
+                    ? "font-bold text-accent-warning"
                     : isCurrent
-                      ? "text-accent-success"
+                      ? "font-medium text-accent-primary"
                       : "text-text-tertiary"
                 }`}
               >

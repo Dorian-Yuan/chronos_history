@@ -17,24 +17,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [setIsMobile]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-bg-primary text-text-primary">
+    <div className="flex h-dvh w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg ink-wash">
       {!isMobile && <Sidebar />}
       {isMobile && sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/50"
+            className="fixed inset-0 z-sidebar glass-subtle animate-fade-in"
             onClick={() => useUIStore.getState().setSidebarOpen(false)}
           />
-          <div className="fixed left-0 top-0 z-50 h-full w-64">
+          <div className="fixed left-0 top-0 z-header h-full w-72 animate-slide-in-left">
             <Sidebar />
           </div>
         </>
       )}
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-auto">{children}</main>
-        {isMobile && <MobileNav />}
+        <main className={`flex-1 overflow-auto ${isMobile ? "pb-16" : ""}`}>
+          {children}
+        </main>
       </div>
+      {isMobile && <MobileNav />}
     </div>
   );
 }

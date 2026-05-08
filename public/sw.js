@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chronos-v0.1.0';
+const CACHE_NAME = 'chronos-v0.2.1';
 const STATIC_ASSETS = [
   '/chronos_history/',
   '/chronos_history/index.html',

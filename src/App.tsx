@@ -10,6 +10,7 @@ import { getAllSessions } from "@/lib/db";
 import { useSessionStore } from "@/stores";
 import { usePWA } from "@/hooks/usePWA";
 import { useTranslation } from "@/hooks/useTranslation";
+import { WifiOff, RefreshCw, Download } from "lucide-react";
 
 function PWABanner() {
   const { canInstall, installApp, isUpdateAvailable, updateApp, isOffline } =
@@ -18,7 +19,8 @@ function PWABanner() {
 
   if (isOffline) {
     return (
-      <div className="bg-accent-warning/20 px-4 py-2 text-center text-xs text-accent-warning">
+      <div className="flex items-center justify-center gap-2 bg-accent-warning/15 px-4 py-2 text-center text-xs text-accent-warning">
+        <WifiOff size={12} />
         {t("pwa.offlineNotice")}
       </div>
     );
@@ -26,9 +28,13 @@ function PWABanner() {
 
   if (isUpdateAvailable) {
     return (
-      <div className="bg-accent-info/20 px-4 py-2 text-center text-xs text-accent-info flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2 bg-accent-info/15 px-4 py-2 text-center text-xs text-accent-info">
+        <RefreshCw size={12} />
         {t("pwa.updateAvailable")}
-        <button onClick={updateApp} className="underline font-medium">
+        <button
+          onClick={updateApp}
+          className="font-medium underline underline-offset-2 active:scale-95 transition-transform"
+        >
           {t("pwa.updateNow")}
         </button>
       </div>
@@ -37,9 +43,13 @@ function PWABanner() {
 
   if (canInstall) {
     return (
-      <div className="bg-accent-primary/20 px-4 py-2 text-center text-xs text-accent-primary flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2 bg-accent-primary/15 px-4 py-2 text-center text-xs text-accent-primary">
+        <Download size={12} />
         {t("pwa.installPrompt")}
-        <button onClick={installApp} className="underline font-medium">
+        <button
+          onClick={installApp}
+          className="font-medium underline underline-offset-2 active:scale-95 transition-transform"
+        >
           {t("pwa.install")}
         </button>
       </div>

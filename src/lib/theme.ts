@@ -8,33 +8,33 @@ export interface ThemeConfig {
 const themes: Record<string, ThemeConfig> = {
   dark: {
     name: "dark",
-    label: "深色",
-    labelEn: "Dark",
+    label: "墨韵深色",
+    labelEn: "Ink Dark",
     variables: {},
   },
   light: {
     name: "light",
-    label: "浅色",
-    labelEn: "Light",
+    label: "宣纸浅色",
+    labelEn: "Rice Paper",
     variables: {
-      "--color-bg-primary": "#f5f5f5",
-      "--color-bg-secondary": "#ffffff",
-      "--color-bg-tertiary": "#e8e8e8",
+      "--color-bg-primary": "#f0ece4",
+      "--color-bg-secondary": "#faf7f2",
+      "--color-bg-tertiary": "#e4dfd6",
       "--color-bg-card": "#ffffff",
-      "--color-bg-hover": "#eeeeee",
-      "--color-bg-active": "#e0e0e0",
-      "--color-text-primary": "#1a1a1a",
-      "--color-text-secondary": "#555555",
-      "--color-text-tertiary": "#888888",
-      "--color-text-inverse": "#ffffff",
-      "--color-accent-primary": "#2563eb",
-      "--color-accent-secondary": "#7c3aed",
-      "--color-accent-success": "#16a34a",
-      "--color-accent-warning": "#d97706",
-      "--color-accent-danger": "#dc2626",
-      "--color-accent-info": "#0284c7",
-      "--color-border": "#d4d4d4",
-      "--color-border-hover": "#b0b0b0",
+      "--color-bg-hover": "#ebe7df",
+      "--color-bg-active": "#ddd8ce",
+      "--color-text-primary": "#2c2820",
+      "--color-text-secondary": "#6b6558",
+      "--color-text-tertiary": "#9e9688",
+      "--color-text-inverse": "#faf7f2",
+      "--color-accent-primary": "#8b6914",
+      "--color-accent-secondary": "#6b5238",
+      "--color-accent-success": "#3d7a4a",
+      "--color-accent-warning": "#9e7518",
+      "--color-accent-danger": "#a83838",
+      "--color-accent-info": "#4a7a8c",
+      "--color-border": "#d4cfc5",
+      "--color-border-hover": "#b8b2a6",
     },
   },
 };
@@ -59,6 +59,12 @@ export function setTheme(name: string): void {
       root.style.setProperty(key, value);
     });
     localStorage.setItem("chronos_prev_theme", name);
+
+    const themeColor = name === "light" ? "#f0ece4" : "#0d0f14";
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute("content", themeColor);
+    }
   }
 }
 

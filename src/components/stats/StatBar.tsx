@@ -11,6 +11,7 @@ interface StatBarProps {
     | "culture"
     | "primary";
   type?: "gauge" | "text";
+  danger?: boolean;
 }
 
 const colorMap: Record<string, string> = {
@@ -35,12 +36,13 @@ export function StatBar({
   max = 100,
   color = "primary",
   type = "gauge",
+  danger = false,
 }: StatBarProps) {
   if (type === "text" || typeof value === "string") {
     return (
-      <div className="flex items-center justify-between py-1">
+      <div className="flex items-center justify-between py-2">
         <span className="text-xs text-text-secondary">{label}</span>
-        <span className="text-xs text-text-primary">{value}</span>
+        <span className="text-xs font-medium text-text-primary">{value}</span>
       </div>
     );
   }
@@ -49,15 +51,23 @@ export function StatBar({
   const barColor = color === "chaos" ? getChaosColor(value) : colorMap[color];
 
   return (
-    <div className="py-1">
-      <div className="flex items-center justify-between mb-1">
+    <div className={`py-2 ${danger ? "stat-danger-zone" : ""}`}>
+      <div className="mb-1.5 flex items-center justify-between">
         <span className="text-xs text-text-secondary">{label}</span>
-        <span className="text-xs font-mono text-text-primary">{value}</span>
+        <span
+          className={`font-mono text-xs font-medium ${danger ? "text-accent-danger animate-danger-pulse" : "text-text-primary"}`}
+        >
+          {value}
+        </span>
       </div>
-      <div className="h-1.5 w-full rounded-full bg-bg-tertiary overflow-hidden">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-bg-tertiary">
         <div
-          className="h-full rounded-full transition-all duration-700 ease-out"
-          style={{ width: `${percentage}%`, backgroundColor: barColor }}
+          className="stat-bar-fill h-full rounded-full transition-all duration-700 ease-out"
+          style={{
+            width: `${percentage}%`,
+            backgroundColor: danger ? "var(--color-accent-danger)" : barColor,
+            boxShadow: `0 0 8px ${danger ? "var(--color-accent-danger)" : barColor}40`,
+          }}
         />
       </div>
     </div>

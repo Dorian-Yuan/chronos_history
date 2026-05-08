@@ -1,6 +1,6 @@
 import type { ScenarioConfig } from "@/types";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Play } from "lucide-react";
+import { Play, Calendar } from "lucide-react";
 
 interface ScenarioCardProps {
   scenario: ScenarioConfig;
@@ -16,21 +16,21 @@ export function ScenarioCard({ scenario, onSelect }: ScenarioCardProps) {
   return (
     <button
       onClick={onSelect}
-      className="group flex flex-col rounded-xl border border-border bg-bg-card p-5 text-left hover:border-accent-primary/50 hover:bg-bg-hover transition-all duration-200"
+      className="group flex flex-col rounded-xl border border-border bg-bg-card p-5 text-left transition-all duration-300 hover:border-accent-primary/40 hover:bg-bg-hover hover:shadow-glow active:scale-[0.98]"
     >
-      <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
+      <div className="mb-3 flex items-start justify-between">
+        <h3 className="font-serif text-lg font-semibold text-text-primary transition-colors group-hover:text-accent-primary">
           {name}
         </h3>
-        <Play
-          size={16}
-          className="text-text-tertiary group-hover:text-accent-primary transition-colors"
-        />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg-tertiary text-text-tertiary transition-all group-hover:bg-accent-primary/15 group-hover:text-accent-primary">
+          <Play size={15} />
+        </div>
       </div>
-      <p className="text-sm text-text-secondary mb-4 line-clamp-3">
+      <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-text-secondary">
         {description}
       </p>
       <div className="mt-auto flex items-center gap-2 text-xs text-text-tertiary">
+        <Calendar size={12} />
         <span>
           {t("scenario.startYear")}:{" "}
           {scenario.startYear < 0

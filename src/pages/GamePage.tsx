@@ -57,14 +57,23 @@ export function GamePage() {
   if (isMobile) {
     return (
       <div className="h-full">
-        {activeTab === "game" && <ChatPanel />}
-        {activeTab === "state" && <WorldStatePanel />}
-        {activeTab === "timeline" && (
-          <div className="h-full overflow-auto">
-            <TimelineRuler />
-            <ChaosHistoryChart />
-          </div>
-        )}
+        <div className={activeTab === "game" ? "h-full" : "hidden"}>
+          <ChatPanel />
+        </div>
+        <div
+          className={activeTab === "state" ? "h-full overflow-auto" : "hidden"}
+        >
+          <WorldStatePanel />
+        </div>
+        <div
+          className={
+            activeTab === "timeline" ? "h-full overflow-auto" : "hidden"
+          }
+        >
+          <TimelineRuler />
+          <div className="border-t border-border" />
+          <ChaosHistoryChart />
+        </div>
       </div>
     );
   }
@@ -74,9 +83,11 @@ export function GamePage() {
       <div className="flex-1 overflow-hidden">
         <ChatPanel />
       </div>
-      <div className="w-80 border-l border-border overflow-auto">
+      <div className="w-80 border-l border-border overflow-auto bg-bg-secondary/30">
         <WorldStatePanel />
+        <div className="border-t border-border" />
         <TimelineRuler />
+        <div className="border-t border-border" />
         <ChaosHistoryChart />
       </div>
     </div>
