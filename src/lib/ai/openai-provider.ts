@@ -4,6 +4,7 @@ import type { AIMessage, AISendOptions, AIResponse } from "@/types/ai-provider";
 export class OpenAICompatibleProvider extends BaseAIProvider {
   readonly id: string;
   readonly name: string;
+  private readonly supportsStructuredOutput: boolean;
 
   constructor(
     id: string,
@@ -15,6 +16,7 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
     super(apiKey, baseUrl, model);
     this.id = id;
     this.name = name;
+    this.supportsStructuredOutput = id === "openai";
   }
 
   validateConfig(): boolean {
@@ -27,9 +29,6 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
   ): Promise<AIResponse> {
     const url = `${this.baseUrl}/chat/completions`;
 
-    const useStructuredOutput =
-      options?.responseSchema && options?.responseFormat === "json";
-
     const body: Record<string, unknown> = {
       model: options?.model || this.model,
       messages,
@@ -38,17 +37,19 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
       stream: false,
     };
 
-    if (useStructuredOutput && options.responseSchema) {
-      body.response_format = {
-        type: "json_schema",
-        json_schema: {
-          name: "response",
-          strict: true,
-          schema: options.responseSchema,
-        },
-      };
-    } else if (options?.responseFormat === "json") {
-      body.response_format = { type: "json_object" };
+    if (options?.responseFormat === "json") {
+      if (this.supportsStructuredOutput && options.responseSchema) {
+        body.response_format = {
+          type: "json_schema",
+          json_schema: {
+            name: "response",
+            strict: true,
+            schema: options.responseSchema,
+          },
+        };
+      } else {
+        body.response_format = { type: "json_object" };
+      }
     }
 
     const response = await fetch(url, {

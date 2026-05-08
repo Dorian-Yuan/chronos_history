@@ -55,7 +55,16 @@ export function SelectionPage() {
       const scenario = await generateScenario(playStyle);
       dispatch({ type: "SET_SCENARIO", scenario });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "生成剧本失败，请重试");
+      const msg = e instanceof Error ? e.message : "生成剧本失败，请重试";
+      if (
+        msg.includes("JSON") ||
+        msg.includes("json") ||
+        msg.includes("Unrecognized token")
+      ) {
+        setError("AI 返回格式异常，请检查 API 配置或更换模型后重试");
+      } else {
+        setError(msg);
+      }
       setGenerating(false);
     }
   };

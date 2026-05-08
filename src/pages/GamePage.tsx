@@ -26,6 +26,7 @@ export function GamePage() {
   const dispatch = useGameDispatch();
   const [turnResults, setTurnResults] = useState<TurnResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
   const [mobileTab, setMobileTab] = useState<"chronicle" | SideTab>(
     "chronicle",
@@ -55,6 +56,7 @@ export function GamePage() {
     async (action: string) => {
       if (isLoading || !scenario) return;
       setIsLoading(true);
+      setError(null);
 
       try {
         const result = await evaluateTurn(
@@ -149,6 +151,16 @@ export function GamePage() {
         }
       } catch (e) {
         console.error("Turn evaluation failed:", e);
+        const msg = e instanceof Error ? e.message : "推演失败";
+        if (
+          msg.includes("JSON") ||
+          msg.includes("json") ||
+          msg.includes("Unrecognized token")
+        ) {
+          setError("AI 返回格式异常，请检查 API 配置或更换模型");
+        } else {
+          setError(msg);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -202,6 +214,17 @@ export function GamePage() {
           <div
             className={`flex-1 flex flex-col overflow-hidden md:flex ${mobileTab !== "chronicle" ? "hidden md:flex" : "flex"}`}
           >
+            {error && (
+              <div className="mx-5 mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 flex items-center justify-between">
+                <span>{error}</span>
+                <button
+                  onClick={() => setError(null)}
+                  className="ml-3 text-red-400/60 hover:text-red-400"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <ChroniclePanel
               scenario={scenario}
               turnCount={state.turnCount}
