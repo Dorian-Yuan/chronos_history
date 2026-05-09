@@ -40,7 +40,8 @@
     "yearFormat": "AD/BC",
     "noData": "No data",
     "opinionConflict": "⚠ Opinion Conflicts",
-    "yearBC": "BC"
+    "yearBC": "BC",
+    "currentIdentity": "Current Identity"
   },
   "relation": {
     "ally": "Ally",

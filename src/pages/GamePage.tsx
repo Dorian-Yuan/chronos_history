@@ -25,6 +25,7 @@ import {
   Radar,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type SideTab = "cabinet" | "intelligence";
 
@@ -65,6 +66,7 @@ const TAB_CONFIG = {
 export function GamePage() {
   const state = useGameState();
   const dispatch = useGameDispatch();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
@@ -221,7 +223,7 @@ export function GamePage() {
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-[0.15em] text-[#666666]">
-                Current Identity
+                {t("game.currentIdentity")}
               </div>
               <div className="text-lg font-bold text-text-primary">
                 {nationName}
@@ -262,7 +264,7 @@ export function GamePage() {
                   onClick={() => setError(null)}
                   className="ml-3 text-red-400/60 hover:text-red-400"
                 >
-                  \u2715
+                  ✕
                 </button>
               </div>
             )}
@@ -319,7 +321,7 @@ export function GamePage() {
               id="panel-intelligence"
               role="tabpanel"
               className={sideTab === "intelligence" ? "" : "hidden"}
-            >
+                       >
               <IntelligencePanel factions={currentFactions} />
             </div>
           </div>

@@ -11,27 +11,45 @@ const ROLE_CONFIG: Record<
   {
     label: string;
     icon: typeof Shield;
+    color: string;
+    bgColor: string;
+    borderColor: string;
   }
 > = {
   General: {
-    label: "\u5C06\u519B",
+    label: "将军",
     icon: Shield,
+    color: "#E85A5A",
+    bgColor: "rgba(232, 90, 90, 0.08)",
+    borderColor: "rgba(232, 90, 90, 0.2)",
   },
   Diplomat: {
-    label: "\u5916\u4EA4\u5B98",
+    label: "外交官",
     icon: Scroll,
+    color: "#4A9EF5",
+    bgColor: "rgba(74, 158, 245, 0.08)",
+    borderColor: "rgba(74, 158, 245, 0.2)",
   },
   Intel: {
-    label: "\u5BC6\u63A2",
+    label: "密探",
     icon: Eye,
+    color: "#A78BFA",
+    bgColor: "rgba(167, 139, 250, 0.08)",
+    borderColor: "rgba(167, 139, 250, 0.2)",
   },
   Scholar: {
-    label: "\u5B66\u8005",
+    label: "学者",
     icon: BookOpen,
+    color: "#2ECE8B",
+    bgColor: "rgba(46, 206, 139, 0.08)",
+    borderColor: "rgba(46, 206, 139, 0.2)",
   },
   Merchant: {
-    label: "\u5546\u4EBA",
+    label: "商人",
     icon: Coins,
+    color: "#E8833A",
+    bgColor: "rgba(232, 131, 58, 0.08)",
+    borderColor: "rgba(232, 131, 58, 0.2)",
   },
 };
 
@@ -43,12 +61,21 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
   const Icon = config.icon;
 
   return (
-    <div className="rounded-lg border border-[#2A2A2E] bg-[#141418] p-5 transition-all hover:border-[#3A3A3E]">
+    <div
+      className="rounded-lg border bg-[#141418] p-5 transition-all hover:border-[#3A3A3E]"
+      style={{ borderColor: config.borderColor }}
+    >
       <div className="flex items-center gap-2.5">
-        <Icon size={16} className="text-[#666666]" aria-hidden="true" />
-        <span className="text-sm text-[#CCCCCC]">
-          {config.label} // {advisor.name}
+        <div
+          className="flex h-7 w-7 items-center justify-center rounded-md"
+          style={{ backgroundColor: config.bgColor }}
+        >
+          <Icon size={14} style={{ color: config.color }} aria-hidden="true" />
+        </div>
+        <span className="text-sm" style={{ color: config.color }}>
+          {config.label}
         </span>
+        <span className="text-sm text-[#CCCCCC]">// {advisor.name}</span>
       </div>
 
       <p className="mt-3 text-[17px] text-white font-medium leading-[1.8]">
@@ -56,7 +83,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
       </p>
 
       <div className="mt-3 text-[13px] text-[#666666]">
-        \u503E\u5411\uFF1A{advisor.bias}
+        倾向：{advisor.bias}
       </div>
 
       {advisor.hidden_motive && (
@@ -64,9 +91,9 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
           <button
             onClick={() => setShowMotive(!showMotive)}
             className="text-[11px] text-[#666666] hover:text-[#CCCCCC] transition-colors"
-            aria-label={showMotive ? "\u9690\u85CF\u79D8\u5BC6\u52A8\u673A" : "\u67E5\u770B\u79D8\u5BC6\u52A8\u673A"}
+            aria-label={showMotive ? "隐藏秘密动机" : "查看秘密动机"}
           >
-            {showMotive ? "\u25B2 \u9690\u85CF\u52A8\u673A" : "\u25BC \u79D8\u5BC6\u52A8\u673A"}
+            {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
           </button>
         </div>
       )}

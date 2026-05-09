@@ -40,7 +40,8 @@
     "yearFormat": "AD/BC",
     "noData": "暂无数据",
     "opinionConflict": "⚠ 观点冲突",
-    "yearBC": "BC"
+    "yearBC": "BC",
+    "currentIdentity": "当前身份"
   },
   "relation": {
     "ally": "盟友",
