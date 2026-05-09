@@ -165,7 +165,7 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-5 py-4 glass">
+      <header className="flex items-center justify-between border-b border-border px-5 py-3.5 glass">
         <div className="flex items-center gap-3">
           <span className="font-serif text-sm font-medium text-text-primary">
             {scenarioTitle}

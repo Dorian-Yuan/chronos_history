@@ -25,16 +25,14 @@ export function ChroniclePanel({
   return (
     <div
       ref={scrollRef}
-      className="flex-1 overflow-y-auto px-6 py-5"
+      className="flex-1 overflow-y-auto px-5 py-5"
       role="log"
       aria-label="编年史"
       aria-live="polite"
     >
       {turnCount === 1 && turnResults.length === 0 && (
         <div className="space-y-4 animate-fade-in">
-          <div className="text-xs font-medium text-accent-primary/80 tracking-wider uppercase">
-            {scenario.start_date || "元年"}
-          </div>
+          <div className="section-label">{scenario.start_date || "元年"}</div>
 
           {scenario.player_context?.nation_name && (
             <div className="flex items-center gap-2">
@@ -77,9 +75,7 @@ export function ChroniclePanel({
 
       {turnResults.map((result, idx) => (
         <article key={idx} className="mb-8 space-y-4">
-          <div className="text-xs font-medium text-accent-primary/70 tracking-wider uppercase">
-            {result.date_display}
-          </div>
+          <div className="section-label">{result.date_display}</div>
 
           <div className="text-base font-serif font-bold text-text-primary leading-snug">
             {result.headline}

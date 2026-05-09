@@ -21,6 +21,16 @@
       "apiKeyPlaceholder": "sk-..."
     },
     {
+      "id": "longcat",
+      "name": "LongCat",
+      "type": "openai-compatible",
+      "defaultBaseUrl": "https://api.longcat.chat/openai/v1",
+      "defaultModel": "LongCat-Flash-Chat",
+      "supportsStreaming": true,
+      "supportsStructuredOutput": false,
+      "apiKeyPlaceholder": "ak_..."
+    },
+    {
       "id": "ollama",
       "name": "Ollama (Local)",
       "type": "openai-compatible",

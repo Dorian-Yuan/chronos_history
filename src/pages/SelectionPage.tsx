@@ -87,13 +87,13 @@ export function SelectionPage() {
           aria-live="polite"
         >
           <div className="flex gap-2.5">
-            <div className="h-3 w-3 animate-pulse rounded-full bg-accent-primary" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-accent-primary" />
             <div
-              className="h-3 w-3 animate-pulse rounded-full bg-accent-primary"
+              className="h-2 w-2 animate-pulse rounded-full bg-accent-primary"
               style={{ animationDelay: "0.2s" }}
             />
             <div
-              className="h-3 w-3 animate-pulse rounded-full bg-accent-primary"
+              className="h-2 w-2 animate-pulse rounded-full bg-accent-primary"
               style={{ animationDelay: "0.4s" }}
             />
           </div>
@@ -138,7 +138,7 @@ export function SelectionPage() {
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-lg border border-red-900/30 bg-red-900/10 px-5 py-4 text-sm text-red-400"
+          className="mt-6 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400"
         >
           {error}
         </div>

@@ -66,7 +66,7 @@ export function StartPage() {
           </button>
         )}
 
-        <div className="h-px bg-border my-3" />
+        <div className="divider" />
 
         <div className="flex gap-3 justify-center">
           <button

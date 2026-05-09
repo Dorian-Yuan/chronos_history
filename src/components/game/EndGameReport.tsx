@@ -96,7 +96,7 @@ export function EndGameReport({
 
       <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
         <div className="section-label">对比分析</div>
-        <div className="font-serif text-sm leading-relaxed text-text-secondary mt-1">
+        <div className="font-serif text-sm leading-relaxed text-text-secondary">
           {analysis.comparison_text}
         </div>
         <div className="mt-4 text-sm">

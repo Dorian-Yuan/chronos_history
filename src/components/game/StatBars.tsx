@@ -33,21 +33,21 @@ const STAT_CONFIG = [
 ];
 
 function getBarColor(value: number): string {
-  if (value < 30) return "bg-red-500";
-  if (value <= 70) return "bg-amber-500";
-  return "bg-green-500";
+  if (value < 30) return "bg-accent-danger";
+  if (value <= 70) return "bg-accent-warning";
+  return "bg-accent-success";
 }
 
 function getTextColor(value: number): string {
-  if (value < 30) return "text-red-400";
-  if (value <= 70) return "text-amber-400";
-  return "text-green-400";
+  if (value < 30) return "text-accent-danger";
+  if (value <= 70) return "text-accent-warning";
+  return "text-accent-success";
 }
 
 export function StatBars({ stats, delta }: StatBarsProps) {
   return (
     <div
-      className="grid grid-cols-2 sm:grid-cols-4 gap-4 px-5 py-4 border-b border-border bg-bg-secondary/30"
+      className="grid grid-cols-2 sm:grid-cols-4 gap-4 px-5 py-3.5 border-b border-border bg-bg-secondary/30"
       role="group"
       aria-label="国家属性"
     >
@@ -69,7 +69,7 @@ export function StatBars({ stats, delta }: StatBarsProps) {
                 </span>
                 {deltaValue !== 0 && (
                   <span
-                    className={`font-mono text-xs font-medium ${deltaValue > 0 ? "text-green-400" : "text-red-400"}`}
+                    className={`font-mono text-xs font-medium ${deltaValue > 0 ? "text-accent-success" : "text-accent-danger"}`}
                   >
                     {deltaValue > 0 ? `+${deltaValue}` : deltaValue}
                   </span>

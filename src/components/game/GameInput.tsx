@@ -40,7 +40,7 @@ export function GameInput({ onSubmit, disabled, placeholder }: GameInputProps) {
   };
 
   return (
-    <div className="border-t border-border bg-bg-secondary/50 px-5 py-4 backdrop-blur-md">
+    <div className="border-t border-border bg-bg-secondary/50 px-5 py-3.5 backdrop-blur-md">
       <div className="flex items-end gap-3">
         <textarea
           ref={textareaRef}
@@ -56,7 +56,7 @@ export function GameInput({ onSubmit, disabled, placeholder }: GameInputProps) {
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || disabled}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-primary text-bg-primary disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-all hover:bg-accent-primary/90 shadow-sm"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-accent-primary text-bg-primary disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-all hover:bg-accent-primary/90 shadow-sm"
           aria-label="发送决策"
         >
           <Send size={16} />

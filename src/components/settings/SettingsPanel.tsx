@@ -31,8 +31,8 @@ export function SettingsPanel() {
         onClick={() => setSettingsOpen(false)}
       />
       <div
-        className={`relative w-full max-w-lg rounded-t-xl md:rounded-xl border border-border bg-bg-secondary shadow-lg animate-slide-in-up md:animate-scale-in ${
-          isMobile ? "max-h-[85vh]" : ""
+        className={`modal-content max-w-lg animate-slide-in-up md:animate-scale-in ${
+          isMobile ? "max-h-[85vh] rounded-t-xl" : ""
         }`}
       >
         <div className="modal-header">
@@ -49,7 +49,7 @@ export function SettingsPanel() {
 
         <div className="modal-body space-y-6 safe-bottom">
           <div>
-            <label className="mb-2.5 block text-sm font-medium text-text-secondary">
+            <label className="mb-2 block text-sm font-medium text-text-secondary">
               {t("settings.language")}
             </label>
             <select
@@ -69,7 +69,7 @@ export function SettingsPanel() {
           </div>
 
           <div>
-            <label className="mb-2.5 block text-sm font-medium text-text-secondary">
+            <label className="mb-2 block text-sm font-medium text-text-secondary">
               {t("settings.theme")}
             </label>
             <select

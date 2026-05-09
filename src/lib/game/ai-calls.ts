@@ -265,9 +265,24 @@ export async function generateScenario(
 ): Promise<ScenarioData> {
   const provider = getProvider();
 
-  const systemPrompt = provider.supportsStructuredOutput()
+  const structuredOutputSupported = provider.supportsStructuredOutput();
+  console.log(
+    "[generateScenario] provider:",
+    provider.id,
+    "supportsStructuredOutput:",
+    structuredOutputSupported,
+  );
+
+  const systemPrompt = structuredOutputSupported
     ? SCENARIO_SYSTEM_PROMPT
     : SCENARIO_SYSTEM_PROMPT + SCENARIO_SCHEMA_PROMPT;
+
+  console.log(
+    "[generateScenario] systemPrompt length:",
+    systemPrompt.length,
+    "includes schema:",
+    !structuredOutputSupported,
+  );
 
   const userContent =
     playedEvents.length > 0
@@ -289,6 +304,24 @@ export async function generateScenario(
       });
 
       const scenario = parseResponse<ScenarioData>(response.content, provider);
+
+      console.log(
+        "[generateScenario] parsed scenario keys:",
+        Object.keys(scenario),
+      );
+      console.log(
+        "[generateScenario] player_context:",
+        scenario.player_context,
+      );
+      console.log("[generateScenario] initial_stats:", scenario.initial_stats);
+      console.log(
+        "[generateScenario] initial_advisors count:",
+        scenario.initial_advisors?.length,
+      );
+      console.log(
+        "[generateScenario] factions count:",
+        scenario.factions?.length,
+      );
 
       validateScenario(scenario);
 

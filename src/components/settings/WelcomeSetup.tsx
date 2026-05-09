@@ -95,13 +95,13 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
         {step === 0 && (
           <div className="text-center space-y-10">
             <div className="space-y-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-bg-tertiary border border-border">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-bg-tertiary/60 border border-border mb-2">
                 <Sparkles size={30} className="text-accent-primary" />
               </div>
-              <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">
+              <h1 className="font-display text-6xl font-bold tracking-[0.15em] text-text-primary">
                 CHRONOS
               </h1>
-              <div className="w-10 h-0.5 bg-accent-primary/40 mx-auto rounded-full" />
+              <div className="w-12 h-0.5 bg-accent-primary/40 mx-auto rounded-full" />
               <p className="font-serif text-base text-text-secondary">
                 {t("app.subtitle")}
               </p>
@@ -212,12 +212,12 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               <button
                 onClick={handleSaveAndTest}
                 disabled={!apiKey.trim() || testStatus === "testing"}
-                className={`touch-target w-full rounded-lg px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
+                className={`btn-primary w-full ${
                   testStatus === "success"
-                    ? "bg-accent-success text-text-inverse"
+                    ? "!bg-accent-success"
                     : testStatus === "error"
-                      ? "bg-accent-danger text-text-inverse"
-                      : "bg-accent-primary text-text-inverse hover:opacity-90"
+                      ? "!bg-accent-danger"
+                      : ""
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
               >
                 <span className="flex items-center justify-center gap-2">
@@ -237,13 +237,13 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </button>
 
               {testStatus === "error" && testError && (
-                <div className="mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-3 text-xs text-red-400 leading-relaxed">
+                <div className="mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 leading-relaxed">
                   {testError}
                 </div>
               )}
 
               {testStatus === "success" && (
-                <div className="mt-3 rounded-lg border border-green-900/30 bg-green-900/10 px-4 py-3 text-xs text-green-400">
+                <div className="mt-3 rounded-lg border border-green-900/30 bg-green-900/10 px-4 py-2.5 text-xs text-green-400">
                   API 连接测试通过，即将进入...
                 </div>
               )}

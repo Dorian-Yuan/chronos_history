@@ -98,14 +98,14 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div ref={modalRef} className="modal-content max-w-lg">
+      <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
             存档管理
           </h2>
           <button
             onClick={onClose}
-            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
+            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary active:scale-95 transition-all"
             aria-label="关闭"
           >
             <X size={18} />
@@ -118,7 +118,7 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
             return (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-5 py-4"
+                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-5 py-5"
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-text-primary">

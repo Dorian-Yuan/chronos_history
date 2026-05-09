@@ -40,14 +40,14 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div ref={modalRef} className="modal-content max-w-lg">
+      <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
             历史档案
           </h2>
           <button
             onClick={onClose}
-            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all"
+            className="touch-target flex items-center justify-center rounded-lg p-2 text-text-tertiary hover:bg-bg-hover hover:text-text-primary active:scale-95 transition-all"
             aria-label="关闭"
           >
             <X size={18} />
@@ -64,7 +64,7 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
               {records.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-lg border border-border bg-bg-card px-5 py-4"
+                  className="rounded-lg border border-border bg-bg-card px-5 py-5"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-text-primary">
