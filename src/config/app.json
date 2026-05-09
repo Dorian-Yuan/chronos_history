@@ -1,0 +1,12 @@
+{
+  "version": "1.2.0",
+  "defaultLocale": "zh",
+  "defaultTheme": "dark",
+  "appName": "Chronos: 历史的回响",
+  "appNameEn": "Chronos: Echoes of History",
+  "maxTurns": 28,
+  "minTurnsBeforeEnd": 8,
+  "earlyGameProtectionTurns": 4,
+  "maxHistoryRecords": 50,
+  "saveSlots": 5
+}

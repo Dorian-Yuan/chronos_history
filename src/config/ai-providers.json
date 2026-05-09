@@ -1,0 +1,53 @@
+{
+  "providers": [
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "type": "openai-compatible",
+      "defaultBaseUrl": "https://api.openai.com/v1",
+      "defaultModel": "gpt-4o",
+      "supportsStreaming": true,
+      "supportsStructuredOutput": true,
+      "apiKeyPlaceholder": "sk-..."
+    },
+    {
+      "id": "deepseek",
+      "name": "DeepSeek",
+      "type": "openai-compatible",
+      "defaultBaseUrl": "https://api.deepseek.com/v1",
+      "defaultModel": "deepseek-chat",
+      "supportsStreaming": true,
+      "supportsStructuredOutput": true,
+      "apiKeyPlaceholder": "sk-..."
+    },
+    {
+      "id": "longcat",
+      "name": "LongCat",
+      "type": "openai-compatible",
+      "defaultBaseUrl": "https://api.longcat.chat/openai/v1",
+      "defaultModel": "LongCat-Flash-Chat",
+      "supportsStreaming": true,
+      "supportsStructuredOutput": false,
+      "apiKeyPlaceholder": "ak_..."
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama (Local)",
+      "type": "openai-compatible",
+      "defaultBaseUrl": "http://localhost:11434/v1",
+      "defaultModel": "llama3",
+      "supportsStreaming": true,
+      "supportsStructuredOutput": false,
+      "apiKeyPlaceholder": "ollama"
+    },
+    {
+      "id": "gemini",
+      "name": "Google Gemini",
+      "type": "gemini",
+      "defaultBaseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "defaultModel": "gemini-2.0-flash",
+      "supportsStreaming": true,
+      "apiKeyPlaceholder": "AIza..."
+    }
+  ]
+}

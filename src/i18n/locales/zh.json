@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Chronos: 历史的回响",
+    "subtitle": "AI 社会历史推演系统",
+    "version": "版本"
+  },
+  "nav": {
+    "home": "首页",
+    "game": "游戏",
+    "settings": "设置",
+    "history": "历史"
+  },
+  "setup": {
+    "welcomeDescription": "欢迎来到 Chronos。本系统需要连接 AI 服务来生成历史推演剧本。请先配置您的 AI 服务提供商和 API 密钥。",
+    "getStarted": "开始配置",
+    "configureAI": "配置 AI 服务",
+    "configureAIDescription": "选择您的 AI 服务提供商并填写 API 密钥，这是开始推演的必要步骤。",
+    "startJourney": "完成配置，开始推演"
+  },
+  "scenario": {
+    "select": "选择场景",
+    "start": "开始游戏",
+    "import": "导入场景",
+    "noScenarios": "暂无场景",
+    "startYear": "起始年份",
+    "description": "描述"
+  },
+  "game": {
+    "inputPlaceholder": "输入你的策略...",
+    "send": "发送",
+    "suggestedActions": "推荐行动",
+    "cabinetDebate": "内阁辩论",
+    "worldState": "世界状态",
+    "timeline": "时间线",
+    "deviations": "历史偏差",
+    "causalChain": "因果脉络",
+    "characterNetwork": "人物关系网",
+    "newGame": "新游戏",
+    "continueGame": "继续游戏",
+    "yearFormat": "AD/BC",
+    "noData": "暂无数据",
+    "opinionConflict": "⚠ 观点冲突",
+    "yearBC": "BC",
+    "currentIdentity": "当前身份"
+  },
+  "relation": {
+    "ally": "盟友",
+    "rival": "对手",
+    "subordinate": "下属",
+    "superior": "上级",
+    "neutral": "中立"
+  },
+  "advisor": {
+    "economist": "经济顾问",
+    "military": "军事顾问",
+    "diplomat": "外交顾问",
+    "public_sentiment": "民意顾问",
+    "intervention": "干预建议",
+    "reasoning": "推理过程",
+    "riskAssessment": "风险评估",
+    "confidence": "信心指数"
+  },
+  "state": {
+    "year": "年份",
+    "chaosLevel": "混沌度",
+    "populationMood": "人口情绪",
+    "stability": "地缘稳定性",
+    "economy": "经济",
+    "military": "军事",
+    "diplomacy": "外交",
+    "technology": "科技",
+    "culture": "文化",
+    "gdp": "GDP",
+    "trade": "贸易",
+    "resources": "资源",
+    "power": "军力",
+    "defense": "防御",
+    "factions": "派系"
+  },
+  "settings": {
+    "title": "设置",
+    "language": "语言",
+    "theme": "主题",
+    "aiProvider": "AI 提供商",
+    "apiKey": "API Key",
+    "baseUrl": "API 地址",
+    "model": "模型",
+    "save": "保存",
+    "cancel": "取消",
+    "apiConfig": "API 配置",
+    "enterApiKey": "请输入 API Key",
+    "enterBaseUrl": "请输入 API 地址",
+    "selectModel": "选择模型"
+  },
+  "session": {
+    "title": "会话",
+    "newSession": "新建会话",
+    "deleteSession": "删除会话",
+    "exportSession": "导出会话",
+    "importSession": "导入会话",
+    "lastUpdated": "最后更新",
+    "confirmDelete": "确认删除此会话？"
+  },
+  "pwa": {
+    "install": "安装应用",
+    "installPrompt": "安装到桌面以获得更好的体验",
+    "updateAvailable": "有新版本可用",
+    "updateNow": "立即更新",
+    "offlineNotice": "当前处于离线模式，AI 推演功能不可用"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "confirm": "确认",
+    "cancel": "取消",
+    "close": "关闭",
+    "save": "保存",
+    "saved": "已保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "yes": "是",
+    "no": "否"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Chronos: 历史的回响",
+  "short_name": "Chronos",
+  "description": "AI 社会历史推演系统 - 通过自由策略重写历史",
+  "start_url": "/chronos_history/",
+  "display": "standalone",
+  "background_color": "#0d0f14",
+  "theme_color": "#0d0f14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/chronos_history/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/chronos_history/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "lang": "zh-CN",
+  "dir": "ltr"
+}

@@ -1,0 +1,128 @@
+{
+  "app": {
+    "title": "Chronos: Echoes of History",
+    "subtitle": "AI Social History Simulation System",
+    "version": "Version"
+  },
+  "nav": {
+    "home": "Home",
+    "game": "Game",
+    "settings": "Settings",
+    "history": "History"
+  },
+  "setup": {
+    "welcomeDescription": "Welcome to Chronos. This system requires an AI service connection to generate historical simulation scenarios. Please configure your AI provider and API key first.",
+    "getStarted": "Get Started",
+    "configureAI": "Configure AI Service",
+    "configureAIDescription": "Select your AI provider and enter your API key. This is required to start the simulation.",
+    "startJourney": "Complete Setup & Begin"
+  },
+  "scenario": {
+    "select": "Select Scenario",
+    "start": "Start Game",
+    "import": "Import Scenario",
+    "noScenarios": "No Scenarios",
+    "startYear": "Start Year",
+    "description": "Description"
+  },
+  "game": {
+    "inputPlaceholder": "Enter your strategy...",
+    "send": "Send",
+    "suggestedActions": "Suggested Actions",
+    "cabinetDebate": "Cabinet Debate",
+    "worldState": "World State",
+    "timeline": "Timeline",
+    "deviations": "Deviations",
+    "causalChain": "Causal Chain",
+    "characterNetwork": "Character Network",
+    "newGame": "New Game",
+    "continueGame": "Continue Game",
+    "yearFormat": "AD/BC",
+    "noData": "No data",
+    "opinionConflict": "⚠ Opinion Conflicts",
+    "yearBC": "BC",
+    "currentIdentity": "Current Identity"
+  },
+  "relation": {
+    "ally": "Ally",
+    "rival": "Rival",
+    "subordinate": "Subordinate",
+    "superior": "Superior",
+    "neutral": "Neutral"
+  },
+  "advisor": {
+    "economist": "Economist",
+    "military": "Military Advisor",
+    "diplomat": "Diplomat",
+    "public_sentiment": "Public Sentiment",
+    "intervention": "Intervention",
+    "reasoning": "Reasoning",
+    "riskAssessment": "Risk Assessment",
+    "confidence": "Confidence"
+  },
+  "state": {
+    "year": "Year",
+    "chaosLevel": "Chaos Level",
+    "populationMood": "Population Mood",
+    "stability": "Geopolitical Stability",
+    "economy": "Economy",
+    "military": "Military",
+    "diplomacy": "Diplomacy",
+    "technology": "Technology",
+    "culture": "Culture",
+    "gdp": "GDP",
+    "trade": "Trade",
+    "resources": "Resources",
+    "power": "Power",
+    "defense": "Defense",
+    "factions": "Factions"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "aiProvider": "AI Provider",
+    "apiKey": "API Key",
+    "baseUrl": "API Base URL",
+    "model": "Model",
+    "save": "Save",
+    "cancel": "Cancel",
+    "apiConfig": "API Configuration",
+    "enterApiKey": "Enter API Key",
+    "enterBaseUrl": "Enter API Base URL",
+    "selectModel": "Select Model"
+  },
+  "session": {
+    "title": "Sessions",
+    "newSession": "New Session",
+    "deleteSession": "Delete Session",
+    "exportSession": "Export Session",
+    "importSession": "Import Session",
+    "lastUpdated": "Last Updated",
+    "confirmDelete": "Confirm delete this session?"
+  },
+  "pwa": {
+    "install": "Install App",
+    "installPrompt": "Install to desktop for a better experience",
+    "updateAvailable": "Update available",
+    "updateNow": "Update Now",
+    "offlineNotice": "You are in offline mode. AI simulation is unavailable."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "saved": "Saved",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No"
+  }
+}
