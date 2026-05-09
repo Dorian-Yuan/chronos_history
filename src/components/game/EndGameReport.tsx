@@ -14,19 +14,19 @@ const OUTCOME_CONFIG: Record<
   victory: {
     label: "胜利",
     color: "text-green-400",
-    emoji: "👑",
+    emoji: "\uD83D\uDC51",
     bg: "bg-green-900/10 border-green-800/20",
   },
   neutral: {
     label: "存续",
     color: "text-amber-400",
-    emoji: "⚖️",
+    emoji: "\u2696\uFE0F",
     bg: "bg-amber-900/10 border-amber-800/20",
   },
   defeat: {
     label: "失败",
     color: "text-red-400",
-    emoji: "💀",
+    emoji: "\uD83D\uDC80",
     bg: "bg-red-900/10 border-red-800/20",
   },
 };
