@@ -19,7 +19,7 @@ export function EndPage() {
         turnCount={state.turnCount}
       />
 
-      <div className="flex justify-center gap-4 pb-10 px-6">
+      <div className="flex justify-center gap-4 pb-10 px-6 pt-4">
         <button
           onClick={() => {
             dispatch({ type: "ENTER_SELECTION" });

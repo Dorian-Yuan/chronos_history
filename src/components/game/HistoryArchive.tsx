@@ -60,11 +60,11 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
               暂无历史记录
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {records.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-lg border border-border bg-bg-card px-4 py-3.5"
+                  className="rounded-lg border border-border bg-bg-card px-5 py-4"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-text-primary">
@@ -84,10 +84,10 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
                     {record.nationName} · {record.leaderTitle} ·{" "}
                     {record.turnCount}回合
                   </div>
-                  <div className="text-xs text-text-tertiary mt-1">
+                  <div className="text-xs text-text-tertiary mt-1.5">
                     {record.personaTitle} · 历史原型：{record.realEventTitle}
                   </div>
-                  <div className="text-xs text-text-tertiary/60 mt-1.5">
+                  <div className="text-xs text-text-tertiary/60 mt-2">
                     {new Date(record.timestamp).toLocaleString()}
                   </div>
                 </li>

@@ -112,13 +112,13 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
           </button>
         </div>
 
-        <div className="modal-body space-y-3">
+        <div className="modal-body space-y-4">
           {Array.from({ length: 5 }, (_, i) => {
             const save = saves.find((s) => s.slotIndex === i);
             return (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-4 py-3.5"
+                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-5 py-4"
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-text-primary">
@@ -135,7 +135,7 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
                     <div className="text-xs text-text-tertiary mt-1">空</div>
                   )}
                 </div>
-                <div className="flex gap-1 shrink-0">
+                <div className="flex gap-2 shrink-0">
                   <button
                     onClick={() => handleSave(i)}
                     className="btn-ghost p-2"

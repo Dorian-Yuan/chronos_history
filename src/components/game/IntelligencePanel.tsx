@@ -27,15 +27,15 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   return (
     <section className="flex flex-col gap-4 p-5" aria-label="情报面板">
       <div className="section-label">情报</div>
-      <ul className="flex flex-col gap-3">
+      <ul className="flex flex-col gap-4">
         {factions.map((faction, idx) => (
           <li
             key={`${faction.name}-${idx}`}
-            className={`rounded-lg border border-border bg-bg-card px-4 py-4 transition-all ${
+            className={`rounded-lg border border-border bg-bg-card px-5 py-5 transition-all ${
               faction.is_destroyed ? "opacity-40" : ""
             } ${faction.is_new ? "ring-1 ring-accent-primary/30" : ""}`}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 {faction.is_destroyed ? (
                   <Skull
@@ -65,11 +65,11 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
               </div>
             )}
 
-            <p className="font-serif text-xs italic leading-relaxed text-text-secondary mb-3">
+            <p className="font-serif text-xs italic leading-relaxed text-text-secondary mb-4">
               {faction.description}
             </p>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <div className="flex items-start gap-2 text-xs">
                 <Flame
                   size={11}

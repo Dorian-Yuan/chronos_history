@@ -11,7 +11,7 @@ export function CabinetPanel({ advisors }: CabinetPanelProps) {
   return (
     <div className="flex flex-col gap-4 p-5">
       <div className="section-label">内阁</div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {advisors.map((advisor) => (
           <AdvisorCard key={advisor.role} advisor={advisor} />
         ))}

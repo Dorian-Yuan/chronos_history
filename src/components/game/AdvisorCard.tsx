@@ -66,9 +66,9 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
 
   return (
     <div
-      className={`rounded-lg border ${config.borderColor} ${config.bgColor} p-4 transition-all hover:brightness-110`}
+      className={`rounded-lg border ${config.borderColor} ${config.bgColor} p-5 transition-all hover:brightness-110`}
     >
-      <div className="mb-3 flex items-center gap-3">
+      <div className="mb-4 flex items-center gap-3">
         <div
           className={`flex h-9 w-9 items-center justify-center rounded-lg ${config.iconBg}`}
         >
@@ -90,7 +90,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-3 flex items-center justify-end">
+      <div className="mt-4 flex items-center justify-end">
         <span className={`badge ${config.bgColor} ${config.textColor}`}>
           {advisor.bias}
         </span>

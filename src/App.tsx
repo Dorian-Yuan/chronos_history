@@ -21,7 +21,7 @@ function PWABanner() {
 
   if (isOffline) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-2.5 text-center text-xs text-amber-400 border-b border-amber-900/20">
+      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-3 text-center text-xs text-amber-400 border-b border-amber-900/20">
         <WifiOff size={13} />
         {t("pwa.offlineNotice")}
       </div>
@@ -30,7 +30,7 @@ function PWABanner() {
 
   if (isUpdateAvailable) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-blue-900/20 px-5 py-2.5 text-center text-xs text-blue-400 border-b border-blue-900/20">
+      <div className="flex items-center justify-center gap-2 bg-blue-900/20 px-5 py-3 text-center text-xs text-blue-400 border-b border-blue-900/20">
         <RefreshCw size={13} />
         {t("pwa.updateAvailable")}
         <button
@@ -45,7 +45,7 @@ function PWABanner() {
 
   if (canInstall) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-2.5 text-center text-xs text-amber-400 border-b border-amber-900/20">
+      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-3 text-center text-xs text-amber-400 border-b border-amber-900/20">
         <Download size={13} />
         {t("pwa.installPrompt")}
         <button

@@ -54,7 +54,7 @@ export function ChroniclePanel({
       )}
 
       {turnResults.map((result, idx) => (
-        <article key={idx} className="mb-8 space-y-3">
+        <article key={idx} className="mb-8 space-y-4">
           <div className="text-xs font-medium text-accent-primary/70 tracking-wider uppercase">
             {result.date_display}
           </div>
@@ -69,14 +69,14 @@ export function ChroniclePanel({
             </div>
           )}
 
-          <div className="border-l-2 border-border pl-4">
+          <div className="border-l-2 border-border pl-5">
             <div className="font-serif text-sm leading-relaxed text-text-secondary">
               {result.narrative}
             </div>
           </div>
 
           {result.situation_update && (
-            <div className="border-l-2 border-accent-primary/30 bg-accent-primary/5 px-4 py-3 rounded-r-xl">
+            <div className="border-l-2 border-accent-primary/30 bg-accent-primary/5 px-5 py-4 rounded-r-xl">
               <div className="text-xs font-semibold uppercase tracking-wider text-accent-primary/80 mb-1.5">
                 最新情报
               </div>

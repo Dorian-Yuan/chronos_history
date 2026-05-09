@@ -286,7 +286,7 @@ export function GamePage() {
               role="tab"
               aria-selected={sideTab === "cabinet"}
               aria-controls="panel-cabinet"
-              className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+              className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
                 sideTab === "cabinet"
                   ? "text-accent-primary border-b-2 border-accent-primary"
                   : "text-text-tertiary hover:text-text-secondary"
@@ -299,7 +299,7 @@ export function GamePage() {
               role="tab"
               aria-selected={sideTab === "intelligence"}
               aria-controls="panel-intelligence"
-              className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+              className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
                 sideTab === "intelligence"
                   ? "text-accent-primary border-b-2 border-accent-primary"
                   : "text-text-tertiary hover:text-text-secondary"
@@ -333,7 +333,7 @@ export function GamePage() {
       >
         <button
           onClick={() => setMobileTab("chronicle")}
-          className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+          className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "chronicle"
               ? "text-accent-primary border-t-2 border-accent-primary"
               : "text-text-tertiary"
@@ -343,7 +343,7 @@ export function GamePage() {
         </button>
         <button
           onClick={() => setMobileTab("cabinet")}
-          className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+          className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "cabinet"
               ? "text-accent-primary border-t-2 border-accent-primary"
               : "text-text-tertiary"
@@ -353,7 +353,7 @@ export function GamePage() {
         </button>
         <button
           onClick={() => setMobileTab("intelligence")}
-          className={`flex-1 px-4 py-3 text-xs font-semibold tracking-wider transition-colors ${
+          className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "intelligence"
               ? "text-accent-primary border-t-2 border-accent-primary"
               : "text-text-tertiary"

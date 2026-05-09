@@ -52,8 +52,8 @@ export function EndGameReport({
   );
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 p-8">
-      <div className="text-center space-y-3 py-4">
+    <div className="mx-auto max-w-2xl space-y-8 p-8">
+      <div className="text-center space-y-4 py-4">
         <div className="text-5xl mb-2">{outcomeConfig.emoji}</div>
         <div
           className={`text-3xl font-display font-bold ${outcomeConfig.color}`}
@@ -66,7 +66,7 @@ export function EndGameReport({
       </div>
 
       <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
-        <div className="text-xl font-serif font-bold text-text-primary mb-2">
+        <div className="text-xl font-serif font-bold text-text-primary mb-3">
           {analysis.persona_title}
         </div>
         <div className="font-serif text-sm text-text-secondary leading-relaxed">
@@ -96,7 +96,7 @@ export function EndGameReport({
 
       <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
         <div className="section-label">对比分析</div>
-        <div className="font-serif text-sm leading-relaxed text-text-secondary">
+        <div className="font-serif text-sm leading-relaxed text-text-secondary mt-1">
           {analysis.comparison_text}
         </div>
         <div className="mt-4 text-sm">
@@ -109,7 +109,7 @@ export function EndGameReport({
 
       <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
         <div className="section-label">统治者画像</div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {analysis.radar_stats.map((stat) => (
             <div key={stat.dimension} className="flex items-center gap-4">
               <span className="w-14 text-xs text-text-tertiary shrink-0">
@@ -132,7 +132,7 @@ export function EndGameReport({
       {analysis.turn_reviews.length > 0 && (
         <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
           <div className="section-label">决策复盘</div>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {analysis.turn_reviews.map((review) => (
               <div key={review.turn} className="flex gap-4">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-bg-tertiary text-xs font-mono text-text-tertiary">
