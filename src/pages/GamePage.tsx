@@ -16,7 +16,14 @@ import {
 } from "@/components/game";
 import type { TurnResult, ScenarioData, FactionData } from "@/types";
 import { determineOutcome, checkGameOver, clampStat } from "@/types";
-import { Settings, Save } from "lucide-react";
+import {
+  Settings,
+  Save,
+  User,
+  BookOpen,
+  Users,
+  Radar,
+} from "lucide-react";
 import { useUIStore } from "@/stores";
 
 type SideTab = "cabinet" | "intelligence";
@@ -48,6 +55,12 @@ function safeGetDelta(turnResults: TurnResult[]) {
   }
   return undefined;
 }
+
+const TAB_CONFIG = {
+  chronicle: { icon: BookOpen, label: "编年史", color: "#2ECE8B" },
+  cabinet: { icon: Users, label: "内阁", color: "#E8833A" },
+  intelligence: { icon: Radar, label: "情报", color: "#4A9EF5" },
+} as const;
 
 export function GamePage() {
   const state = useGameState();
@@ -163,32 +176,75 @@ export function GamePage() {
     );
   }
 
+  const renderTabButton = (
+    tabKey: "chronicle" | SideTab,
+    onClick: () => void,
+    isActive: boolean,
+  ) => {
+    const config = TAB_CONFIG[tabKey];
+    const Icon = config.icon;
+    return (
+      <button
+        onClick={onClick}
+        role="tab"
+        aria-selected={isActive}
+        className="flex flex-col items-center justify-center gap-1 flex-1 py-2 relative transition-colors"
+      >
+        <Icon
+          size={20}
+          className={isActive ? "" : "text-[#666666]"}
+          style={isActive ? { color: config.color } : undefined}
+        />
+        <span
+          className={`text-[13px] font-semibold ${isActive ? "" : "text-[#666666]"}`}
+          style={isActive ? { color: config.color } : undefined}
+        >
+          {config.label}
+        </span>
+        {isActive && (
+          <div
+            className="absolute bottom-0 h-[3px] w-10 rounded-full"
+            style={{ backgroundColor: config.color }}
+          />
+        )}
+      </button>
+    );
+  };
+
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-5 py-4 glass">
-        <div className="flex items-center gap-3">
-          <span className="font-serif text-sm font-medium text-text-primary">
-            {scenarioTitle}
-          </span>
-          <span className="text-xs text-text-tertiary">
-            {nationName} · 第{state.turnCount}回合
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowSaveManager(true)}
-            className="btn-ghost p-2"
-            aria-label="存档管理"
-          >
-            <Save size={15} />
-          </button>
-          <button
-            onClick={() => setSettingsOpen(true)}
-            className="btn-ghost p-2"
-            aria-label="设置"
-          >
-            <Settings size={15} />
-          </button>
+      <header className="px-6 py-3">
+        <div className="flex items-center justify-between rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#3A3A3E] bg-[#2A2A2E]">
+              <User size={20} className="text-[#666666]" />
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.15em] text-[#666666]">
+                Current Identity
+              </div>
+              <div className="text-lg font-bold text-text-primary">
+                {nationName}
+              </div>
+              <div className="text-[13px] text-[#2ECE8B]">{leaderTitle}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSaveManager(true)}
+              className="btn-ghost p-2"
+              aria-label="存档管理"
+            >
+              <Save size={15} />
+            </button>
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="btn-ghost p-2"
+              aria-label="设置"
+            >
+              <Settings size={15} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -200,13 +256,13 @@ export function GamePage() {
             className={`flex-1 flex flex-col overflow-hidden md:flex ${mobileTab !== "chronicle" ? "hidden md:flex" : "flex"}`}
           >
             {error && (
-              <div className="mx-5 mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 flex items-center justify-between">
+              <div className="mx-6 mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 flex items-center justify-between">
                 <span>{error}</span>
                 <button
                   onClick={() => setError(null)}
                   className="ml-3 text-red-400/60 hover:text-red-400"
                 >
-                  ✕
+                  \u2715
                 </button>
               </div>
             )}
@@ -219,12 +275,12 @@ export function GamePage() {
             <GameInput
               onSubmit={handleSubmit}
               disabled={isLoading || state.phase === "ended"}
-              placeholder={`阁下，作为${leaderTitle}，您的决策是...`}
+              placeholder={`下达指令...（外交、经济、军事等）`}
             />
           </div>
 
           <div
-            className={`flex-1 flex flex-col overflow-hidden md:hidden ${mobileTab === "chronicle" ? "hidden" : "flex"}`}
+            className={`flex-1 flex flex-col overflow-y-auto md:hidden ${mobileTab === "chronicle" ? "hidden" : "flex"}`}
           >
             {mobileTab === "cabinet" ? (
               <CabinetPanel advisors={currentAdvisors} />
@@ -234,38 +290,22 @@ export function GamePage() {
           </div>
         </div>
 
-        <div className="hidden md:flex w-80 shrink-0 flex-col border-l border-border bg-bg-secondary/50">
+        <div className="hidden md:flex w-80 shrink-0 flex-col border-l border-[#2A2A2E] bg-[#141418]">
           <div
-            className="flex border-b border-border"
+            className="flex border-b border-[#2A2A2E]"
             role="tablist"
             aria-label="侧边栏"
           >
-            <button
-              onClick={() => setSideTab("cabinet")}
-              role="tab"
-              aria-selected={sideTab === "cabinet"}
-              aria-controls="panel-cabinet"
-              className={`flex-1 px-5 py-4 text-xs font-semibold tracking-wider transition-colors ${
-                sideTab === "cabinet"
-                  ? "text-accent-primary border-b-2 border-accent-primary"
-                  : "text-text-tertiary hover:text-text-secondary"
-              }`}
-            >
-              内阁
-            </button>
-            <button
-              onClick={() => setSideTab("intelligence")}
-              role="tab"
-              aria-selected={sideTab === "intelligence"}
-              aria-controls="panel-intelligence"
-              className={`flex-1 px-5 py-4 text-xs font-semibold tracking-wider transition-colors ${
-                sideTab === "intelligence"
-                  ? "text-accent-primary border-b-2 border-accent-primary"
-                  : "text-text-tertiary hover:text-text-secondary"
-              }`}
-            >
-              情报
-            </button>
+            {renderTabButton(
+              "cabinet",
+              () => setSideTab("cabinet"),
+              sideTab === "cabinet",
+            )}
+            {renderTabButton(
+              "intelligence",
+              () => setSideTab("intelligence"),
+              sideTab === "intelligence",
+            )}
           </div>
           <div className="flex-1 overflow-y-auto">
             <div
@@ -287,40 +327,37 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border glass safe-bottom"
+        className="flex md:hidden border-t border-[#2A2A2E] glass safe-bottom"
         aria-label="游戏面板"
       >
-        <button
-          onClick={() => setMobileTab("chronicle")}
-          className={`flex-1 px-4 py-4 text-xs font-semibold tracking-wider transition-colors ${
-            mobileTab === "chronicle"
-              ? "text-accent-primary border-t-2 border-accent-primary"
-              : "text-text-tertiary"
-          }`}
-        >
-          编年史
-        </button>
-        <button
-          onClick={() => setMobileTab("cabinet")}
-          className={`flex-1 px-4 py-4 text-xs font-semibold tracking-wider transition-colors ${
-            mobileTab === "cabinet"
-              ? "text-accent-primary border-t-2 border-accent-primary"
-              : "text-text-tertiary"
-          }`}
-        >
-          内阁
-        </button>
-        <button
-          onClick={() => setMobileTab("intelligence")}
-          className={`flex-1 px-4 py-4 text-xs font-semibold tracking-wider transition-colors ${
-            mobileTab === "intelligence"
-              ? "text-accent-primary border-t-2 border-accent-primary"
-              : "text-text-tertiary"
-          }`}
-        >
-          情报
-        </button>
+        {renderTabButton(
+          "chronicle",
+          () => setMobileTab("chronicle"),
+          mobileTab === "chronicle",
+        )}
+        {renderTabButton(
+          "cabinet",
+          () => setMobileTab("cabinet"),
+          mobileTab === "cabinet",
+        )}
+        {renderTabButton(
+          "intelligence",
+          () => setMobileTab("intelligence"),
+          mobileTab === "intelligence",
+        )}
       </nav>
+
+      <footer className="hidden md:flex items-center justify-between h-11 px-6 border-t border-[#2A2A2E] bg-[#141418] text-xs text-[#666666]">
+        <span className="font-mono">TURN: {state.turnCount}</span>
+        <span>{scenarioTitle}</span>
+        <button
+          onClick={() => setShowSaveManager(true)}
+          className="flex items-center gap-1.5 text-[#666666] hover:text-text-primary transition-colors"
+        >
+          <Save size={12} />
+          存档
+        </button>
+      </footer>
 
       {showSaveManager && (
         <SaveManager
