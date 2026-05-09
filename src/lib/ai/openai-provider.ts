@@ -4,7 +4,7 @@ import type { AIMessage, AISendOptions, AIResponse } from "@/types/ai-provider";
 export class OpenAICompatibleProvider extends BaseAIProvider {
   readonly id: string;
   readonly name: string;
-  private readonly supportsStructuredOutput: boolean;
+  private readonly _supportsStructuredOutput: boolean;
 
   constructor(
     id: string,
@@ -12,15 +12,20 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
     apiKey: string,
     baseUrl: string,
     model: string,
+    supportsStructuredOutput: boolean = false,
   ) {
     super(apiKey, baseUrl, model);
     this.id = id;
     this.name = name;
-    this.supportsStructuredOutput = id === "openai";
+    this._supportsStructuredOutput = supportsStructuredOutput;
   }
 
   validateConfig(): boolean {
     return !!(this.apiKey && this.baseUrl && this.model);
+  }
+
+  supportsStructuredOutput(): boolean {
+    return this._supportsStructuredOutput;
   }
 
   async sendMessage(
@@ -38,7 +43,7 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
     };
 
     if (options?.responseFormat === "json") {
-      if (this.supportsStructuredOutput && options.responseSchema) {
+      if (this._supportsStructuredOutput && options.responseSchema) {
         body.response_format = {
           type: "json_schema",
           json_schema: {

@@ -24,6 +24,7 @@ export abstract class BaseAIProvider implements AIProvider {
     options?: AISendOptions,
   ): Promise<AIResponse>;
   abstract validateConfig(): boolean;
+  abstract supportsStructuredOutput(): boolean;
 
   parseJSONResponse(content: string): unknown {
     let cleaned = content.trim();

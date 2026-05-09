@@ -5,11 +5,13 @@ export interface AIProviderConfig {
   defaultBaseUrl: string;
   defaultModel: string;
   apiKeyPlaceholder: string;
+  supportsStructuredOutput?: boolean;
 }
 
 export interface AIProvider {
   readonly id: string;
   readonly name: string;
+  supportsStructuredOutput(): boolean;
   sendMessage(
     messages: AIMessage[],
     options?: AISendOptions,

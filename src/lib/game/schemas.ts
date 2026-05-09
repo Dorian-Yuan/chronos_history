@@ -1,5 +1,6 @@
 export const scenarioSchema = {
   type: "object" as const,
+  additionalProperties: false,
   properties: {
     id: { type: "string" as const },
     title: { type: "string" as const, description: "4字中文标题" },
@@ -9,6 +10,7 @@ export const scenarioSchema = {
     },
     player_context: {
       type: "object" as const,
+      additionalProperties: false,
       properties: {
         nation_name: {
           type: "string" as const,
@@ -27,6 +29,7 @@ export const scenarioSchema = {
     },
     initial_stats: {
       type: "object" as const,
+      additionalProperties: false,
       properties: {
         stability: { type: "number" as const, minimum: 0, maximum: 100 },
         economy: { type: "number" as const, minimum: 0, maximum: 100 },
@@ -52,6 +55,7 @@ export const scenarioSchema = {
       type: "array" as const,
       items: {
         type: "object" as const,
+        additionalProperties: false,
         properties: {
           role: {
             type: "string" as const,
@@ -71,6 +75,7 @@ export const scenarioSchema = {
       type: "array" as const,
       items: {
         type: "object" as const,
+        additionalProperties: false,
         properties: {
           name: { type: "string" as const, description: "2字简称" },
           description: {
@@ -109,6 +114,7 @@ export const scenarioSchema = {
 
 export const turnResultSchema = {
   type: "object" as const,
+  additionalProperties: false,
   properties: {
     narrative: {
       type: "string" as const,
@@ -123,6 +129,7 @@ export const turnResultSchema = {
     rumor: { type: "string" as const, description: "民间流言（简体中文）" },
     stats_delta: {
       type: "object" as const,
+      additionalProperties: false,
       properties: {
         stability: { type: "number" as const, minimum: -10, maximum: 10 },
         economy: { type: "number" as const, minimum: -10, maximum: 10 },
@@ -139,6 +146,7 @@ export const turnResultSchema = {
       type: "array" as const,
       items: {
         type: "object" as const,
+        additionalProperties: false,
         properties: {
           role: {
             type: "string" as const,
@@ -156,6 +164,7 @@ export const turnResultSchema = {
       type: "array" as const,
       items: {
         type: "object" as const,
+        additionalProperties: false,
         properties: {
           name: { type: "string" as const },
           description: { type: "string" as const },
@@ -204,6 +213,7 @@ export const turnResultSchema = {
 
 export const analysisSchema = {
   type: "object" as const,
+  additionalProperties: false,
   properties: {
     real_event_title: { type: "string" as const },
     real_outcome_summary: { type: "string" as const },
@@ -219,6 +229,7 @@ export const analysisSchema = {
       type: "array" as const,
       items: {
         type: "object" as const,
+        additionalProperties: false,
         properties: {
           dimension: {
             type: "string" as const,
@@ -234,6 +245,7 @@ export const analysisSchema = {
       type: "array" as const,
       items: {
         type: "object" as const,
+        additionalProperties: false,
         properties: {
           turn: { type: "number" as const },
           summary: { type: "string" as const },

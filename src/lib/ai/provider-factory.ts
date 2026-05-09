@@ -17,6 +17,7 @@ export function createProvider(setting: AIProviderSetting): AIProvider {
         setting.apiKey,
         setting.baseUrl || config.defaultBaseUrl,
         setting.model || config.defaultModel,
+        config.supportsStructuredOutput ?? false,
       );
     case "gemini":
       return new GeminiProvider(

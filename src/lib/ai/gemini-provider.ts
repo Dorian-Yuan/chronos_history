@@ -13,6 +13,10 @@ export class GeminiProvider extends BaseAIProvider {
     return !!(this.apiKey && this.model);
   }
 
+  supportsStructuredOutput(): boolean {
+    return true;
+  }
+
   private convertMessages(
     messages: AIMessage[],
   ): { role: string; parts: { text: string }[] }[] {

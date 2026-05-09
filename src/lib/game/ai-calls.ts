@@ -128,6 +128,115 @@ function parseResponse<T>(
 
 const JSON_OUTPUT_INSTRUCTION = `\n\n【输出格式】你必须只返回纯 JSON 对象，不要包含任何其他文字、解释、注释或 markdown 标记（如 \`\`\`json）。直接以 { 开头，以 } 结尾。`;
 
+const SCENARIO_SCHEMA_PROMPT = `
+
+【输出 JSON 结构】你必须严格按以下结构返回JSON：
+{
+  "id": "唯一标识字符串",
+  "title": "4字中文标题",
+  "description": "匿名化的情境描述（200-400字）",
+  "player_context": {
+    "nation_name": "玩家国家/派系名称",
+    "leader_title": "玩家头衔（如皇帝、总督、执行官）",
+    "background_summary": "背景简介（100-200字）"
+  },
+  "initial_stats": {
+    "stability": 数字(0-100),
+    "economy": 数字(0-100),
+    "military": 数字(0-100),
+    "international_standing": 数字(0-100)
+  },
+  "hidden_real_event": "真实历史事件名称",
+  "play_style": "Conquest或Prosperity或Reform或Survival",
+  "start_date": "中文日期字符串",
+  "initial_advisors": [
+    {
+      "role": "General",
+      "name": "中文名",
+      "advice": "建议（简体中文）",
+      "bias": "倾向描述"
+    },
+    { "role": "Diplomat", ... },
+    { "role": "Intel", ... },
+    { "role": "Scholar", ... },
+    { "role": "Merchant", ... }
+  ],
+  "factions": [
+    {
+      "name": "2字简称",
+      "description": "地理/氛围描述",
+      "strength": "主要优势",
+      "weakness": "关键弱点",
+      "needs": "急需什么",
+      "attitude": "当前立场"
+    }
+  ]
+}`;
+
+const TURN_SCHEMA_PROMPT = `
+
+【输出 JSON 结构】你必须严格按以下结构返回JSON：
+{
+  "narrative": "用户行动的直接后果（200-500字）",
+  "situation_update": "新挑战/危机",
+  "date_display": "当前相对日期",
+  "headline": "报纸/诏令标题",
+  "rumor": "民间流言",
+  "stats_delta": {
+    "stability": 数字(-10到10),
+    "economy": 数字(-10到10),
+    "military": 数字(-10到10),
+    "international_standing": 数字(-10到10)
+  },
+  "advisors": [
+    {
+      "role": "General或Diplomat或Intel或Scholar或Merchant",
+      "name": "顾问名",
+      "advice": "建议",
+      "bias": "倾向",
+      "hidden_motive": "秘密动机"
+    }
+  ],
+  "factions_update": [
+    {
+      "name": "派系名",
+      "description": "描述",
+      "strength": "优势",
+      "weakness": "弱点",
+      "needs": "需求",
+      "attitude": "立场",
+      "is_new": 布尔值,
+      "is_destroyed": 布尔值
+    }
+  ],
+  "hidden_consequences": "回合总结（AI长期记忆）",
+  "is_game_over": 布尔值,
+  "game_over_reason": "结束原因（如未结束则为空字符串）"
+}`;
+
+const ANALYSIS_SCHEMA_PROMPT = `
+
+【输出 JSON 结构】你必须严格按以下结构返回JSON：
+{
+  "real_event_title": "真实历史事件名称",
+  "real_outcome_summary": "真实历史的结果",
+  "user_outcome_summary": "玩家时间线的结果",
+  "comparison_text": "对比分析",
+  "similar_historical_figure": "相似历史人物",
+  "persona_title": "统治者画像标题",
+  "persona_description": "画像描述",
+  "radar_stats": [
+    { "dimension": "Authority", "value": 数字(0-100), "fullMark": 100 },
+    { "dimension": "Strategy", "value": 数字(0-100), "fullMark": 100 },
+    { "dimension": "Empathy", "value": 数字(0-100), "fullMark": 100 },
+    { "dimension": "Vision", "value": 数字(0-100), "fullMark": 100 },
+    { "dimension": "Economy", "value": 数字(0-100), "fullMark": 100 }
+  ],
+  "turn_reviews": [
+    { "turn": 回合数, "summary": "决策摘要", "commentary": "战略点评" }
+  ]
+}`;
+
 const SCENARIO_SYSTEM_PROMPT = `你是Chronos历史推演引擎的剧本生成器。根据玩家选择的执政基调，生成一个历史决策推演剧本。
 
 严格规则：
@@ -156,13 +265,17 @@ export async function generateScenario(
 ): Promise<ScenarioData> {
   const provider = getProvider();
 
+  const systemPrompt = provider.supportsStructuredOutput()
+    ? SCENARIO_SYSTEM_PROMPT
+    : SCENARIO_SYSTEM_PROMPT + SCENARIO_SCHEMA_PROMPT;
+
   const userContent =
     playedEvents.length > 0
       ? `执政基调：${playStyle}\n\n已玩过的历史事件（请避免重复）：\n${playedEvents.map((e, i) => `${i + 1}. ${e}`).join("\n")}`
       : `执政基调：${playStyle}`;
 
   const messages: AIMessage[] = [
-    { role: "system", content: SCENARIO_SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
     { role: "user", content: userContent },
   ];
 
@@ -249,6 +362,10 @@ export async function evaluateTurn(
 ): Promise<TurnResult> {
   const provider = getProvider();
 
+  const systemPrompt = provider.supportsStructuredOutput()
+    ? TURN_SYSTEM_PROMPT
+    : TURN_SYSTEM_PROMPT + TURN_SCHEMA_PROMPT;
+
   const contextMessage = `当前剧本：${scenario.title}
 玩家国家：${scenario.player_context.nation_name}
 玩家身份：${scenario.player_context.leader_title}
@@ -270,7 +387,7 @@ ${scenario.factions.map((f) => `- ${f.name}（${f.attitude}）：${f.description
 玩家行动：${userAction}`;
 
   const messages: AIMessage[] = [
-    { role: "system", content: TURN_SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
     { role: "user", content: contextMessage },
   ];
 
@@ -318,6 +435,10 @@ export async function analyzeGame(
 ): Promise<EndGameAnalysis> {
   const provider = getProvider();
 
+  const systemPrompt = provider.supportsStructuredOutput()
+    ? ANALYSIS_SYSTEM_PROMPT
+    : ANALYSIS_SYSTEM_PROMPT + ANALYSIS_SCHEMA_PROMPT;
+
   const contextMessage = `剧本：${scenario.title}
 真实历史事件：${scenario.hidden_real_event}
 玩家国家：${scenario.player_context.nation_name}
@@ -327,7 +448,7 @@ export async function analyzeGame(
 ${historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n")}`;
 
   const messages: AIMessage[] = [
-    { role: "system", content: ANALYSIS_SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
     { role: "user", content: contextMessage },
   ];
 

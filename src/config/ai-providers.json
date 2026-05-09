@@ -7,6 +7,7 @@
       "defaultBaseUrl": "https://api.openai.com/v1",
       "defaultModel": "gpt-4o",
       "supportsStreaming": true,
+      "supportsStructuredOutput": true,
       "apiKeyPlaceholder": "sk-..."
     },
     {
@@ -16,6 +17,7 @@
       "defaultBaseUrl": "https://api.deepseek.com/v1",
       "defaultModel": "deepseek-chat",
       "supportsStreaming": true,
+      "supportsStructuredOutput": true,
       "apiKeyPlaceholder": "sk-..."
     },
     {
@@ -25,6 +27,7 @@
       "defaultBaseUrl": "http://localhost:11434/v1",
       "defaultModel": "llama3",
       "supportsStreaming": true,
+      "supportsStructuredOutput": false,
       "apiKeyPlaceholder": "ollama"
     },
     {
