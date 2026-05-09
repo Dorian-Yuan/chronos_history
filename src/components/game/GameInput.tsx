@@ -40,7 +40,7 @@ export function GameInput({ onSubmit, disabled, placeholder }: GameInputProps) {
   };
 
   return (
-    <div className="border-t border-border bg-bg-secondary/50 px-5 py-3.5 backdrop-blur-md">
+    <div className="border-t border-border bg-bg-secondary/50 px-5 py-4 backdrop-blur-md">
       <div className="flex items-end gap-3">
         <textarea
           ref={textareaRef}

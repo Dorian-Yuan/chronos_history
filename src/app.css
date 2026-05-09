@@ -427,7 +427,7 @@ select,
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   border: 1px solid var(--color-border);
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
 }
 
 .noise-bg::before {
@@ -499,7 +499,7 @@ select,
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
   box-shadow: var(--shadow-card);
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.25rem;
   transition:
     border-color var(--transition-fast),
     box-shadow var(--transition-fast);
@@ -515,7 +515,7 @@ select,
   border: 1px solid var(--color-border);
   background: var(--color-bg-card);
   box-shadow: var(--shadow-card);
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.25rem;
   transition: all var(--transition-normal);
   cursor: pointer;
 }

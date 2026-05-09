@@ -116,7 +116,7 @@ function AppContent() {
     <HashRouter>
       <GameProvider>
         <PWABanner />
-        <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg">
+        <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg safe-top safe-bottom">
           <div className="absolute inset-0 ink-wash pointer-events-none" />
           <div className="relative z-10 h-full">
             <ErrorBoundary>

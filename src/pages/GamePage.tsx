@@ -165,7 +165,7 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-5 py-3.5 glass">
+      <header className="flex items-center justify-between border-b border-border px-5 py-4 glass">
         <div className="flex items-center gap-3">
           <span className="font-serif text-sm font-medium text-text-primary">
             {scenarioTitle}
@@ -245,7 +245,7 @@ export function GamePage() {
               role="tab"
               aria-selected={sideTab === "cabinet"}
               aria-controls="panel-cabinet"
-              className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
+              className={`flex-1 px-5 py-4 text-xs font-semibold tracking-wider transition-colors ${
                 sideTab === "cabinet"
                   ? "text-accent-primary border-b-2 border-accent-primary"
                   : "text-text-tertiary hover:text-text-secondary"
@@ -258,7 +258,7 @@ export function GamePage() {
               role="tab"
               aria-selected={sideTab === "intelligence"}
               aria-controls="panel-intelligence"
-              className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
+              className={`flex-1 px-5 py-4 text-xs font-semibold tracking-wider transition-colors ${
                 sideTab === "intelligence"
                   ? "text-accent-primary border-b-2 border-accent-primary"
                   : "text-text-tertiary hover:text-text-secondary"
@@ -287,12 +287,12 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border glass"
+        className="flex md:hidden border-t border-border glass safe-bottom"
         aria-label="游戏面板"
       >
         <button
           onClick={() => setMobileTab("chronicle")}
-          className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
+          className={`flex-1 px-4 py-4 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "chronicle"
               ? "text-accent-primary border-t-2 border-accent-primary"
               : "text-text-tertiary"
@@ -302,7 +302,7 @@ export function GamePage() {
         </button>
         <button
           onClick={() => setMobileTab("cabinet")}
-          className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
+          className={`flex-1 px-4 py-4 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "cabinet"
               ? "text-accent-primary border-t-2 border-accent-primary"
               : "text-text-tertiary"
@@ -312,7 +312,7 @@ export function GamePage() {
         </button>
         <button
           onClick={() => setMobileTab("intelligence")}
-          className={`flex-1 px-4 py-3.5 text-xs font-semibold tracking-wider transition-colors ${
+          className={`flex-1 px-4 py-4 text-xs font-semibold tracking-wider transition-colors ${
             mobileTab === "intelligence"
               ? "text-accent-primary border-t-2 border-accent-primary"
               : "text-text-tertiary"

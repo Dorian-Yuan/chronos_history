@@ -54,7 +54,7 @@ export function ChroniclePanel({
           )}
 
           {scenario.description && (
-            <div className="mt-4 rounded-xl border border-accent-primary/20 bg-accent-primary/5 px-5 py-4">
+            <div className="mt-4 rounded-xl border border-accent-primary/20 bg-accent-primary/5 px-5 py-5">
               <div className="text-xs font-semibold text-accent-primary tracking-wider uppercase mb-2">
                 当前危机
               </div>
@@ -64,7 +64,7 @@ export function ChroniclePanel({
             </div>
           )}
 
-          <div className="mt-4 rounded-xl border border-border bg-bg-secondary/50 px-5 py-4">
+          <div className="mt-4 rounded-xl border border-border bg-bg-secondary/50 px-5 py-5">
             <div className="font-serif text-sm text-text-secondary leading-relaxed">
               阁下，作为{scenario.player_context?.leader_title || "统治者"}
               ，您的第一道政令是什么？
@@ -94,7 +94,7 @@ export function ChroniclePanel({
           </div>
 
           {result.situation_update && (
-            <div className="border-l-2 border-accent-primary/30 bg-accent-primary/5 px-5 py-4 rounded-r-xl">
+            <div className="border-l-2 border-accent-primary/30 bg-accent-primary/5 px-5 py-5 rounded-r-xl">
               <div className="text-xs font-semibold uppercase tracking-wider text-accent-primary/80 mb-1.5">
                 最新情报
               </div>
