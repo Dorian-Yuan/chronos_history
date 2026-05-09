@@ -27,12 +27,12 @@ const themes: Record<string, ThemeConfig> = {
       "--color-text-secondary": "#6b6558",
       "--color-text-tertiary": "#9e9688",
       "--color-text-inverse": "#faf7f2",
-      "--color-accent-primary": "#8b6914",
-      "--color-accent-secondary": "#6b5238",
-      "--color-accent-success": "#3d7a4a",
-      "--color-accent-warning": "#9e7518",
-      "--color-accent-danger": "#a83838",
-      "--color-accent-info": "#4a7a8c",
+      "--color-accent-primary": "#1a9e6b",
+      "--color-accent-secondary": "#c06a28",
+      "--color-accent-success": "#1a9e6b",
+      "--color-accent-warning": "#c06a28",
+      "--color-accent-danger": "#b83838",
+      "--color-accent-info": "#3a7abc",
       "--color-border": "#d4cfc5",
       "--color-border-hover": "#b8b2a6",
       "--color-glass-bg": "rgba(240, 236, 228, 0.88)",
@@ -40,15 +40,15 @@ const themes: Record<string, ThemeConfig> = {
       "--color-glass-subtle-bg": "rgba(240, 236, 228, 0.65)",
       "--color-glass-subtle-border": "rgba(0, 0, 0, 0.03)",
       "--color-glass-card-bg": "rgba(255, 255, 255, 0.75)",
-      "--shadow-accent-sm": "0 2px 8px rgba(139, 105, 20, 0.2)",
-      "--shadow-accent-md": "0 4px 16px rgba(139, 105, 20, 0.3)",
-      "--shadow-accent-xs": "0 1px 4px rgba(139, 105, 20, 0.15)",
-      "--color-accent-focus": "rgba(139, 105, 20, 0.5)",
-      "--color-accent-ring": "rgba(139, 105, 20, 0.08)",
-      "--color-accent-hover-border": "rgba(139, 105, 20, 0.3)",
-      "--color-accent-hover-glow": "rgba(139, 105, 20, 0.06)",
-      "--color-accent-glow-sm": "rgba(139, 105, 20, 0.15)",
-      "--color-accent-glow-md": "rgba(139, 105, 20, 0.3)",
+      "--shadow-accent-sm": "0 2px 8px rgba(26, 158, 107, 0.2)",
+      "--shadow-accent-md": "0 4px 16px rgba(26, 158, 107, 0.3)",
+      "--shadow-accent-xs": "0 1px 4px rgba(26, 158, 107, 0.15)",
+      "--color-accent-focus": "rgba(26, 158, 107, 0.5)",
+      "--color-accent-ring": "rgba(26, 158, 107, 0.08)",
+      "--color-accent-hover-border": "rgba(26, 158, 107, 0.3)",
+      "--color-accent-hover-glow": "rgba(26, 158, 107, 0.06)",
+      "--color-accent-glow-sm": "rgba(26, 158, 107, 0.15)",
+      "--color-accent-glow-md": "rgba(26, 158, 107, 0.3)",
     },
   },
 };
@@ -74,7 +74,7 @@ export function setTheme(name: string): void {
     });
     localStorage.setItem("chronos_prev_theme", name);
 
-    const themeColor = name === "light" ? "#f0ece4" : "#0d0f14";
+    const themeColor = name === "light" ? "#f0ece4" : "#0A0A0A";
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute("content", themeColor);
