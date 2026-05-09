@@ -15,7 +15,7 @@ import {
   SaveManager,
 } from "@/components/game";
 import type { TurnResult, ScenarioData, FactionData } from "@/types";
-import { determineOutcome, checkGameOver } from "@/types";
+import { determineOutcome, checkGameOver, clampStat } from "@/types";
 import { Settings, Save } from "lucide-react";
 import { useUIStore } from "@/stores";
 
@@ -52,7 +52,6 @@ function safeGetDelta(turnResults: TurnResult[]) {
 export function GamePage() {
   const state = useGameState();
   const dispatch = useGameDispatch();
-  const [turnResults, setTurnResults] = useState<TurnResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
@@ -63,6 +62,7 @@ export function GamePage() {
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
 
   const scenario = state.scenario;
+  const turnResults = state.turnResults;
 
   const currentAdvisors = safeGetAdvisors(scenario, turnResults);
   const currentFactions = safeGetFactions(scenario);
@@ -93,70 +93,29 @@ export function GamePage() {
           state.turnCount,
         );
 
-        setTurnResults((prev) => [...prev, result]);
         dispatch({ type: "PROCESS_TURN", result });
 
         if (checkGameOver(state, result)) {
           try {
-            const updatedScenario = {
-              ...scenario,
-              factions: result.factions_update.reduce(
-                (acc, update) => {
-                  if (update.is_destroyed) {
-                    return acc.map((f) =>
-                      f.name === update.name
-                        ? { ...f, is_destroyed: true, attitude: "已灭亡" }
-                        : f,
-                    );
-                  }
-                  const existing = acc.find((f) => f.name === update.name);
-                  if (existing) {
-                    return acc.map((f) =>
-                      f.name === update.name ? { ...f, ...update } : f,
-                    );
-                  }
-                  if (update.is_new) {
-                    return [...acc, update];
-                  }
-                  return acc;
-                },
-                [...scenario.factions],
-              ),
-            };
-
-            const analysis = await analyzeGame(updatedScenario, [
+            const analysis = await analyzeGame(scenario, [
               ...state.historyLog,
               result.hidden_consequences,
             ]);
             dispatch({ type: "GAME_OVER", analysis });
 
             const outcome = determineOutcome({
-              ...state.stats,
-              stability: Math.max(
-                0,
-                Math.min(
-                  100,
-                  state.stats.stability + result.stats_delta.stability,
-                ),
+              stability: clampStat(
+                state.stats.stability + result.stats_delta.stability,
               ),
-              economy: Math.max(
-                0,
-                Math.min(100, state.stats.economy + result.stats_delta.economy),
+              economy: clampStat(
+                state.stats.economy + result.stats_delta.economy,
               ),
-              military: Math.max(
-                0,
-                Math.min(
-                  100,
-                  state.stats.military + result.stats_delta.military,
-                ),
+              military: clampStat(
+                state.stats.military + result.stats_delta.military,
               ),
-              international_standing: Math.max(
-                0,
-                Math.min(
-                  100,
-                  state.stats.international_standing +
-                    result.stats_delta.international_standing,
-                ),
+              international_standing: clampStat(
+                state.stats.international_standing +
+                  result.stats_delta.international_standing,
               ),
             });
 
@@ -368,7 +327,6 @@ export function GamePage() {
           gameState={state}
           onLoad={(gameState) => {
             dispatch({ type: "LOAD_SAVE", state: gameState });
-            setTurnResults([]);
             setShowSaveManager(false);
           }}
           onClose={() => setShowSaveManager(false)}

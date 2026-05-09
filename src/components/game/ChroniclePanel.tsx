@@ -35,17 +35,39 @@ export function ChroniclePanel({
           <div className="text-xs font-medium text-accent-primary/80 tracking-wider uppercase">
             {scenario.start_date || "元年"}
           </div>
-          <div className="text-sm font-serif leading-relaxed text-text-primary">
-            {scenario.player_context?.background_summary || ""}
-          </div>
-          <div className="text-sm font-serif leading-relaxed text-text-secondary">
-            {scenario.description || ""}
-          </div>
-          <div className="mt-6 rounded-xl border border-accent-primary/20 bg-accent-primary/5 px-5 py-4">
-            <div className="text-xs font-semibold text-accent-primary tracking-wider uppercase mb-2">
-              当前危机
+
+          {scenario.player_context?.nation_name && (
+            <div className="flex items-center gap-2">
+              <span className="text-base font-serif font-bold text-text-primary">
+                {scenario.player_context.nation_name}
+              </span>
+              {scenario.player_context?.leader_title && (
+                <span className="text-xs text-text-tertiary">
+                  — {scenario.player_context.leader_title}
+                </span>
+              )}
             </div>
-            <div className="font-serif text-sm text-accent-primary/80 leading-relaxed">
+          )}
+
+          {scenario.player_context?.background_summary && (
+            <div className="text-sm font-serif leading-relaxed text-text-secondary">
+              {scenario.player_context.background_summary}
+            </div>
+          )}
+
+          {scenario.description && (
+            <div className="mt-4 rounded-xl border border-accent-primary/20 bg-accent-primary/5 px-5 py-4">
+              <div className="text-xs font-semibold text-accent-primary tracking-wider uppercase mb-2">
+                当前危机
+              </div>
+              <div className="font-serif text-sm text-accent-primary/80 leading-relaxed">
+                {scenario.description}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4 rounded-xl border border-border bg-bg-secondary/50 px-5 py-4">
+            <div className="font-serif text-sm text-text-secondary leading-relaxed">
               阁下，作为{scenario.player_context?.leader_title || "统治者"}
               ，您的第一道政令是什么？
             </div>

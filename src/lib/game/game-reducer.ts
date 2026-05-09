@@ -53,11 +53,12 @@ function updateFactions(
     if (idx >= 0) {
       result[idx] = {
         ...result[idx],
-        description: update.description || result[idx].description,
-        strength: update.strength || result[idx].strength,
-        weakness: update.weakness || result[idx].weakness,
-        needs: update.needs || result[idx].needs,
-        attitude: update.attitude || result[idx].attitude,
+        description: update.description ?? result[idx].description,
+        strength: update.strength ?? result[idx].strength,
+        weakness: update.weakness ?? result[idx].weakness,
+        needs: update.needs ?? result[idx].needs,
+        attitude: update.attitude ?? result[idx].attitude,
+        is_new: false,
       };
     } else if (update.is_new) {
       result.push({
@@ -91,6 +92,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         historyLog: [],
         currentTurnResult: null,
         endGameAnalysis: null,
+        turnResults: [],
       };
     }
 
@@ -114,6 +116,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         historyLog: [...state.historyLog, result.hidden_consequences],
         currentTurnResult: result,
         scenario: newScenario,
+        turnResults: [...state.turnResults, result],
       };
     }
 
@@ -125,7 +128,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
 
     case "LOAD_SAVE":
-      return { ...action.state };
+      return {
+        ...action.state,
+        turnResults: action.state.turnResults ?? [],
+      };
 
     case "RESET":
       return { ...INITIAL_GAME_STATE };

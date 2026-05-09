@@ -1,6 +1,7 @@
 import type { ScenarioData } from "./scenario";
 import type { TurnResult } from "./turn-result";
 import type { EndGameAnalysis } from "./end-game";
+import { getAppConfig } from "@/config";
 
 export interface GameStats {
   stability: number;
@@ -19,6 +20,7 @@ export interface GameState {
   historyLog: string[];
   currentTurnResult: TurnResult | null;
   endGameAnalysis: EndGameAnalysis | null;
+  turnResults: TurnResult[];
 }
 
 export type GameOutcome = "victory" | "neutral" | "defeat";
@@ -36,6 +38,7 @@ export const INITIAL_GAME_STATE: GameState = {
   historyLog: [],
   currentTurnResult: null,
   endGameAnalysis: null,
+  turnResults: [],
 };
 
 export function clampStat(value: number): number {
@@ -55,11 +58,13 @@ export function checkGameOver(
   state: GameState,
   turnResult: TurnResult,
 ): boolean {
+  const config = getAppConfig();
   const nextTurn = state.turnCount + 1;
   const anyStatZero = Object.values(state.stats).some((v) => v <= 0);
-  const hardCap = nextTurn > 28;
-  const collapse = anyStatZero && nextTurn > 8;
-  const aiEnded = turnResult.is_game_over && nextTurn > 8;
+  const hardCap = nextTurn > config.maxTurns;
+  const collapse = anyStatZero && nextTurn > config.minTurnsBeforeEnd;
+  const aiEnded =
+    turnResult.is_game_over && nextTurn > config.minTurnsBeforeEnd;
   const perfectVictory = Object.values(state.stats).every((v) => v >= 100);
   return hardCap || collapse || aiEnded || perfectVictory;
 }

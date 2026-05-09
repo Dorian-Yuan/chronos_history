@@ -22,7 +22,19 @@ function getAttitudeStyle(attitude: string): string {
 }
 
 export function IntelligencePanel({ factions }: IntelligencePanelProps) {
-  if (!factions.length) return null;
+  if (!factions.length) {
+    return (
+      <section className="flex flex-col gap-4 p-5" aria-label="情报面板">
+        <div className="section-label">情报</div>
+        <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
+          <p className="text-xs">暂无情报信息</p>
+          <p className="text-[10px] mt-1 text-text-tertiary/60">
+            完成第一回合后将显示派系情报
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="flex flex-col gap-4 p-5" aria-label="情报面板">

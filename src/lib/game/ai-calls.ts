@@ -4,12 +4,110 @@ import type {
   EndGameAnalysis,
   GameStats,
   PlayStyle,
+  AdvisorRole,
 } from "@/types";
 import type { AIMessage } from "@/types/ai-provider";
 import { createProvider, withRetry } from "@/lib/ai";
 import { useSettingsStore } from "@/stores";
 import { scenarioSchema, turnResultSchema, analysisSchema } from "./schemas";
 import { checkObjectForSensitiveContent } from "./sensitive-content";
+
+const REQUIRED_ADVISOR_ROLES: AdvisorRole[] = [
+  "General",
+  "Diplomat",
+  "Intel",
+  "Scholar",
+  "Merchant",
+];
+
+function validateScenario(data: ScenarioData): void {
+  const errors: string[] = [];
+
+  if (!data.player_context?.nation_name?.trim()) {
+    errors.push("nation_name为空");
+  }
+  if (!data.player_context?.leader_title?.trim()) {
+    errors.push("leader_title为空");
+  }
+  if (!data.description?.trim()) {
+    errors.push("剧本描述为空");
+  }
+  if (!data.title?.trim()) {
+    errors.push("剧本标题为空");
+  }
+
+  if (data.initial_stats) {
+    const stats = data.initial_stats;
+    const sum =
+      (stats.stability ?? 0) +
+      (stats.economy ?? 0) +
+      (stats.military ?? 0) +
+      (stats.international_standing ?? 0);
+    if (sum < 200 || sum > 320) {
+      errors.push(`初始属性总和${sum}不在200-320范围内`);
+    }
+    const maxStat = Math.max(
+      stats.stability ?? 0,
+      stats.economy ?? 0,
+      stats.military ?? 0,
+      stats.international_standing ?? 0,
+    );
+    if (maxStat > 85) {
+      errors.push(`单项属性${maxStat}超过85上限`);
+    }
+  } else {
+    errors.push("initial_stats缺失");
+  }
+
+  if (
+    !Array.isArray(data.initial_advisors) ||
+    data.initial_advisors.length < 5
+  ) {
+    errors.push(
+      `初始顾问数量${Array.isArray(data.initial_advisors) ? data.initial_advisors.length : 0}不足5个`,
+    );
+  } else {
+    const roles = new Set(data.initial_advisors.map((a) => a.role));
+    const missingRoles = REQUIRED_ADVISOR_ROLES.filter((r) => !roles.has(r));
+    if (missingRoles.length > 0) {
+      errors.push(`缺少顾问角色: ${missingRoles.join(", ")}`);
+    }
+  }
+
+  if (!Array.isArray(data.factions) || data.factions.length < 2) {
+    errors.push(
+      `初始派系数量${Array.isArray(data.factions) ? data.factions.length : 0}不足2个`,
+    );
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`剧本验证失败: ${errors.join("; ")}`);
+  }
+}
+
+function validateTurnResult(data: TurnResult): void {
+  const errors: string[] = [];
+
+  if (!data.narrative?.trim()) {
+    errors.push("叙事内容为空");
+  }
+  if (!data.headline?.trim()) {
+    errors.push("标题为空");
+  }
+  if (!data.stats_delta) {
+    errors.push("stats_delta缺失");
+  }
+  if (!Array.isArray(data.advisors) || data.advisors.length < 5) {
+    errors.push(`顾问数量不足5个`);
+  }
+  if (!Array.isArray(data.factions_update)) {
+    errors.push("factions_update缺失");
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`回合结果验证失败: ${errors.join("; ")}`);
+  }
+}
 
 function getProvider() {
   const settings = useSettingsStore.getState();
@@ -78,6 +176,8 @@ export async function generateScenario(
       });
 
       const scenario = parseResponse<ScenarioData>(response.content, provider);
+
+      validateScenario(scenario);
 
       if (checkObjectForSensitiveContent(scenario)) {
         throw new Error(
@@ -184,6 +284,8 @@ ${scenario.factions.map((f) => `- ${f.name}（${f.attitude}）：${f.description
       });
 
       const result = parseResponse<TurnResult>(response.content, provider);
+
+      validateTurnResult(result);
 
       if (checkObjectForSensitiveContent(result)) {
         throw new Error(

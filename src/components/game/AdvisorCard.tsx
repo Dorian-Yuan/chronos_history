@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { AdvisorData, AdvisorRole } from "@/types";
 import { Shield, Scroll, Eye, BookOpen, Coins } from "lucide-react";
 
@@ -60,6 +61,7 @@ const ROLE_CONFIG: Record<
 
 export function AdvisorCard({ advisor }: AdvisorCardProps) {
   const config = ROLE_CONFIG[advisor.role];
+  const [showMotive, setShowMotive] = useState(false);
   if (!config) return null;
 
   const Icon = config.icon;
@@ -90,11 +92,28 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-4 flex items-center justify-end">
+      <div className="mt-4 flex items-center justify-between">
         <span className={`badge ${config.bgColor} ${config.textColor}`}>
           {advisor.bias}
         </span>
+        {advisor.hidden_motive && (
+          <button
+            onClick={() => setShowMotive(!showMotive)}
+            className="text-[10px] text-text-tertiary hover:text-text-secondary transition-colors"
+            aria-label={showMotive ? "隐藏秘密动机" : "查看秘密动机"}
+          >
+            {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
+          </button>
+        )}
       </div>
+
+      {advisor.hidden_motive && showMotive && (
+        <div className="mt-3 rounded-md border border-amber-800/20 bg-amber-900/10 px-3 py-2">
+          <p className="font-serif text-[11px] italic leading-relaxed text-amber-400/70">
+            {advisor.hidden_motive}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
