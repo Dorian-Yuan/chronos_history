@@ -40,9 +40,6 @@ export function StartPage() {
         <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">
           CHRONOS
         </h1>
-        <p className="text-sm text-text-tertiary tracking-[0.3em]">
-          历史的回响 / 决策推演
-        </p>
       </div>
 
       <div className="absolute top-[60%] left-1/2 -translate-x-1/2 z-10 flex flex-col gap-4 w-full max-w-[240px] animate-slide-up">

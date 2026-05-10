@@ -118,21 +118,21 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
             return (
               <div
                 key={i}
-                className="flex items-center gap-4 rounded-lg border border-border bg-bg-card px-4 py-2"
+                className="flex items-center gap-4 rounded-lg border border-border bg-bg-card px-5 py-2"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium font-serif text-text-primary pl-2">
+                  <div className="text-sm font-medium font-serif text-text-primary">
                     存档 {i + 1}
                   </div>
                   {save ? (
-                    <div className="text-xs text-text-tertiary mt-1 truncate pl-2">
+                    <div className="text-xs text-text-tertiary mt-1 truncate">
                       {save.data.metadata.scenarioTitle} ·{" "}
                       {save.data.metadata.nationName} · 第
                       {save.data.metadata.turnCount}回合 ·{" "}
                       {new Date(save.data.metadata.timestamp).toLocaleString()}
                     </div>
                   ) : (
-                    <div className="text-xs text-text-tertiary mt-1 font-serif pl-2">空</div>
+                    <div className="text-xs text-text-tertiary mt-1 font-serif">空</div>
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">

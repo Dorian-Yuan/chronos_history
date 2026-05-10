@@ -216,8 +216,8 @@ export function GamePage() {
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="px-5 pt-4 pb-4">
+    <div className="flex h-full flex-col gap-3">
+      <header className="px-5 pt-4">
         <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card px-5 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-border-hover bg-bg-tertiary">

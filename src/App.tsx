@@ -116,13 +116,15 @@ function AppContent() {
   return (
     <HashRouter>
       <GameProvider>
-        <PWABanner />
-        <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg safe-top">
-          <div className="absolute inset-0 ink-wash pointer-events-none" />
-          <div className="relative z-10 h-full">
-            <ErrorBoundary>
-              <GameRouter />
-            </ErrorBoundary>
+        <div className="h-dvh w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg flex flex-col">
+          <PWABanner />
+          <div className="flex-1 relative overflow-hidden">
+            <div className="absolute inset-0 ink-wash pointer-events-none" />
+            <div className="relative z-10 h-full safe-top">
+              <ErrorBoundary>
+                <GameRouter />
+              </ErrorBoundary>
+            </div>
           </div>
         </div>
         <SettingsPanel />
