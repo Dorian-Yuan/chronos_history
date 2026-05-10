@@ -107,7 +107,7 @@ function AppContent() {
 
   if (!setupComplete) {
     return (
-      <div className="h-screen w-screen overflow-hidden bg-bg-primary text-text-primary">
+      <div className="h-dvh w-screen overflow-hidden bg-bg-primary text-text-primary">
         <WelcomeSetup onComplete={() => setSetupComplete(true)} />
       </div>
     );
