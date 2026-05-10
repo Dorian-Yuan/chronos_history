@@ -41,9 +41,9 @@ function getTextColor(value: number): string {
 
 export function StatBars({ stats, delta }: StatBarsProps) {
   return (
-    <div className="px-6 py-4">
+    <div className="px-5 py-4 mb-2">
       <div
-        className="grid grid-cols-2 gap-4 rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] p-5"
+        className="grid grid-cols-2 gap-x-5 gap-y-5 rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] p-5"
         role="group"
         aria-label="国家属性"
       >
@@ -52,7 +52,7 @@ export function StatBars({ stats, delta }: StatBarsProps) {
           const deltaValue = delta?.[key] ?? 0;
 
           return (
-            <div key={key} className="space-y-2">
+            <div key={key} className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
                   <Icon size={12} className="text-[#666666]" />
@@ -75,7 +75,7 @@ export function StatBars({ stats, delta }: StatBarsProps) {
                 </div>
               </div>
               <div
-                className="h-1 w-full overflow-hidden rounded-sm bg-[#2A2A2E]"
+                className="h-1.5 w-full overflow-hidden rounded-sm bg-[#2A2A2E]"
                 role="progressbar"
                 aria-valuenow={value}
                 aria-valuemin={0}

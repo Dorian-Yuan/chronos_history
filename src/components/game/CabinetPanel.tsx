@@ -8,8 +8,8 @@ interface CabinetPanelProps {
 export function CabinetPanel({ advisors }: CabinetPanelProps) {
   if (!advisors.length) {
     return (
-      <div className="flex flex-col gap-4 p-6">
-        <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666]">
+      <div className="flex flex-col gap-6 px-5 py-4">
+        <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666] pt-4">
           TOP SECRET // ADVISORY
         </div>
         <div className="flex flex-col items-center justify-center py-10 text-[#666666]">
@@ -23,8 +23,8 @@ export function CabinetPanel({ advisors }: CabinetPanelProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666]">
+    <div className="flex flex-col gap-6 px-5 py-4">
+      <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666] pt-4">
         TOP SECRET // ADVISORY
       </div>
       <div className="flex flex-col gap-4">

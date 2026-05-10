@@ -6,11 +6,11 @@ interface IntelligencePanelProps {
 }
 
 const ATTITUDE_STYLES: Record<string, string> = {
-  敌对: "bg-red-900/20 text-red-400",
-  求和: "bg-blue-900/20 text-blue-400",
+  敌对: "bg-red-900/30 text-red-400",
+  求和: "bg-blue-900/30 text-blue-400",
   中立: "bg-[#2A2A2E] text-zinc-300",
-  友好: "bg-green-900/20 text-green-400",
-  臣服: "bg-amber-900/20 text-amber-400",
+  友好: "bg-green-900/30 text-green-400",
+  臣服: "bg-amber-900/30 text-amber-400",
   已灭亡: "bg-[#2A2A2E] text-zinc-500 line-through",
 };
 
@@ -22,7 +22,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   if (!factions.length) {
     return (
       <section className="flex flex-col gap-4 p-6" aria-label="情报面板">
-        <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666]">
+        <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666] pt-4">
           GEOPOLITICAL INTELLIGENCE
         </div>
         <div className="flex flex-col items-center justify-center py-10 text-[#666666]">
@@ -36,8 +36,8 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   }
 
   return (
-    <section className="flex flex-col gap-4 p-6" aria-label="情报面板">
-      <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666]">
+    <section className="flex flex-col gap-6 px-5 py-4" aria-label="情报面板">
+      <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666] pt-4">
         GEOPOLITICAL INTELLIGENCE
       </div>
       <ul className="flex flex-col gap-4">
@@ -55,7 +55,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                 ) : (
                   <Swords size={14} className="text-[#666666]" aria-hidden="true" />
                 )}
-                <span className="text-[22px] font-bold text-text-primary">
+                <span className="text-lg font-bold text-text-primary">
                   {faction.name}
                 </span>
               </div>
@@ -70,7 +70,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
               </div>
             )}
 
-            <p className="italic text-base text-[#CCCCCC] leading-[1.7] mb-4">
+            <p className="italic text-sm text-[#CCCCCC] leading-[1.7] mb-4">
               {faction.description}
             </p>
 

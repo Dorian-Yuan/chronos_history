@@ -41,7 +41,7 @@ export function SettingsPanel() {
           </button>
         </div>
 
-        <div className="modal-body space-y-6 safe-bottom">
+        <div className="modal-body space-y-5 safe-bottom">
           <div>
             <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
               {t("settings.theme")}
@@ -66,7 +66,7 @@ export function SettingsPanel() {
 
           <AIProviderConfig />
 
-          <div className="text-right text-[10px] text-text-tertiary pt-6">
+          <div className="text-right text-[10px] text-text-tertiary pt-8">
             {t("app.version")}: {appConfig.version}
           </div>
         </div>

@@ -215,8 +215,8 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="px-6 py-3">
-        <div className="flex items-center justify-between rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] px-5 py-3.5">
+      <header className="px-5 pt-5 pb-2">
+        <div className="flex items-center justify-between rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] px-5 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#3A3A3E] bg-[#2A2A2E]">
               <User size={20} className="text-[#666666]" />
@@ -255,7 +255,7 @@ export function GamePage() {
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 flex flex-col overflow-hidden">
           <div
-            className={`flex-1 flex flex-col overflow-hidden md:flex ${mobileTab !== "chronicle" ? "hidden md:flex" : "flex"}`}
+            className={`flex-1 flex-col overflow-hidden md:flex ${mobileTab !== "chronicle" ? "hidden" : "flex"}`}
           >
             {error && (
               <div className="mx-6 mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 flex items-center justify-between">
@@ -282,7 +282,7 @@ export function GamePage() {
           </div>
 
           <div
-            className={`flex-1 flex flex-col overflow-y-auto md:hidden ${mobileTab === "chronicle" ? "hidden" : "flex"}`}
+            className={`flex-1 flex-col overflow-y-auto md:hidden ${mobileTab === "chronicle" ? "hidden" : "flex"}`}
           >
             {mobileTab === "cabinet" ? (
               <CabinetPanel advisors={currentAdvisors} />

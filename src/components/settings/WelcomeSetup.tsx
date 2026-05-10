@@ -108,16 +108,16 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
 
             <button
               onClick={() => setStep(1)}
-              className="btn-primary w-full max-w-[15rem] mx-auto text-base py-3"
+              className="btn-primary w-full max-w-[15rem] mx-auto text-base py-3 gap-3"
             >
               {t("setup.getStarted")}
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           </div>
         )}
 
         {step === 1 && (
-          <div className="space-y-6 px-4">
+          <div className="space-y-6 px-6">
             <div className="text-center space-y-2">
               <h2 className="font-serif text-xl font-semibold text-text-primary">
                 {t("setup.configureAI")}
@@ -200,7 +200,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </div>
             </div>
 
-            <div className="pt-6">
+            <div className="pt-8">
               <button
                 onClick={handleSaveAndTest}
                 disabled={!apiKey.trim() || testStatus === "testing"}

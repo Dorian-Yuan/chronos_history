@@ -100,7 +100,7 @@ export function SelectionPage() {
           <p className="text-sm text-text-secondary">正在生成剧本...</p>
         </div>
       ) : (
-        <div className="grid w-full max-w-lg grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
           {PLAY_STYLES.map((style, idx) => {
             const Icon = STYLE_ICONS[style.id];
             const colors = STYLE_COLORS[style.id];
@@ -108,21 +108,21 @@ export function SelectionPage() {
               <button
                 key={style.id}
                 onClick={() => handleSelect(style.id)}
-                className={`group card-interactive px-5 py-5 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
+                className={`group card-interactive p-3 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-2">
                   <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}
                   >
-                    <Icon size={16} className={colors.text} />
+                    <Icon size={14} className={colors.text} />
                   </div>
-                  <h2 className="text-base font-serif font-bold text-text-primary">
+                  <h2 className="text-sm font-serif font-bold text-text-primary">
                     {style.name}
                   </h2>
                 </div>
 
-                <p className="font-serif text-xs italic leading-relaxed text-text-secondary mb-4">
+                <p className="font-serif text-xs italic leading-relaxed text-text-tertiary/80 mb-5">
                   &ldquo;{style.quote}&rdquo;
                 </p>
 

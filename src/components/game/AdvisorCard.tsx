@@ -78,7 +78,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         <span className="text-sm text-[#CCCCCC]">// {advisor.name}</span>
       </div>
 
-      <p className="mt-3 text-[17px] text-white font-medium leading-[1.8]">
+      <p className="mt-3 text-[17px] font-serif text-white font-medium leading-[1.8]">
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
@@ -100,7 +100,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
 
       {advisor.hidden_motive && showMotive && (
         <div className="mt-3 rounded border border-[#2A2A2E] bg-[#1A1A1E] px-5 py-4">
-          <p className="text-[12px] italic leading-[1.7] text-[#E8833A]/80">
+          <p className="text-[12px] font-serif italic leading-[1.7] text-[#E8833A]">
             {advisor.hidden_motive}
           </p>
         </div>
