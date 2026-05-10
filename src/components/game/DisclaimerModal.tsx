@@ -26,7 +26,7 @@ export function DisclaimerModal() {
           </h2>
         </div>
 
-        <div className="modal-body space-y-4 text-sm text-text-secondary leading-relaxed">
+        <div className="modal-body space-y-5 text-sm text-text-secondary leading-relaxed">
           <p>
             本游戏为虚构的历史决策推演模拟，所有剧情、人物、国家均为AI生成，不代表任何真实观点或立场。
           </p>

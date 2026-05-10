@@ -91,45 +91,37 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
     <div className="flex h-full flex-col items-center justify-center bg-bg-primary px-6 noise-bg">
       <div className="absolute inset-0 ink-wash pointer-events-none" />
 
-      <div className="relative w-full max-w-sm animate-fade-in">
+      <div className="relative w-full max-w-sm mx-auto animate-fade-in">
         {step === 0 && (
           <div className="text-center space-y-10">
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-bg-tertiary/60 border border-border mb-2">
                 <Sparkles size={30} className="text-accent-primary" />
               </div>
-              <h1 className="font-display text-6xl font-bold tracking-[0.15em] text-text-primary">
+              <h1 className="font-display text-5xl font-bold tracking-[0.1em] text-text-primary">
                 CHRONOS
               </h1>
-              <div className="w-12 h-0.5 bg-accent-primary/40 mx-auto rounded-full" />
               <p className="font-serif text-base text-text-secondary">
                 {t("app.subtitle")}
               </p>
             </div>
-
-            <p className="text-sm text-text-tertiary leading-relaxed max-w-xs mx-auto">
-              {t("setup.welcomeDescription")}
-            </p>
 
             <button
               onClick={() => setStep(1)}
               className="btn-primary w-full max-w-[15rem] mx-auto text-base py-3"
             >
               {t("setup.getStarted")}
-              <ChevronRight size={18} />
+              <ChevronRight size={14} />
             </button>
           </div>
         )}
 
         {step === 1 && (
-          <div className="space-y-6">
+          <div className="space-y-6 px-4">
             <div className="text-center space-y-2">
               <h2 className="font-serif text-xl font-semibold text-text-primary">
                 {t("setup.configureAI")}
               </h2>
-              <p className="text-sm text-text-tertiary">
-                {t("setup.configureAIDescription")}
-              </p>
             </div>
 
             <div className="space-y-5">
@@ -187,7 +179,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
                 <p className="mt-1.5 text-[11px] text-text-tertiary leading-relaxed">
                   {selectedProvider?.type === "gemini"
                     ? "Gemini API 地址通常到 /v1beta 即可"
-                    : "OpenAI 兼容接口地址需包含到 /v1，无需包含 /chat/completions"}
+                    : "OpenAI 兼容 API 只需包含到 /v1"}
                 </p>
               </div>
 
@@ -208,7 +200,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </div>
             </div>
 
-            <div className="pt-3">
+            <div className="pt-6">
               <button
                 onClick={handleSaveAndTest}
                 disabled={!apiKey.trim() || testStatus === "testing"}

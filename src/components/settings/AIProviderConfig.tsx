@@ -87,11 +87,11 @@ export function AIProviderConfig() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="section-label mb-1">{t("settings.apiConfig")}</div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-text-secondary">
+        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.aiProvider")}
         </label>
         <select
@@ -108,7 +108,7 @@ export function AIProviderConfig() {
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-text-secondary">
+        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.apiKey")}
           <span className="text-accent-danger ml-1">*</span>
         </label>
@@ -127,7 +127,7 @@ export function AIProviderConfig() {
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-text-secondary">
+        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.baseUrl")}
         </label>
         <input
@@ -143,12 +143,12 @@ export function AIProviderConfig() {
         <p className="mt-1.5 text-[11px] text-text-tertiary leading-relaxed">
           {selectedProvider?.type === "gemini"
             ? "Gemini API 地址通常到 /v1beta 即可"
-            : "OpenAI 兼容接口地址需包含到 /v1，无需包含 /chat/completions"}
+            : "OpenAI 兼容 API 只需包含到 /v1"}
         </p>
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-text-secondary">
+        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.model")}
         </label>
         <input
@@ -163,7 +163,7 @@ export function AIProviderConfig() {
         />
       </div>
 
-      <div className="pt-4">
+      <div className="pt-8">
         <button
           onClick={handleSaveAndTest}
           disabled={!apiKey.trim() || testStatus === "testing"}

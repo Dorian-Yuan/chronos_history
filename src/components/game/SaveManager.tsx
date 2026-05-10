@@ -112,27 +112,27 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
           </button>
         </div>
 
-        <div className="modal-body space-y-4">
+        <div className="modal-body space-y-3">
           {Array.from({ length: 5 }, (_, i) => {
             const save = saves.find((s) => s.slotIndex === i);
             return (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-5 py-5"
+                className="flex items-center gap-4 rounded-lg border border-border bg-bg-card px-5 py-3.5"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-text-primary">
+                  <div className="text-sm font-medium font-serif text-text-primary pl-1">
                     存档 {i + 1}
                   </div>
                   {save ? (
-                    <div className="text-xs text-text-tertiary mt-1 truncate">
+                    <div className="text-xs text-text-tertiary mt-1.5 truncate pl-1">
                       {save.data.metadata.scenarioTitle} ·{" "}
                       {save.data.metadata.nationName} · 第
                       {save.data.metadata.turnCount}回合 ·{" "}
                       {new Date(save.data.metadata.timestamp).toLocaleString()}
                     </div>
                   ) : (
-                    <div className="text-xs text-text-tertiary mt-1">空</div>
+                    <div className="text-xs text-text-tertiary mt-1.5 font-serif pl-1">空</div>
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">
@@ -177,10 +177,10 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
         </div>
 
         <div className="modal-footer flex gap-2.5">
-          <button onClick={handleExport} className="btn-secondary flex-1">
+          <button onClick={handleExport} className="btn-secondary flex-1 font-serif">
             <Download size={13} /> 导出
           </button>
-          <button onClick={handleImport} className="btn-secondary flex-1">
+          <button onClick={handleImport} className="btn-secondary flex-1 font-serif">
             <Upload size={13} /> 导入
           </button>
         </div>

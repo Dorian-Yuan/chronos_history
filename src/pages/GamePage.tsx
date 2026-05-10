@@ -190,7 +190,7 @@ export function GamePage() {
         onClick={onClick}
         role="tab"
         aria-selected={isActive}
-        className="flex flex-col items-center justify-center gap-1 flex-1 py-2 relative transition-colors"
+        className="flex flex-col items-center justify-center gap-1 flex-1 py-3 relative transition-colors"
       >
         <Icon
           size={20}
@@ -216,7 +216,7 @@ export function GamePage() {
   return (
     <div className="flex h-full flex-col">
       <header className="px-6 py-3">
-        <div className="flex items-center justify-between rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] px-4 py-3">
+        <div className="flex items-center justify-between rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] px-5 py-3.5">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#3A3A3E] bg-[#2A2A2E]">
               <User size={20} className="text-[#666666]" />

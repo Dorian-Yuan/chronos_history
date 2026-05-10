@@ -138,7 +138,7 @@ export function EndGameReport({
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-bg-tertiary text-xs font-mono text-text-tertiary">
                   {review.turn}
                 </div>
-                <div className="flex-1 space-y-1.5">
+                <div className="flex-1 space-y-2">
                   <div className="text-sm text-text-secondary">
                     {review.summary}
                   </div>

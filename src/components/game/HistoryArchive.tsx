@@ -64,7 +64,7 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
               {records.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-lg border border-border bg-bg-card px-5 py-5"
+                  className="rounded-lg border border-border bg-bg-card px-5 py-4"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-text-primary">

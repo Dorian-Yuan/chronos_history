@@ -41,9 +41,9 @@ function getTextColor(value: number): string {
 
 export function StatBars({ stats, delta }: StatBarsProps) {
   return (
-    <div className="px-6 py-3">
+    <div className="px-6 py-4">
       <div
-        className="grid grid-cols-2 gap-4 rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] p-4"
+        className="grid grid-cols-2 gap-4 rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] p-5"
         role="group"
         aria-label="国家属性"
       >

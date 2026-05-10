@@ -3,17 +3,11 @@ import { useUIStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AIProviderConfig } from "./AIProviderConfig";
 import { getAppConfig } from "@/config";
-import { setLocale } from "@/i18n";
 import { getAvailableThemes, setTheme, getTheme } from "@/lib/theme";
 import { useState } from "react";
 
 export function SettingsPanel() {
-  const {
-    t,
-    locale,
-    setLocale: setLocaleHook,
-    availableLocales,
-  } = useTranslation();
+  const { t } = useTranslation();
   const settingsOpen = useUIStore((s) => s.settingsOpen);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
   const isMobile = useUIStore((s) => s.isMobile);
@@ -49,27 +43,7 @@ export function SettingsPanel() {
 
         <div className="modal-body space-y-6 safe-bottom">
           <div>
-            <label className="mb-2 block text-sm font-medium text-text-secondary">
-              {t("settings.language")}
-            </label>
-            <select
-              value={locale}
-              onChange={(e) => {
-                setLocale(e.target.value);
-                setLocaleHook(e.target.value);
-              }}
-              className="input-field"
-            >
-              {availableLocales.map((l) => (
-                <option key={l} value={l}>
-                  {l === "zh" ? "中文" : "English"}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-text-secondary">
+            <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
               {t("settings.theme")}
             </label>
             <select
@@ -82,7 +56,7 @@ export function SettingsPanel() {
             >
               {themes.map((th) => (
                 <option key={th.name} value={th.name}>
-                  {locale === "zh" ? th.label : th.labelEn}
+                  {th.label}
                 </option>
               ))}
             </select>
@@ -92,7 +66,7 @@ export function SettingsPanel() {
 
           <AIProviderConfig />
 
-          <div className="text-right text-[10px] text-text-tertiary pt-2">
+          <div className="text-right text-[10px] text-text-tertiary pt-6">
             {t("app.version")}: {appConfig.version}
           </div>
         </div>
