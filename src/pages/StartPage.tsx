@@ -65,7 +65,8 @@ export function StartPage() {
         )}
       </div>
 
-      <div className="absolute bottom-8 left-0 right-0 z-10 flex gap-8 justify-center">
+      <div className="absolute bottom-0 left-0 right-0 z-10 safe-bottom">
+        <div className="flex gap-8 justify-center pb-8">
         <button
           onClick={() => setShowSaveManager(true)}
           className="btn-ghost py-2.5 text-sm"
@@ -87,6 +88,7 @@ export function StartPage() {
           <Settings size={14} />
           设置
         </button>
+        </div>
       </div>
 
       {showSaveManager && (
