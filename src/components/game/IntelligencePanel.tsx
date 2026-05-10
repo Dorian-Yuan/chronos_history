@@ -38,11 +38,11 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
         {factions.map((faction, idx) => (
           <li
             key={`${faction.name}-${idx}`}
-            className={`rounded-lg border border-border bg-bg-secondary p-5 transition-all ${
+            className={`rounded-lg border border-border bg-bg-secondary p-4 transition-all ${
               faction.is_destroyed ? "opacity-40" : ""
             } ${faction.is_new ? "ring-1 ring-accent-primary/30" : ""}`}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 {faction.is_destroyed ? (
                   <Skull size={14} className="text-text-tertiary" aria-hidden="true" />
@@ -53,7 +53,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                   {faction.name}
                 </span>
               </div>
-              <span className={`badge ${getAttitudeStyle(faction.attitude)} text-xs`}>
+              <span className={`badge ${getAttitudeStyle(faction.attitude)}`}>
                 {faction.attitude}
               </span>
             </div>
@@ -64,11 +64,11 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
               </div>
             )}
 
-            <p className="font-serif italic text-sm text-text-secondary leading-relaxed mb-4">
+            <p className="font-serif italic text-sm text-text-secondary leading-relaxed mb-3">
               {faction.description}
             </p>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <TrendingUp size={13} className="shrink-0 text-accent-primary" aria-hidden="true" />
                 <span className="text-sm font-semibold text-accent-primary shrink-0">优势：</span>

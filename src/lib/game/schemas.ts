@@ -61,7 +61,7 @@ export const scenarioSchema = {
             type: "string" as const,
             enum: ["General", "Diplomat", "Intel", "Scholar", "Merchant"],
           },
-          name: { type: "string" as const, description: "符合时代与文明真实人名风格的名字" },
+          name: { type: "string" as const, description: "真实人名（禁止奇幻风格，中国用姓+名如'陈伯年'，欧洲用名+姓，禁止'铁牙''影爪'等）" },
           advice: { type: "string" as const, description: "建议（简体中文）" },
           bias: {
             type: "string" as const,
@@ -77,7 +77,7 @@ export const scenarioSchema = {
         type: "object" as const,
         additionalProperties: false,
         properties: {
-          name: { type: "string" as const, description: "2字简称" },
+          name: { type: "string" as const, description: "2字势力简称（必须真实可信，禁止奇幻风格如'暗影''血月'）" },
           description: {
             type: "string" as const,
             description: "势力描述（Conquest以外国势力为主，Prosperity以经济集团为主，Reform以内部政治力量为主，Survival内外兼有）",

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSettingsStore } from "@/stores";
+import { useUIStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getAIProviders } from "@/config";
 import { getProviderDefaultConfig, createProvider } from "@/lib/ai";
@@ -12,6 +13,7 @@ export function AIProviderConfig() {
   const { t } = useTranslation();
   const aiProvider = useSettingsStore((s) => s.aiProvider);
   const setAIProvider = useSettingsStore((s) => s.setAIProvider);
+  const showToast = useUIStore((s) => s.showToast);
   const providers = getAIProviders();
 
   const [providerId, setProviderId] = useState(
@@ -21,7 +23,6 @@ export function AIProviderConfig() {
   const [baseUrl, setBaseUrl] = useState(aiProvider?.baseUrl || "");
   const [model, setModel] = useState(aiProvider?.model || "");
   const [testStatus, setTestStatus] = useState<TestStatus>("idle");
-  const [testError, setTestError] = useState<string | null>(null);
 
   const handleProviderChange = (id: string) => {
     setProviderId(id);
@@ -29,7 +30,6 @@ export function AIProviderConfig() {
     setBaseUrl(defaults.baseUrl || "");
     setModel(defaults.model || "");
     setTestStatus("idle");
-    setTestError(null);
   };
 
   const handleSaveAndTest = async () => {
@@ -42,13 +42,12 @@ export function AIProviderConfig() {
     setAIProvider(setting);
 
     setTestStatus("testing");
-    setTestError(null);
 
     try {
       const provider = createProvider(setting);
       if (!provider.validateConfig()) {
         setTestStatus("error");
-        setTestError("配置不完整，请检查 API Key 和 Base URL");
+        showToast("配置不完整，请检查 API Key 和 Base URL", "error");
         return;
       }
 
@@ -67,13 +66,14 @@ export function AIProviderConfig() {
 
       if (response.content) {
         setTestStatus("success");
+        showToast("API 连接测试通过，配置已保存", "success");
       } else {
         setTestStatus("error");
-        setTestError("API 返回了空响应");
+        showToast("API 返回了空响应", "error");
       }
     } catch (e) {
       setTestStatus("error");
-      setTestError(e instanceof Error ? e.message : "连接测试失败，请检查配置");
+      showToast(e instanceof Error ? e.message : "连接测试失败，请检查配置", "error");
     }
   };
 
@@ -191,17 +191,6 @@ export function AIProviderConfig() {
           </span>
         </button>
 
-        {testStatus === "error" && testError && (
-          <div className="mt-3 rounded-lg border border-status-error-border bg-status-error-bg px-4 py-2.5 text-xs text-status-error-text leading-relaxed">
-            {testError}
-          </div>
-        )}
-
-        {testStatus === "success" && (
-          <div className="mt-3 rounded-lg border border-status-success-border bg-status-success-bg px-4 py-2.5 text-xs text-status-success-text">
-            API 连接测试通过，配置已保存
-          </div>
-        )}
       </div>
     </div>
   );

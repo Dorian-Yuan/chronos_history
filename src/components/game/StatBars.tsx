@@ -36,7 +36,7 @@ function getBarColorVar(value: number): string {
 
 export function StatBars({ stats, delta }: StatBarsProps) {
   return (
-    <div className="px-5 pt-2 pb-3">
+    <div className="px-5 pt-3 pb-4 border-b border-border">
       <div
         className="grid grid-cols-2 gap-x-5 gap-y-3 rounded-lg border border-border bg-bg-card p-4"
         role="group"
@@ -47,9 +47,9 @@ export function StatBars({ stats, delta }: StatBarsProps) {
           const deltaValue = delta?.[key] ?? 0;
 
           return (
-            <div key={key} className="space-y-1.5">
+            <div key={key} className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-serif font-medium text-text-secondary flex items-center gap-1.5">
+                <span className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
                   <Icon size={11} className="text-text-tertiary" />
                   {label}
                 </span>

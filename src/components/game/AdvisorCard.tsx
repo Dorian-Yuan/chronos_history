@@ -66,7 +66,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
 
   return (
     <div
-      className="rounded-lg border bg-bg-secondary p-5 transition-all hover:border-border-hover"
+      className="rounded-lg border bg-bg-secondary p-4 transition-all hover:border-border-hover"
       style={{ borderColor: roleBorderColor }}
     >
       <div className="flex items-center gap-2.5">
@@ -82,16 +82,16 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         <span className="text-sm font-serif text-text-secondary">// {advisor.name}</span>
       </div>
 
-      <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
+      <p className="mt-2 text-sm font-serif text-text-primary font-medium leading-relaxed">
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-3 text-xs font-serif text-text-tertiary">
+      <div className="mt-2 text-xs font-serif text-text-tertiary">
         倾向：{advisor.bias}
       </div>
 
       {advisor.hidden_motive && (
-        <div className="mt-3">
+        <div className="mt-2">
           <button
             onClick={() => setShowMotive(!showMotive)}
             className="text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
@@ -103,7 +103,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
       )}
 
       {advisor.hidden_motive && showMotive && (
-        <div className="mt-3 rounded border border-border bg-bg-card px-5 py-4">
+        <div className="mt-2 rounded border border-border bg-bg-card px-4 py-3">
           <p className="text-xs font-serif italic leading-relaxed text-accent-secondary">
             {advisor.hidden_motive}
           </p>

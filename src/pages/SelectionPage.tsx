@@ -71,13 +71,10 @@ export function SelectionPage() {
 
   return (
     <main className="flex h-full flex-col items-center justify-center px-6">
-      <div className="mb-10 text-center space-y-4 animate-fade-in">
+      <div className="mb-6 text-center animate-fade-in">
         <h1 className="font-serif text-2xl font-bold text-text-primary">
           选择执政基调
         </h1>
-        <p className="text-sm text-text-tertiary max-w-sm mx-auto leading-relaxed">
-          不同的基调将带来截然不同的历史剧本与挑战
-        </p>
       </div>
 
       {generating ? (

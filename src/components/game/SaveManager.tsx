@@ -118,7 +118,7 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
             return (
               <div
                 key={i}
-                className="flex items-center gap-4 rounded-lg border border-border bg-bg-card px-5 py-4"
+                className="flex items-center gap-4 rounded-lg border border-border bg-bg-card px-4 py-2.5"
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium font-serif text-text-primary pl-1">

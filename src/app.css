@@ -773,9 +773,10 @@ select,
   display: inline-flex;
   align-items: center;
   border-radius: 4px;
-  padding: 5px 12px;
-  font-size: 0.75rem;
+  padding: 3px 8px;
+  font-size: 0.6875rem;
   font-weight: 600;
+  font-family: var(--font-serif);
   letter-spacing: 0.02em;
 }
 
