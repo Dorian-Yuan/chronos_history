@@ -71,7 +71,7 @@ export function SelectionPage() {
 
   return (
     <main className="flex h-full flex-col items-center justify-center px-6">
-      <div className="mb-6 text-center animate-fade-in">
+      <div className="mb-8 text-center animate-fade-in">
         <h1 className="font-serif text-2xl font-bold text-text-primary">
           选择执政基调
         </h1>

@@ -50,7 +50,7 @@ export function GameInput({ onSubmit, disabled, placeholder }: GameInputProps) {
           placeholder={placeholder || "下达指令..."}
           aria-label="决策输入"
           rows={1}
-          className="flex-1 resize-none bg-transparent py-1.5 pl-1 text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none"
+          className="flex-1 resize-none bg-transparent py-1.5 pl-2 text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none"
           disabled={disabled}
         />
         <button

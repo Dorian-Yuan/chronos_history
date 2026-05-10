@@ -47,7 +47,7 @@ export function AIProviderConfig() {
       const provider = createProvider(setting);
       if (!provider.validateConfig()) {
         setTestStatus("error");
-        showToast("配置不完整，请检查 API Key 和 Base URL", "error");
+        showToast("配置不完整", "error");
         return;
       }
 
@@ -66,14 +66,14 @@ export function AIProviderConfig() {
 
       if (response.content) {
         setTestStatus("success");
-        showToast("API 连接测试通过，配置已保存", "success");
+        showToast("连接成功", "success");
       } else {
         setTestStatus("error");
-        showToast("API 返回了空响应", "error");
+        showToast("空响应", "error");
       }
     } catch (e) {
       setTestStatus("error");
-      showToast(e instanceof Error ? e.message : "连接测试失败，请检查配置", "error");
+      showToast(e instanceof Error ? e.message : "连接失败", "error");
     }
   };
 
