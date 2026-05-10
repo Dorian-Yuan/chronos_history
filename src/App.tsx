@@ -21,7 +21,7 @@ function PWABanner() {
 
   if (isOffline) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-3 text-center text-xs text-amber-400 border-b border-amber-900/20">
+      <div className="flex items-center justify-center gap-2 bg-status-warning-bg px-5 py-3 text-center text-xs text-status-warning-text border-b border-status-warning-border">
         <WifiOff size={13} />
         {t("pwa.offlineNotice")}
       </div>
@@ -30,12 +30,12 @@ function PWABanner() {
 
   if (isUpdateAvailable) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-blue-900/20 px-5 py-3 text-center text-xs text-blue-400 border-b border-blue-900/20">
+      <div className="flex items-center justify-center gap-2 bg-status-info-bg px-5 py-3 text-center text-xs text-status-info-text border-b border-status-info-border">
         <RefreshCw size={13} />
         {t("pwa.updateAvailable")}
         <button
           onClick={updateApp}
-          className="font-semibold underline underline-offset-2 hover:text-blue-300 transition-colors"
+          className="font-semibold underline underline-offset-2 hover:opacity-80 transition-opacity"
         >
           {t("pwa.updateNow")}
         </button>
@@ -45,12 +45,12 @@ function PWABanner() {
 
   if (canInstall) {
     return (
-      <div className="flex items-center justify-center gap-2 bg-amber-900/20 px-5 py-3 text-center text-xs text-amber-400 border-b border-amber-900/20">
+      <div className="flex items-center justify-center gap-2 bg-status-warning-bg px-5 py-3 text-center text-xs text-status-warning-text border-b border-status-warning-border">
         <Download size={13} />
         {t("pwa.installPrompt")}
         <button
           onClick={installApp}
-          className="font-semibold underline underline-offset-2 hover:text-amber-300 transition-colors"
+          className="font-semibold underline underline-offset-2 hover:opacity-80 transition-opacity"
         >
           {t("pwa.install")}
         </button>

@@ -30,7 +30,7 @@ export function ChroniclePanel({
       aria-label="编年史"
       aria-live="polite"
     >
-      <div className="rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] p-4">
+      <div className="rounded-lg border border-border bg-bg-card p-5">
         {turnCount === 1 && turnResults.length === 0 && (
           <div className="space-y-4 animate-fade-in">
             <div className="section-label">{scenario.start_date || "元年"}</div>
@@ -41,7 +41,7 @@ export function ChroniclePanel({
                   {scenario.player_context.nation_name}
                 </span>
                 {scenario.player_context?.leader_title && (
-                  <span className="text-xs text-[#666666]">
+                  <span className="text-xs text-text-tertiary">
                     — {scenario.player_context.leader_title}
                   </span>
                 )}
@@ -49,26 +49,26 @@ export function ChroniclePanel({
             )}
 
             {scenario.player_context?.background_summary && (
-              <div className="text-sm font-serif leading-[1.6] text-[#CCCCCC]">
+              <div className="text-sm font-serif leading-relaxed text-text-secondary">
                 {scenario.player_context.background_summary}
               </div>
             )}
 
             {scenario.description && (
-              <div className="border-l-[3px] border-[#2ECE8B] bg-[#2ECE8B]/5 px-4 py-3 rounded-r-lg my-4">
-                <div className="text-xs font-semibold text-[#2ECE8B] tracking-wider uppercase mb-1">
+              <div className="border-l-[3px] border-accent-primary bg-accent-primary/5 px-4 py-3 rounded-r-lg my-4">
+                <div className="text-xs font-semibold text-accent-primary tracking-wider uppercase mb-1">
                   当前危机
                 </div>
-                <div className="font-serif text-sm text-[#2ECE8B] leading-[1.6]">
+                <div className="font-serif text-sm text-accent-primary leading-relaxed">
                   {scenario.description}
                 </div>
               </div>
             )}
 
-            <div className="h-px bg-[#2A2A2E] my-4" />
+            <div className="h-px bg-border my-4" />
 
-            <div className="border-l-[3px] border-[#2ECE8B] pl-3">
-              <div className="font-serif text-sm text-[#CCCCCC] leading-[1.6]">
+            <div className="border-l-[3px] border-accent-primary pl-3">
+              <div className="font-serif text-sm text-text-secondary leading-relaxed">
                 阁下，作为{scenario.player_context?.leader_title || "统治者"}
                 ，您的第一道政令是什么？
               </div>
@@ -85,30 +85,30 @@ export function ChroniclePanel({
             </div>
 
             {result.rumor && (
-              <div className="font-serif text-xs italic text-[#666666] leading-[1.6]">
+              <div className="font-serif text-xs italic text-text-tertiary leading-relaxed">
                 民间传言：{result.rumor}
               </div>
             )}
 
-            <div className="border-l-[3px] border-[#2A2A2E] pl-4">
-              <div className="font-serif text-sm leading-[1.6] text-[#CCCCCC]">
+            <div className="border-l-[3px] border-border pl-4">
+              <div className="font-serif text-sm leading-relaxed text-text-secondary">
                 {result.narrative}
               </div>
             </div>
 
             {result.situation_update && (
-              <div className="border-l-[3px] border-[#2ECE8B] bg-[#2ECE8B]/5 px-4 py-3 rounded-r-lg my-4">
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#2ECE8B] mb-1">
+              <div className="border-l-[3px] border-accent-primary bg-accent-primary/5 px-4 py-3 rounded-r-lg my-4">
+                <div className="text-xs font-semibold uppercase tracking-wider text-accent-primary mb-1">
                   最新情报
                 </div>
-                <div className="font-serif text-sm text-[#2ECE8B] leading-[1.6]">
+                <div className="font-serif text-sm text-accent-primary leading-relaxed">
                   {result.situation_update}
                 </div>
               </div>
             )}
 
             {idx < turnResults.length - 1 && (
-              <div className="h-px bg-[#2A2A2E] my-4" />
+              <div className="h-px bg-border my-4" />
             )}
           </article>
         ))}
@@ -119,16 +119,16 @@ export function ChroniclePanel({
             role="status"
             aria-live="polite"
           >
-            <div className="h-2 w-2 animate-pulse rounded-full bg-[#2ECE8B]" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-accent-primary" />
             <div
-              className="h-2 w-2 animate-pulse rounded-full bg-[#2ECE8B]"
+              className="h-2 w-2 animate-pulse rounded-full bg-accent-primary"
               style={{ animationDelay: "0.2s" }}
             />
             <div
-              className="h-2 w-2 animate-pulse rounded-full bg-[#2ECE8B]"
+              className="h-2 w-2 animate-pulse rounded-full bg-accent-primary"
               style={{ animationDelay: "0.4s" }}
             />
-            <span className="text-xs text-[#666666] ml-2">推演中...</span>
+            <span className="text-xs text-text-tertiary ml-2">推演中...</span>
           </div>
         )}
       </div>

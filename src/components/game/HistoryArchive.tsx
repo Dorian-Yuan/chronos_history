@@ -28,9 +28,9 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
   }, []);
 
   const OUTCOME_STYLES: Record<string, string> = {
-    victory: "bg-green-900/20 text-green-400 border-green-800/20",
-    neutral: "bg-amber-900/20 text-amber-400 border-amber-800/20",
-    defeat: "bg-red-900/20 text-red-400 border-red-800/20",
+    victory: "bg-status-success-bg text-status-success-text border border-status-success-border",
+    neutral: "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
+    defeat: "bg-status-error-bg text-status-error-text border border-status-error-border",
   };
 
   return (
@@ -64,14 +64,14 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
               {records.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-lg border border-border bg-bg-card px-5 py-4"
+                  className="rounded-lg border border-border bg-bg-card p-5"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-text-primary">
                       {record.scenarioTitle}
                     </span>
                     <span
-                      className={`badge ${OUTCOME_STYLES[record.outcome] || "bg-zinc-800/30 text-zinc-400 border-zinc-700/20"}`}
+                      className={`badge ${OUTCOME_STYLES[record.outcome] || "bg-bg-tertiary text-text-tertiary"}`}
                     >
                       {record.outcome === "victory"
                         ? "胜利"

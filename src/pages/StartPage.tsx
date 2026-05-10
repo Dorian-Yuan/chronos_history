@@ -33,26 +33,24 @@ export function StartPage() {
     <main className="relative h-full flex flex-col items-center px-6 stripe-texture overflow-hidden">
       <DisclaimerModal />
 
-      {/* 标题区域：绝对定位在上 28% 位置 */}
-      <div className="absolute top-[28%] left-0 right-0 z-10 flex flex-col items-center gap-8 animate-fade-in">
-        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-[#333333]">
-          <Globe size={32} className="text-white" strokeWidth={1.5} />
+      <div className="absolute top-[28%] left-0 right-0 z-10 flex flex-col items-center gap-6 animate-fade-in">
+        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-bg-tertiary">
+          <Globe size={32} className="text-text-primary" strokeWidth={1.5} />
         </div>
         <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">
           CHRONOS
         </h1>
-        <p className="text-sm text-[#999999] tracking-[0.3em]">
+        <p className="text-sm text-text-tertiary tracking-[0.3em]">
           历史的回响 / 决策推演
         </p>
       </div>
 
-      {/* 主按钮区域：绝对定位在 60% 位置 */}
-      <div className="absolute top-[60%] left-1/2 -translate-x-1/2 z-10 flex flex-col gap-5 w-full max-w-[240px] animate-slide-up">
+      <div className="absolute top-[60%] left-1/2 -translate-x-1/2 z-10 flex flex-col gap-4 w-full max-w-[240px] animate-slide-up">
         <button
           onClick={handleEnter}
           className="btn-primary w-full h-14 text-base"
         >
-          <BookOpen size={18} className="text-black" />
+          <BookOpen size={18} className="text-btn-primary-text" />
           进入历史
         </button>
 
@@ -67,7 +65,6 @@ export function StartPage() {
         )}
       </div>
 
-      {/* 底部功能按钮：绝对定位在底部 */}
       <div className="absolute bottom-8 left-0 right-0 z-10 flex gap-8 justify-center">
         <button
           onClick={() => setShowSaveManager(true)}

@@ -91,6 +91,55 @@
   --color-accent-hover-glow: rgba(46, 206, 139, 0.06);
   --color-accent-glow-sm: rgba(46, 206, 139, 0.15);
   --color-accent-glow-md: rgba(46, 206, 139, 0.3);
+
+  --color-btn-primary-bg: #ffffff;
+  --color-btn-primary-text: #000000;
+  --color-btn-primary-hover-bg: #f0f0f0;
+  --color-btn-secondary-bg: #2a2a2e;
+  --color-btn-secondary-border: #3a3a3e;
+  --color-btn-secondary-text: #ffffff;
+  --color-btn-secondary-hover-bg: #333338;
+  --color-btn-secondary-hover-border: #4a4a4e;
+  --color-btn-secondary-hover-text: #ffffff;
+
+  --color-status-error-bg: rgba(239, 68, 68, 0.1);
+  --color-status-error-border: rgba(239, 68, 68, 0.3);
+  --color-status-error-text: #f87171;
+  --color-status-success-bg: rgba(34, 197, 94, 0.1);
+  --color-status-success-border: rgba(34, 197, 94, 0.3);
+  --color-status-success-text: #4ade80;
+  --color-status-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-status-warning-border: rgba(245, 158, 11, 0.3);
+  --color-status-warning-text: #fbbf24;
+  --color-status-info-bg: rgba(59, 130, 246, 0.1);
+  --color-status-info-border: rgba(59, 130, 246, 0.3);
+  --color-status-info-text: #60a5fa;
+
+  --color-modal-overlay: rgba(0, 0, 0, 0.7);
+  --color-ink-wash-1: rgba(46, 206, 139, 0.03);
+  --color-ink-wash-2: rgba(74, 158, 245, 0.02);
+  --color-ink-wash-3: rgba(232, 131, 58, 0.02);
+  --color-stripe-line: rgba(255, 255, 255, 0.03);
+
+  --color-role-general: #E85A5A;
+  --color-role-general-bg: rgba(232, 90, 90, 0.08);
+  --color-role-general-border: rgba(232, 90, 90, 0.2);
+  --color-role-diplomat: #4A9EF5;
+  --color-role-diplomat-bg: rgba(74, 158, 245, 0.08);
+  --color-role-diplomat-border: rgba(74, 158, 245, 0.2);
+  --color-role-intel: #A78BFA;
+  --color-role-intel-bg: rgba(167, 139, 250, 0.08);
+  --color-role-intel-border: rgba(167, 139, 250, 0.2);
+  --color-role-scholar: #2ECE8B;
+  --color-role-scholar-bg: rgba(46, 206, 139, 0.08);
+  --color-role-scholar-border: rgba(46, 206, 139, 0.2);
+  --color-role-merchant: #E8833A;
+  --color-role-merchant-bg: rgba(232, 131, 58, 0.08);
+  --color-role-merchant-border: rgba(232, 131, 58, 0.2);
+
+  --color-tab-chronicle: #2ECE8B;
+  --color-tab-cabinet: #E8833A;
+  --color-tab-intelligence: #4A9EF5;
 }
 
 @theme {
@@ -119,6 +168,32 @@
   --color-diplomacy: var(--color-diplomacy);
   --color-technology: var(--color-technology);
   --color-culture: var(--color-culture);
+  --color-btn-primary-bg: var(--color-btn-primary-bg);
+  --color-btn-primary-text: var(--color-btn-primary-text);
+  --color-btn-secondary-bg: var(--color-btn-secondary-bg);
+  --color-btn-secondary-border: var(--color-btn-secondary-border);
+  --color-btn-secondary-text: var(--color-btn-secondary-text);
+  --color-status-error-bg: var(--color-status-error-bg);
+  --color-status-error-border: var(--color-status-error-border);
+  --color-status-error-text: var(--color-status-error-text);
+  --color-status-success-bg: var(--color-status-success-bg);
+  --color-status-success-border: var(--color-status-success-border);
+  --color-status-success-text: var(--color-status-success-text);
+  --color-status-warning-bg: var(--color-status-warning-bg);
+  --color-status-warning-border: var(--color-status-warning-border);
+  --color-status-warning-text: var(--color-status-warning-text);
+  --color-status-info-bg: var(--color-status-info-bg);
+  --color-status-info-border: var(--color-status-info-border);
+  --color-status-info-text: var(--color-status-info-text);
+  --color-modal-overlay: var(--color-modal-overlay);
+  --color-role-general: var(--color-role-general);
+  --color-role-diplomat: var(--color-role-diplomat);
+  --color-role-intel: var(--color-role-intel);
+  --color-role-scholar: var(--color-role-scholar);
+  --color-role-merchant: var(--color-role-merchant);
+  --color-tab-chronicle: var(--color-tab-chronicle);
+  --color-tab-cabinet: var(--color-tab-cabinet);
+  --color-tab-intelligence: var(--color-tab-intelligence);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 }
@@ -398,6 +473,7 @@ select,
 }
 .safe-bottom {
   padding-bottom: var(--safe-area-bottom);
+  -webkit-padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .safe-left {
   padding-left: var(--safe-area-left);
@@ -447,17 +523,17 @@ select,
   background:
     radial-gradient(
       ellipse at 20% 50%,
-      rgba(46, 206, 139, 0.03) 0%,
+      var(--color-ink-wash-1) 0%,
       transparent 50%
     ),
     radial-gradient(
       ellipse at 80% 20%,
-      rgba(74, 158, 245, 0.02) 0%,
+      var(--color-ink-wash-2) 0%,
       transparent 50%
     ),
     radial-gradient(
       ellipse at 50% 80%,
-      rgba(232, 131, 58, 0.02) 0%,
+      var(--color-ink-wash-3) 0%,
       transparent 50%
     );
 }
@@ -539,8 +615,8 @@ select,
   justify-content: center;
   gap: 0.5rem;
   border-radius: var(--radius-md);
-  background: #ffffff;
-  color: #000000;
+  background: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-text);
   font-weight: 600;
   font-size: 0.875rem;
   padding: 0.75rem 1.5rem;
@@ -549,7 +625,7 @@ select,
 }
 
 .btn-primary:hover {
-  background: #f0f0f0;
+  background: var(--color-btn-primary-hover-bg);
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
@@ -571,10 +647,10 @@ select,
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #3a3a3e;
-  background: #2a2a2e;
-  color: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-btn-secondary-border);
+  background: var(--color-btn-secondary-bg);
+  color: var(--color-btn-secondary-text);
   font-weight: 500;
   font-size: 0.8125rem;
   padding: 0.625rem 1.25rem;
@@ -582,9 +658,9 @@ select,
 }
 
 .btn-secondary:hover {
-  border-color: #4a4a4e;
-  background: #333338;
-  color: #ffffff;
+  border-color: var(--color-btn-secondary-hover-border);
+  background: var(--color-btn-secondary-hover-bg);
+  color: var(--color-btn-secondary-hover-text);
 }
 
 .btn-secondary:active {
@@ -639,7 +715,7 @@ select,
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--color-modal-overlay);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 1.5rem;
@@ -682,7 +758,7 @@ select,
   font-weight: 600;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: #666666;
+  color: var(--color-text-tertiary);
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -717,8 +793,8 @@ select,
     90deg,
     transparent,
     transparent 8px,
-    rgba(255, 255, 255, 0.03) 8px,
-    rgba(255, 255, 255, 0.03) 9px
+    var(--color-stripe-line) 8px,
+    var(--color-stripe-line) 9px
   );
 }
 

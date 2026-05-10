@@ -11,45 +11,45 @@ const ROLE_CONFIG: Record<
   {
     label: string;
     icon: typeof Shield;
-    color: string;
-    bgColor: string;
-    borderColor: string;
+    colorVar: string;
+    bgColorVar: string;
+    borderColorVar: string;
   }
 > = {
   General: {
     label: "将军",
     icon: Shield,
-    color: "#E85A5A",
-    bgColor: "rgba(232, 90, 90, 0.08)",
-    borderColor: "rgba(232, 90, 90, 0.2)",
+    colorVar: "--color-role-general",
+    bgColorVar: "--color-role-general-bg",
+    borderColorVar: "--color-role-general-border",
   },
   Diplomat: {
     label: "外交官",
     icon: Scroll,
-    color: "#4A9EF5",
-    bgColor: "rgba(74, 158, 245, 0.08)",
-    borderColor: "rgba(74, 158, 245, 0.2)",
+    colorVar: "--color-role-diplomat",
+    bgColorVar: "--color-role-diplomat-bg",
+    borderColorVar: "--color-role-diplomat-border",
   },
   Intel: {
     label: "密探",
     icon: Eye,
-    color: "#A78BFA",
-    bgColor: "rgba(167, 139, 250, 0.08)",
-    borderColor: "rgba(167, 139, 250, 0.2)",
+    colorVar: "--color-role-intel",
+    bgColorVar: "--color-role-intel-bg",
+    borderColorVar: "--color-role-intel-border",
   },
   Scholar: {
     label: "学者",
     icon: BookOpen,
-    color: "#2ECE8B",
-    bgColor: "rgba(46, 206, 139, 0.08)",
-    borderColor: "rgba(46, 206, 139, 0.2)",
+    colorVar: "--color-role-scholar",
+    bgColorVar: "--color-role-scholar-bg",
+    borderColorVar: "--color-role-scholar-border",
   },
   Merchant: {
     label: "商人",
     icon: Coins,
-    color: "#E8833A",
-    bgColor: "rgba(232, 131, 58, 0.08)",
-    borderColor: "rgba(232, 131, 58, 0.2)",
+    colorVar: "--color-role-merchant",
+    bgColorVar: "--color-role-merchant-bg",
+    borderColorVar: "--color-role-merchant-border",
   },
 };
 
@@ -60,29 +60,33 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
 
   const Icon = config.icon;
 
+  const roleColor = `var(${config.colorVar})`;
+  const roleBgColor = `var(${config.bgColorVar})`;
+  const roleBorderColor = `var(${config.borderColorVar})`;
+
   return (
     <div
-      className="rounded-lg border bg-[#141418] p-5 transition-all hover:border-[#3A3A3E]"
-      style={{ borderColor: config.borderColor }}
+      className="rounded-lg border bg-bg-secondary p-5 transition-all hover:border-border-hover"
+      style={{ borderColor: roleBorderColor }}
     >
       <div className="flex items-center gap-2.5">
         <div
           className="flex h-7 w-7 items-center justify-center rounded-md"
-          style={{ backgroundColor: config.bgColor }}
+          style={{ backgroundColor: roleBgColor }}
         >
-          <Icon size={14} style={{ color: config.color }} aria-hidden="true" />
+          <Icon size={14} style={{ color: roleColor }} aria-hidden="true" />
         </div>
-        <span className="text-sm" style={{ color: config.color }}>
+        <span className="text-sm" style={{ color: roleColor }}>
           {config.label}
         </span>
-        <span className="text-sm text-[#CCCCCC]">// {advisor.name}</span>
+        <span className="text-sm font-serif text-text-secondary">// {advisor.name}</span>
       </div>
 
-      <p className="mt-3 text-[17px] font-serif text-white font-medium leading-[1.8]">
+      <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-3 text-[13px] text-[#666666]">
+      <div className="mt-3 text-xs font-serif text-text-tertiary">
         倾向：{advisor.bias}
       </div>
 
@@ -90,7 +94,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         <div className="mt-3">
           <button
             onClick={() => setShowMotive(!showMotive)}
-            className="text-[11px] text-[#666666] hover:text-[#CCCCCC] transition-colors"
+            className="text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
             aria-label={showMotive ? "隐藏秘密动机" : "查看秘密动机"}
           >
             {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
@@ -99,8 +103,8 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
       )}
 
       {advisor.hidden_motive && showMotive && (
-        <div className="mt-3 rounded border border-[#2A2A2E] bg-[#1A1A1E] px-5 py-4">
-          <p className="text-[12px] font-serif italic leading-[1.7] text-[#E8833A]">
+        <div className="mt-3 rounded border border-border bg-bg-card px-5 py-4">
+          <p className="text-xs font-serif italic leading-relaxed text-accent-secondary">
             {advisor.hidden_motive}
           </p>
         </div>

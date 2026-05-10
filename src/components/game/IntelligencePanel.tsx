@@ -6,28 +6,25 @@ interface IntelligencePanelProps {
 }
 
 const ATTITUDE_STYLES: Record<string, string> = {
-  敌对: "bg-red-900/30 text-red-400",
-  求和: "bg-blue-900/30 text-blue-400",
-  中立: "bg-[#2A2A2E] text-zinc-300",
-  友好: "bg-green-900/30 text-green-400",
-  臣服: "bg-amber-900/30 text-amber-400",
-  已灭亡: "bg-[#2A2A2E] text-zinc-500 line-through",
+  敌对: "bg-status-error-bg text-status-error-text border border-status-error-border",
+  求和: "bg-status-info-bg text-status-info-text border border-status-info-border",
+  中立: "bg-bg-tertiary text-text-secondary",
+  友好: "bg-status-success-bg text-status-success-text border border-status-success-border",
+  臣服: "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
+  已灭亡: "bg-bg-tertiary text-text-tertiary line-through",
 };
 
 function getAttitudeStyle(attitude: string): string {
-  return ATTITUDE_STYLES[attitude] || "bg-[#2A2A2E] text-zinc-300";
+  return ATTITUDE_STYLES[attitude] || "bg-bg-tertiary text-text-secondary";
 }
 
 export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   if (!factions.length) {
     return (
-      <section className="flex flex-col gap-4 p-6" aria-label="情报面板">
-        <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666] pt-4">
-          GEOPOLITICAL INTELLIGENCE
-        </div>
-        <div className="flex flex-col items-center justify-center py-10 text-[#666666]">
-          <p className="text-xs">暂无情报信息</p>
-          <p className="text-[10px] mt-1 text-[#666666]/60">
+      <section className="flex flex-col gap-4 px-5 py-4" aria-label="情报面板">
+        <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
+          <p className="text-xs font-serif">暂无情报信息</p>
+          <p className="text-xs mt-1 text-text-tertiary/60 font-serif">
             完成第一回合后将显示派系情报
           </p>
         </div>
@@ -36,26 +33,23 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   }
 
   return (
-    <section className="flex flex-col gap-6 px-5 py-4" aria-label="情报面板">
-      <div className="text-center text-xs uppercase tracking-[0.25em] text-[#666666] pt-4">
-        GEOPOLITICAL INTELLIGENCE
-      </div>
+    <section className="flex flex-col gap-4 px-5 py-4" aria-label="情报面板">
       <ul className="flex flex-col gap-4">
         {factions.map((faction, idx) => (
           <li
             key={`${faction.name}-${idx}`}
-            className={`rounded-lg border border-[#2A2A2E] bg-[#141418] p-5 transition-all ${
+            className={`rounded-lg border border-border bg-bg-secondary p-5 transition-all ${
               faction.is_destroyed ? "opacity-40" : ""
-            } ${faction.is_new ? "ring-1 ring-[#2ECE8B]/30" : ""}`}
+            } ${faction.is_new ? "ring-1 ring-accent-primary/30" : ""}`}
           >
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 {faction.is_destroyed ? (
-                  <Skull size={14} className="text-[#666666]" aria-hidden="true" />
+                  <Skull size={14} className="text-text-tertiary" aria-hidden="true" />
                 ) : (
-                  <Swords size={14} className="text-[#666666]" aria-hidden="true" />
+                  <Swords size={14} className="text-text-tertiary" aria-hidden="true" />
                 )}
-                <span className="text-lg font-bold text-text-primary">
+                <span className="text-base font-serif font-bold text-text-primary">
                   {faction.name}
                 </span>
               </div>
@@ -65,30 +59,30 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
             </div>
 
             {faction.is_new && (
-              <div className="mb-2 text-xs font-semibold text-[#2ECE8B]">
+              <div className="mb-2 text-xs font-semibold text-accent-primary">
                 ● 新势力出现
               </div>
             )}
 
-            <p className="italic text-sm text-[#CCCCCC] leading-[1.7] mb-4">
+            <p className="font-serif italic text-sm text-text-secondary leading-relaxed mb-4">
               {faction.description}
             </p>
 
-            <div className="space-y-2.5">
-              <div className="flex items-start gap-2">
-                <TrendingUp size={14} className="mt-0.5 shrink-0 text-[#2ECE8B]" aria-hidden="true" />
-                <span className="text-sm font-semibold text-[#2ECE8B] shrink-0">优势：</span>
-                <span className="text-sm text-[#CCCCCC]">{faction.strength}</span>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp size={13} className="shrink-0 text-accent-primary" aria-hidden="true" />
+                <span className="text-sm font-semibold text-accent-primary shrink-0">优势：</span>
+                <span className="text-sm font-serif text-text-secondary">{faction.strength}</span>
               </div>
-              <div className="flex items-start gap-2">
-                <AlertTriangle size={14} className="mt-0.5 shrink-0 text-[#E8833A]" aria-hidden="true" />
-                <span className="text-sm font-semibold text-[#E8833A] shrink-0">弱点：</span>
-                <span className="text-sm text-[#CCCCCC]">{faction.weakness}</span>
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={13} className="shrink-0 text-accent-secondary" aria-hidden="true" />
+                <span className="text-sm font-semibold text-accent-secondary shrink-0">弱点：</span>
+                <span className="text-sm font-serif text-text-secondary">{faction.weakness}</span>
               </div>
-              <div className="flex items-start gap-2">
-                <Target size={14} className="mt-0.5 shrink-0 text-[#E85A5A]" aria-hidden="true" />
-                <span className="text-sm font-semibold text-[#E85A5A] shrink-0">急需：</span>
-                <span className="text-sm text-[#E85A5A]">{faction.needs}</span>
+              <div className="flex items-center gap-2">
+                <Target size={13} className="shrink-0 text-accent-danger" aria-hidden="true" />
+                <span className="text-sm font-semibold text-accent-danger shrink-0">急需：</span>
+                <span className="text-sm font-serif text-accent-danger">{faction.needs}</span>
               </div>
             </div>
           </li>

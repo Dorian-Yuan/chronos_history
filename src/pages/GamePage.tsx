@@ -23,6 +23,7 @@ import {
   BookOpen,
   Users,
   Radar,
+  Home,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -58,9 +59,9 @@ function safeGetDelta(turnResults: TurnResult[]) {
 }
 
 const TAB_CONFIG = {
-  chronicle: { icon: BookOpen, label: "编年史", color: "#2ECE8B" },
-  cabinet: { icon: Users, label: "内阁", color: "#E8833A" },
-  intelligence: { icon: Radar, label: "情报", color: "#4A9EF5" },
+  chronicle: { icon: BookOpen, label: "编年史", colorVar: "--color-tab-chronicle" },
+  cabinet: { icon: Users, label: "内阁", colorVar: "--color-tab-cabinet" },
+  intelligence: { icon: Radar, label: "情报", colorVar: "--color-tab-intelligence" },
 } as const;
 
 export function GamePage() {
@@ -185,28 +186,29 @@ export function GamePage() {
   ) => {
     const config = TAB_CONFIG[tabKey];
     const Icon = config.icon;
+    const activeColor = `var(${config.colorVar})`;
     return (
       <button
         onClick={onClick}
         role="tab"
         aria-selected={isActive}
-        className="flex flex-col items-center justify-center gap-1 flex-1 py-3 relative transition-colors"
+        className="flex flex-col items-center justify-center gap-0.5 flex-1 py-2 relative transition-colors"
       >
         <Icon
-          size={20}
-          className={isActive ? "" : "text-[#666666]"}
-          style={isActive ? { color: config.color } : undefined}
+          size={18}
+          className={isActive ? "" : "text-text-tertiary"}
+          style={isActive ? { color: activeColor } : undefined}
         />
         <span
-          className={`text-[13px] font-semibold ${isActive ? "" : "text-[#666666]"}`}
-          style={isActive ? { color: config.color } : undefined}
+          className={`text-xs font-semibold ${isActive ? "" : "text-text-tertiary"}`}
+          style={isActive ? { color: activeColor } : undefined}
         >
           {config.label}
         </span>
         {isActive && (
           <div
-            className="absolute bottom-0 h-[3px] w-10 rounded-full"
-            style={{ backgroundColor: config.color }}
+            className="absolute bottom-0 h-[2px] w-8 rounded-full"
+            style={{ backgroundColor: activeColor }}
           />
         )}
       </button>
@@ -215,36 +217,43 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="px-5 pt-5 pb-2">
-        <div className="flex items-center justify-between rounded-lg border border-[#2A2A2E] bg-[#1A1A1E] px-5 py-4">
+      <header className="px-5 pt-4 pb-2">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card px-5 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#3A3A3E] bg-[#2A2A2E]">
-              <User size={20} className="text-[#666666]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-border-hover bg-bg-tertiary">
+              <User size={18} className="text-text-tertiary" />
             </div>
             <div>
-              <div className="text-[11px] uppercase tracking-[0.15em] text-[#666666]">
+              <div className="text-xs uppercase tracking-[0.15em] text-text-tertiary">
                 {t("game.currentIdentity")}
               </div>
-              <div className="text-lg font-bold text-text-primary">
+              <div className="text-lg font-serif font-bold text-text-primary">
                 {nationName}
               </div>
-              <div className="text-[13px] text-[#2ECE8B]">{leaderTitle}</div>
+              <div className="text-sm font-serif text-accent-primary">{leaderTitle}</div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => dispatch({ type: "RESET" })}
+              className="btn-ghost p-2.5"
+              aria-label="返回主页"
+            >
+              <Home size={17} />
+            </button>
             <button
               onClick={() => setShowSaveManager(true)}
-              className="btn-ghost p-2"
+              className="btn-ghost p-2.5"
               aria-label="存档管理"
             >
-              <Save size={15} />
+              <Save size={17} />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="btn-ghost p-2"
+              className="btn-ghost p-2.5"
               aria-label="设置"
             >
-              <Settings size={15} />
+              <Settings size={17} />
             </button>
           </div>
         </div>
@@ -258,11 +267,11 @@ export function GamePage() {
             className={`flex-1 flex-col overflow-hidden md:flex ${mobileTab !== "chronicle" ? "hidden" : "flex"}`}
           >
             {error && (
-              <div className="mx-6 mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 flex items-center justify-between">
+              <div className="mx-5 mt-3 rounded-lg border border-status-error-border bg-status-error-bg px-4 py-2.5 text-xs text-status-error-text flex items-center justify-between">
                 <span>{error}</span>
                 <button
                   onClick={() => setError(null)}
-                  className="ml-3 text-red-400/60 hover:text-red-400"
+                  className="ml-3 text-status-error-text/60 hover:text-status-error-text"
                 >
                   ✕
                 </button>
@@ -292,9 +301,9 @@ export function GamePage() {
           </div>
         </div>
 
-        <div className="hidden md:flex w-80 shrink-0 flex-col border-l border-[#2A2A2E] bg-[#141418]">
+        <div className="hidden md:flex w-80 shrink-0 flex-col border-l border-border bg-bg-secondary">
           <div
-            className="flex border-b border-[#2A2A2E]"
+            className="flex border-b border-border"
             role="tablist"
             aria-label="侧边栏"
           >
@@ -329,7 +338,7 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-[#2A2A2E] glass safe-bottom"
+        className="flex md:hidden border-t border-border glass safe-bottom"
         aria-label="游戏面板"
       >
         {renderTabButton(
@@ -349,12 +358,12 @@ export function GamePage() {
         )}
       </nav>
 
-      <footer className="hidden md:flex items-center justify-between h-11 px-6 border-t border-[#2A2A2E] bg-[#141418] text-xs text-[#666666]">
+      <footer className="hidden md:flex items-center justify-between h-10 px-6 border-t border-border bg-bg-secondary text-xs text-text-tertiary">
         <span className="font-mono">TURN: {state.turnCount}</span>
-        <span>{scenarioTitle}</span>
+        <span className="font-serif">{scenarioTitle}</span>
         <button
           onClick={() => setShowSaveManager(true)}
-          className="flex items-center gap-1.5 text-[#666666] hover:text-text-primary transition-colors"
+          className="flex items-center gap-1.5 text-text-tertiary hover:text-text-primary transition-colors"
         >
           <Save size={12} />
           存档

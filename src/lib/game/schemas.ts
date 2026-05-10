@@ -18,7 +18,7 @@ export const scenarioSchema = {
         },
         leader_title: {
           type: "string" as const,
-          description: "玩家头衔（如执政官、总督、大公、首相、摄政王、城邦领主等）",
+          description: "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
         },
         background_summary: {
           type: "string" as const,
@@ -50,7 +50,7 @@ export const scenarioSchema = {
       type: "string" as const,
       enum: ["Conquest", "Prosperity", "Reform", "Survival"],
     },
-    start_date: { type: "string" as const, description: "中文日期字符串" },
+    start_date: { type: "string" as const, description: "中文日期字符串（风格与时代一致，如中国朝代用年号格式）" },
     initial_advisors: {
       type: "array" as const,
       items: {
@@ -61,7 +61,7 @@ export const scenarioSchema = {
             type: "string" as const,
             enum: ["General", "Diplomat", "Intel", "Scholar", "Merchant"],
           },
-          name: { type: "string" as const, description: "符合文化风格的名字" },
+          name: { type: "string" as const, description: "符合时代与文明真实人名风格的名字" },
           advice: { type: "string" as const, description: "建议（简体中文）" },
           bias: {
             type: "string" as const,

@@ -17,28 +17,28 @@ const STYLE_COLORS: Record<
   { border: string; bg: string; text: string; glow: string }
 > = {
   Conquest: {
-    border: "border-red-800/40",
-    bg: "bg-red-900/10",
-    text: "text-red-400",
-    glow: "group-hover:shadow-red-900/20",
+    border: "border-accent-danger/40",
+    bg: "bg-status-error-bg",
+    text: "text-accent-danger",
+    glow: "group-hover:shadow-accent-danger/20",
   },
   Prosperity: {
-    border: "border-amber-800/40",
-    bg: "bg-amber-900/10",
-    text: "text-amber-400",
-    glow: "group-hover:shadow-amber-900/20",
+    border: "border-accent-secondary/40",
+    bg: "bg-status-warning-bg",
+    text: "text-accent-secondary",
+    glow: "group-hover:shadow-accent-secondary/20",
   },
   Reform: {
-    border: "border-blue-800/40",
-    bg: "bg-blue-900/10",
-    text: "text-blue-400",
-    glow: "group-hover:shadow-blue-900/20",
+    border: "border-accent-info/40",
+    bg: "bg-status-info-bg",
+    text: "text-accent-info",
+    glow: "group-hover:shadow-accent-info/20",
   },
   Survival: {
-    border: "border-emerald-800/40",
-    bg: "bg-emerald-900/10",
-    text: "text-emerald-400",
-    glow: "group-hover:shadow-emerald-900/20",
+    border: "border-accent-primary/40",
+    bg: "bg-status-success-bg",
+    text: "text-accent-primary",
+    glow: "group-hover:shadow-accent-primary/20",
   },
 };
 
@@ -97,10 +97,10 @@ export function SelectionPage() {
               style={{ animationDelay: "0.4s" }}
             />
           </div>
-          <p className="text-sm text-text-secondary">正在生成剧本...</p>
+          <p className="text-sm font-serif text-text-secondary">正在生成剧本...</p>
         </div>
       ) : (
-        <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-2">
           {PLAY_STYLES.map((style, idx) => {
             const Icon = STYLE_ICONS[style.id];
             const colors = STYLE_COLORS[style.id];
@@ -108,25 +108,24 @@ export function SelectionPage() {
               <button
                 key={style.id}
                 onClick={() => handleSelect(style.id)}
-                className={`group card-interactive p-3 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
+                className={`group card-interactive p-4 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-2.5 mb-2">
                   <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg ${colors.bg} border ${colors.border}`}
                   >
-                    <Icon size={14} className={colors.text} />
+                    <Icon size={13} className={colors.text} />
                   </div>
                   <h2 className="text-sm font-serif font-bold text-text-primary">
                     {style.name}
                   </h2>
+                  <span className="font-serif text-xs italic text-text-tertiary/70 truncate">
+                    &ldquo;{style.quote}&rdquo;
+                  </span>
                 </div>
 
-                <p className="font-serif text-xs italic leading-relaxed text-text-tertiary/80 mb-5">
-                  &ldquo;{style.quote}&rdquo;
-                </p>
-
-                <p className="text-xs text-text-tertiary leading-relaxed">
+                <p className="text-xs font-serif text-text-tertiary leading-relaxed">
                   {style.description}
                 </p>
               </button>
@@ -138,7 +137,7 @@ export function SelectionPage() {
       {error && (
         <div
           role="alert"
-          className="mt-6 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400"
+          className="mt-6 rounded-lg border border-status-error-border bg-status-error-bg px-4 py-2.5 text-xs text-status-error-text"
         >
           {error}
         </div>

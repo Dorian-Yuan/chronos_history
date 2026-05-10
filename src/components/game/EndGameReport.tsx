@@ -9,25 +9,25 @@ interface EndGameReportProps {
 
 const OUTCOME_CONFIG: Record<
   GameOutcome,
-  { label: string; color: string; emoji: string; bg: string }
+  { label: string; colorClass: string; emoji: string; bgClass: string }
 > = {
   victory: {
     label: "胜利",
-    color: "text-green-400",
+    colorClass: "text-status-success-text",
     emoji: "\uD83D\uDC51",
-    bg: "bg-green-900/10 border-green-800/20",
+    bgClass: "bg-status-success-bg border border-status-success-border",
   },
   neutral: {
     label: "存续",
-    color: "text-amber-400",
+    colorClass: "text-status-warning-text",
     emoji: "\u2696\uFE0F",
-    bg: "bg-amber-900/10 border-amber-800/20",
+    bgClass: "bg-status-warning-bg border border-status-warning-border",
   },
   defeat: {
     label: "失败",
-    color: "text-red-400",
+    colorClass: "text-status-error-text",
     emoji: "\uD83D\uDC80",
-    bg: "bg-red-900/10 border-red-800/20",
+    bgClass: "bg-status-error-bg border border-status-error-border",
   },
 };
 
@@ -52,11 +52,11 @@ export function EndGameReport({
   );
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-8">
+    <div className="mx-auto max-w-2xl space-y-6 p-5 md:p-8">
       <div className="text-center space-y-4 py-4">
         <div className="text-5xl mb-2">{outcomeConfig.emoji}</div>
         <div
-          className={`text-3xl font-display font-bold ${outcomeConfig.color}`}
+          className={`text-3xl font-display font-bold ${outcomeConfig.colorClass}`}
         >
           {outcomeConfig.label}
         </div>
@@ -65,7 +65,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
+      <div className="rounded-lg border border-border bg-bg-card p-5">
         <div className="text-xl font-serif font-bold text-text-primary mb-3">
           {analysis.persona_title}
         </div>
@@ -74,7 +74,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className={`rounded-lg border px-5 py-5 ${outcomeConfig.bg}`}>
+      <div className={`rounded-lg p-5 ${outcomeConfig.bgClass}`}>
         <div className="text-sm font-semibold text-accent-primary mb-3">
           真实历史：{analysis.real_event_title}
         </div>
@@ -94,7 +94,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
+      <div className="rounded-lg border border-border bg-bg-card p-5">
         <div className="section-label">对比分析</div>
         <div className="font-serif text-sm leading-relaxed text-text-secondary">
           {analysis.comparison_text}
@@ -107,7 +107,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
+      <div className="rounded-lg border border-border bg-bg-card p-5">
         <div className="section-label">统治者画像</div>
         <div className="space-y-4">
           {analysis.radar_stats.map((stat) => (
@@ -130,7 +130,7 @@ export function EndGameReport({
       </div>
 
       {analysis.turn_reviews.length > 0 && (
-        <div className="rounded-lg border border-border bg-bg-card px-5 py-5">
+        <div className="rounded-lg border border-border bg-bg-card p-5">
           <div className="section-label">决策复盘</div>
           <div className="space-y-5">
             {analysis.turn_reviews.map((review) => (

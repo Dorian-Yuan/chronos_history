@@ -111,7 +111,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               className="btn-primary w-full max-w-[15rem] mx-auto text-base py-3 gap-3"
             >
               {t("setup.getStarted")}
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </div>
         )}
@@ -176,7 +176,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
                   placeholder={getBaseUrlHint()}
                   className="input-field"
                 />
-                <p className="mt-1.5 text-[11px] text-text-tertiary leading-relaxed">
+                <p className="mt-1.5 text-xs text-text-tertiary leading-relaxed">
                   {selectedProvider?.type === "gemini"
                     ? "Gemini API 地址通常到 /v1beta 即可"
                     : "OpenAI 兼容 API 只需包含到 /v1"}
@@ -229,13 +229,13 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </button>
 
               {testStatus === "error" && testError && (
-                <div className="mt-3 rounded-lg border border-red-900/30 bg-red-900/10 px-4 py-2.5 text-xs text-red-400 leading-relaxed">
+                <div className="mt-3 rounded-lg border border-status-error-border bg-status-error-bg px-4 py-2.5 text-xs text-status-error-text leading-relaxed">
                   {testError}
                 </div>
               )}
 
               {testStatus === "success" && (
-                <div className="mt-3 rounded-lg border border-green-900/30 bg-green-900/10 px-4 py-2.5 text-xs text-green-400">
+                <div className="mt-3 rounded-lg border border-status-success-border bg-status-success-bg px-4 py-2.5 text-xs text-status-success-text">
                   API 连接测试通过，即将进入...
                 </div>
               )}
