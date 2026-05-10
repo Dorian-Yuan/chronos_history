@@ -107,7 +107,7 @@ function AppContent() {
 
   if (!setupComplete) {
     return (
-      <div className="h-dvh w-screen overflow-hidden bg-bg-primary text-text-primary">
+      <div className="fixed inset-0 overflow-hidden bg-bg-primary text-text-primary">
         <WelcomeSetup onComplete={() => setSetupComplete(true)} />
       </div>
     );
@@ -116,7 +116,7 @@ function AppContent() {
   return (
     <HashRouter>
       <GameProvider>
-        <div className="h-dvh w-screen overflow-hidden bg-bg-primary text-text-primary noise-bg flex flex-col">
+        <div className="fixed inset-0 overflow-hidden bg-bg-primary text-text-primary noise-bg flex flex-col">
           <PWABanner />
           <div className="flex-1 relative overflow-hidden">
             <div className="absolute inset-0 ink-wash pointer-events-none" />

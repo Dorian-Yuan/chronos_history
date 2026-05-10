@@ -107,6 +107,7 @@ export function GamePage() {
           action,
           state.stats,
           state.turnCount,
+          currentAdvisors,
         );
 
         dispatch({ type: "PROCESS_TURN", result });

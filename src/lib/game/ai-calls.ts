@@ -239,6 +239,9 @@ const ANALYSIS_SCHEMA_PROMPT = `
 
 const SCENARIO_SYSTEM_PROMPT = `你是Chronos历史推演引擎的剧本生成器。根据玩家选择的执政基调，生成一个历史决策推演剧本。
 
+【语言规则——最高优先级】
+你返回的JSON中，所有文本字段（title、description、player_context中的所有字段、initial_advisors中的name/advice/bias、factions中的所有文本字段、start_date、hidden_real_event）必须全部使用简体中文，绝对禁止出现任何英文单词、英文缩写、英文人名。唯一例外是JSON结构本身的英文字段名（如title、description等）和play_style的枚举值（Conquest/Prosperity/Reform/Survival）。
+
 严格规则：
 1. 身份定义：必须明确玩家角色，给出具体的nation_name和leader_title。角色应与时代匹配，如：皇帝、天子、国王、亲王、大公、执政官、总督、首相、摄政王、城邦领主、领主、革命委员会主席、商会会长等
    【硬性禁止】leader_title绝对不能是"可汗""大汗""汗"或任何游牧民族领袖头衔
@@ -397,7 +400,18 @@ export async function generateScenario(
 
 const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。根据玩家的行动，评估后果并推进历史进程。
 
+【语言规则——最高优先级】
+你返回的JSON中，所有文本字段（narrative、situation_update、headline、rumor、date_display、hidden_consequences、game_over_reason、advisors中的advice/bias/hidden_motive、factions_update中的所有文本字段）必须全部使用简体中文，绝对禁止出现任何英文单词、英文缩写、英文人名。唯一例外是JSON结构本身的英文字段名（如narrative、stats_delta等）。
+
 严格规则：
+
+【时间推进规则】
+- 剧本初始化时给定了start_date（纪年），这是时间线的起点
+- 每回合必须合理推进时间，date_display必须体现时间的流逝
+- 时间推进幅度应符合历史逻辑：战争时期可能数月一回合，和平时期可能数月甚至数年一回合
+- date_display格式必须与start_date保持同一文化风格（如中国朝代用年号格式，欧洲用公元纪年等）
+- 随着回合推进，年号可能因新君即位、改元等原因变化，但必须符合历史逻辑
+- 绝对禁止date_display出现英文
 
 【可行性检查】
 - military < 20：军队几近崩溃，任何军事行动都可能导致哗变，只能防守
@@ -443,9 +457,21 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 - rumor：民间流言，有趣且暗示潜在危机
 - date_display：当前相对日期
 
-【顾问要求】
+【顾问要求——极其重要】
 - 必须返回5个顾问（General/Diplomat/Intel/Scholar/Merchant各一个）
-- 顾问稳定性：从第一次生成开始，顾问非必要不更换，保持name和role一致。仅在以下情况可更换：顾问因剧情死亡/被罢免/叛逃/升迁调任，此时新顾问标记为替补
+- 【顾问稳定性——硬性约束】顾问一旦任命，绝对不可随意更换！这是最重要的规则之一：
+  ✅ 仅在以下极端情况可更换顾问（且必须在叙事中交代原因）：
+    1. 顾问因战争/暗杀/疾病/意外而死亡
+    2. 顾问因叛国/谋反被罢免处决
+    3. 顾问主动叛逃投敌
+    4. 顾问因年老体衰请求致仕（仅限游戏后期，至少8回合后）
+  ❌ 以下情况绝对不可更换顾问：
+    1. 不允许因为"觉得建议不好"就换人
+    2. 不允许因为"需要新视角"就换人
+    3. 不允许无理由地更换顾问名字
+    4. 不允许在叙事中没有任何交代就悄悄换人
+  - 当顾问未发生更换时，必须保持与上一回合完全相同的name和role
+  - 你将在上下文中看到"当前顾问名单"，必须严格参照该名单，除非满足上述极端条件
 - 每个顾问从自己的偏见角度给出建议
 - 部分建议看似合理但可能导致坏结果（陷阱建议）
 - hidden_motive：顾问的秘密动机（要保持连贯，不要前后矛盾）
@@ -464,6 +490,7 @@ export async function evaluateTurn(
   userAction: string,
   currentStats: GameStats,
   turnCount: number,
+  currentAdvisors?: { role: string; name: string }[],
 ): Promise<TurnResult> {
   const provider = getProvider();
 
@@ -475,6 +502,7 @@ export async function evaluateTurn(
 玩家国家：${scenario.player_context.nation_name}
 玩家身份：${scenario.player_context.leader_title}
 执政基调：${scenario.play_style}
+初始纪年：${scenario.start_date}
 当前回合：第${turnCount}回合
 
 当前属性：
@@ -482,6 +510,9 @@ export async function evaluateTurn(
 - 经济(economy)：${currentStats.economy}
 - 军事(military)：${currentStats.military}
 - 国际声望(international_standing)：${currentStats.international_standing}
+
+当前顾问名单（必须保持一致，除非满足极端更换条件）：
+${currentAdvisors && currentAdvisors.length > 0 ? currentAdvisors.map(a => `- ${a.role}：${a.name}`).join("\n") : scenario.initial_advisors.map(a => `- ${a.role}：${a.name}`).join("\n")}
 
 历史日志（AI长期记忆）：
 ${historyLog.length > 0 ? historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n") : "（无）"}
@@ -522,6 +553,9 @@ ${scenario.factions.map((f) => `- ${f.name}（${f.attitude}）：${f.description
 }
 
 const ANALYSIS_SYSTEM_PROMPT = `你是Chronos历史推演引擎的结局分析师。游戏结束后，生成详细的分析报告。
+
+【语言规则——最高优先级】
+你返回的JSON中，所有文本字段（real_event_title、real_outcome_summary、user_outcome_summary、comparison_text、similar_historical_figure、persona_title、persona_description、turn_reviews中的summary和commentary）必须全部使用简体中文，绝对禁止出现任何英文单词、英文缩写、英文人名。唯一例外是JSON结构本身的英文字段名和radar_stats中的dimension枚举值（Authority/Strategy/Empathy/Vision/Economy）。
 
 要求：
 1. real_event_title：揭示剧本所基于的真实历史事件名称
