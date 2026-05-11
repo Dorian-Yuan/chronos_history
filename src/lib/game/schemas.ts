@@ -267,3 +267,19 @@ export const analysisSchema = {
     "turn_reviews",
   ],
 };
+
+export const mapSchema = {
+  type: "object" as const,
+  additionalProperties: false,
+  properties: {
+    mermaid_code: {
+      type: "string" as const,
+      description: "Mermaid flowchart code showing strategic map",
+    },
+    map_narrative: {
+      type: "string" as const,
+      description: "Brief strategic situation description in Chinese (50-100 chars)",
+    },
+  },
+  required: ["mermaid_code", "map_narrative"],
+};

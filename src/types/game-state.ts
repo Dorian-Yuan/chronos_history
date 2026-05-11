@@ -12,6 +12,12 @@ export interface GameStats {
 
 export type GamePhase = "start" | "selection" | "playing" | "ended";
 
+export interface MapData {
+  mermaid_code: string;
+  map_narrative: string;
+  updated_at: number;
+}
+
 export interface GameState {
   phase: GamePhase;
   scenario: ScenarioData | null;
@@ -21,6 +27,7 @@ export interface GameState {
   currentTurnResult: TurnResult | null;
   endGameAnalysis: EndGameAnalysis | null;
   turnResults: TurnResult[];
+  mapData: MapData | null;
 }
 
 export type GameOutcome = "victory" | "neutral" | "defeat";
@@ -39,6 +46,7 @@ export const INITIAL_GAME_STATE: GameState = {
   currentTurnResult: null,
   endGameAnalysis: null,
   turnResults: [],
+  mapData: null,
 };
 
 export function clampStat(value: number): number {

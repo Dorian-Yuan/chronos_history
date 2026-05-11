@@ -140,6 +140,7 @@
   --color-tab-chronicle: #2ECE8B;
   --color-tab-cabinet: #E8833A;
   --color-tab-intelligence: #4A9EF5;
+  --color-tab-map: #A78BFA;
 }
 
 @theme {
@@ -194,6 +195,7 @@
   --color-tab-chronicle: var(--color-tab-chronicle);
   --color-tab-cabinet: var(--color-tab-cabinet);
   --color-tab-intelligence: var(--color-tab-intelligence);
+  --color-tab-map: var(--color-tab-map);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 }

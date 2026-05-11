@@ -41,7 +41,16 @@
     "noData": "No data",
     "opinionConflict": "⚠ Opinion Conflicts",
     "yearBC": "BC",
-    "currentIdentity": "Current Identity"
+    "currentIdentity": "Current Identity",
+    "mapTab": "Map",
+    "mapGenerate": "Generate Map",
+    "mapRegenerate": "Regenerate",
+    "mapGenerating": "Generating strategic map...",
+    "mapEmpty": "Strategic map not yet generated",
+    "mapEmptyHint": "Click the button below to generate the current strategic situation map",
+    "mapRenderError": "Map rendering failed",
+    "mapLoadingEngine": "Loading map engine...",
+    "mapTurnInfo": "Drawn at turn {turn}"
   },
   "relation": {
     "ally": "Ally",

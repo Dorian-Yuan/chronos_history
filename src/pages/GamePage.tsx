@@ -3,6 +3,7 @@ import { useGameState, useGameDispatch } from "@/lib/game";
 import {
   evaluateTurn,
   analyzeGame,
+  generateMap,
   autoSave,
   addHistoryRecord,
 } from "@/lib/game";
@@ -10,6 +11,7 @@ import {
   ChroniclePanel,
   CabinetPanel,
   IntelligencePanel,
+  MapPanel,
   StatBars,
   GameInput,
   SaveManager,
@@ -23,10 +25,11 @@ import {
   Users,
   Radar,
   Home,
+  Map,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
 
-type SideTab = "cabinet" | "intelligence";
+type SideTab = "cabinet" | "intelligence" | "map";
 
 function safeGetAdvisors(
   scenario: ScenarioData | null,
@@ -60,6 +63,7 @@ const TAB_CONFIG = {
   chronicle: { icon: BookOpen, label: "编年史", colorVar: "--color-tab-chronicle" },
   cabinet: { icon: Users, label: "内阁", colorVar: "--color-tab-cabinet" },
   intelligence: { icon: Radar, label: "情报", colorVar: "--color-tab-intelligence" },
+  map: { icon: Map, label: "舆图", colorVar: "--color-tab-map" },
 } as const;
 
 export function GamePage() {
@@ -68,7 +72,7 @@ export function GamePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
-  const [mobileTab, setMobileTab] = useState<"chronicle" | SideTab>(
+  const [mobileTab, setMobileTab] = useState<keyof typeof TAB_CONFIG>(
     "chronicle",
   );
   const [showSaveManager, setShowSaveManager] = useState(false);
@@ -153,6 +157,57 @@ export function GamePage() {
             console.error("Failed to generate game analysis:", e);
           }
         }
+
+        try {
+          const updatedFactions = scenario.factions.map((f) => ({ ...f }));
+          for (const update of result.factions_update) {
+            if (update.is_destroyed) {
+              const idx = updatedFactions.findIndex((f) => f.name === update.name);
+              if (idx >= 0) {
+                updatedFactions[idx] = { ...updatedFactions[idx], is_destroyed: true, attitude: "已灭亡" };
+              }
+              continue;
+            }
+            const idx = updatedFactions.findIndex((f) => f.name === update.name);
+            if (idx >= 0) {
+              updatedFactions[idx] = {
+                ...updatedFactions[idx],
+                description: update.description ?? updatedFactions[idx].description,
+                strength: update.strength ?? updatedFactions[idx].strength,
+                weakness: update.weakness ?? updatedFactions[idx].weakness,
+                needs: update.needs ?? updatedFactions[idx].needs,
+                attitude: update.attitude ?? updatedFactions[idx].attitude,
+                is_new: false,
+              };
+            } else if (update.is_new) {
+              updatedFactions.push({
+                name: update.name,
+                description: update.description,
+                strength: update.strength,
+                weakness: update.weakness,
+                needs: update.needs,
+                attitude: update.attitude,
+                is_new: true,
+              });
+            }
+          }
+          const updatedScenario = { ...scenario, factions: updatedFactions };
+          const newStats = {
+            stability: clampStat(state.stats.stability + result.stats_delta.stability),
+            economy: clampStat(state.stats.economy + result.stats_delta.economy),
+            military: clampStat(state.stats.military + result.stats_delta.military),
+            international_standing: clampStat(state.stats.international_standing + result.stats_delta.international_standing),
+          };
+          const mapResult = await generateMap(
+            updatedScenario,
+            [...state.historyLog, result.hidden_consequences],
+            newStats,
+            state.turnCount + 1,
+          );
+          dispatch({ type: "SET_MAP_DATA", mapData: mapResult });
+        } catch (e) {
+          console.error("Failed to generate map:", e);
+        }
       } catch (e) {
         console.error("Turn evaluation failed:", e);
         const msg = e instanceof Error ? e.message : "推演失败";
@@ -183,7 +238,7 @@ export function GamePage() {
   }
 
   const renderTabButton = (
-    tabKey: "chronicle" | SideTab,
+    tabKey: keyof typeof TAB_CONFIG,
     onClick: () => void,
     isActive: boolean,
     indicatorPosition: "top" | "bottom" = "bottom"
@@ -295,8 +350,15 @@ export function GamePage() {
           >
             {mobileTab === "cabinet" ? (
               <CabinetPanel advisors={currentAdvisors} />
-            ) : (
+            ) : mobileTab === "intelligence" ? (
               <IntelligencePanel factions={currentFactions} />
+            ) : (
+              <MapPanel
+                scenario={scenario}
+                stats={state.stats}
+                turnCount={state.turnCount}
+                historyLog={state.historyLog}
+              />
             )}
           </div>
         </div>
@@ -319,6 +381,12 @@ export function GamePage() {
               sideTab === "intelligence",
               "bottom"
             )}
+            {renderTabButton(
+              "map",
+              () => setSideTab("map"),
+              sideTab === "map",
+              "bottom"
+            )}
           </div>
           <div className="flex-1 overflow-y-auto">
             <div
@@ -334,6 +402,18 @@ export function GamePage() {
               className={sideTab === "intelligence" ? "" : "hidden"}
             >
               <IntelligencePanel factions={currentFactions} />
+            </div>
+            <div
+              id="panel-map"
+              role="tabpanel"
+              className={sideTab === "map" ? "" : "hidden"}
+            >
+              <MapPanel
+                scenario={scenario}
+                stats={state.stats}
+                turnCount={state.turnCount}
+                historyLog={state.historyLog}
+              />
             </div>
           </div>
         </div>
@@ -360,6 +440,12 @@ export function GamePage() {
           "intelligence",
           () => setMobileTab("intelligence"),
           mobileTab === "intelligence",
+          "top"
+        )}
+        {renderTabButton(
+          "map",
+          () => setMobileTab("map"),
+          mobileTab === "map",
           "top"
         )}
       </nav>

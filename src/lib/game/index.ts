@@ -2,8 +2,8 @@ export { GameProvider } from "./game-provider";
 export { useGameState, useGameDispatch } from "./game-hooks";
 export { gameReducer } from "./game-reducer";
 export type { GameAction } from "./game-reducer";
-export { generateScenario, evaluateTurn, analyzeGame } from "./ai-calls";
-export { scenarioSchema, turnResultSchema, analysisSchema } from "./schemas";
+export { generateScenario, evaluateTurn, analyzeGame, generateMap } from "./ai-calls";
+export { scenarioSchema, turnResultSchema, analysisSchema, mapSchema } from "./schemas";
 export { checkObjectForSensitiveContent } from "./sensitive-content";
 export {
   autoSave,

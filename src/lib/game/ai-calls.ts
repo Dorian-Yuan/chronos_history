@@ -5,11 +5,12 @@ import type {
   GameStats,
   PlayStyle,
   AdvisorRole,
+  MapData,
 } from "@/types";
 import type { AIMessage } from "@/types/ai-provider";
 import { createProvider, withRetry } from "@/lib/ai";
 import { useSettingsStore } from "@/stores";
-import { scenarioSchema, turnResultSchema, analysisSchema } from "./schemas";
+import { scenarioSchema, turnResultSchema, analysisSchema, mapSchema } from "./schemas";
 import { checkObjectForSensitiveContent } from "./sensitive-content";
 
 const REQUIRED_ADVISOR_ROLES: AdvisorRole[] = [
@@ -687,6 +688,134 @@ ${historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n")}`;
       }
 
       return analysis;
+    },
+    { maxRetries: 3 },
+  );
+}
+
+const MAP_SYSTEM_PROMPT = `你是Chronos历史推演引擎的战略地图生成器。根据当前游戏状态，生成Mermaid流程图代码来展示战略态势。
+
+【语言规则——最高优先级】
+你返回的JSON中，map_narrative必须使用简体中文。mermaid_code中的节点标签也必须使用简体中文。
+
+【Mermaid代码规则——极其重要】
+1. 必须使用 flowchart LR 语法（从左到右布局）
+2. 节点ID必须使用纯英文字母和数字，不能包含中文或特殊字符
+3. 节点标签使用方括号包裹中文，如：Player["玩家国家名"]
+4. 连线使用 --> 表示关系，可加文字如：-->|敌对|
+5. 严禁使用以下高级特性（兼容性差）：
+   - 严禁使用 subgraph
+   - 严禁使用 style 语句
+   - 严禁使用 classDef
+   - 严禁使用 click 回调
+   - 严禁使用 ::: 样式类
+   - 严禁使用 & 并行连接
+6. 节点形状规则：
+   - 玩家国家使用 [["玩家国家名"]] 双方括号
+   - 活跃派系使用 ["派系名(态度)"] 方括号
+   - 已灭亡派系使用 ("已灭亡:派系名") 圆括号
+7. 连线规则：
+   - 敌对关系使用 -->|敌对| 红色标注
+   - 求和关系使用 -.->|求和|
+   - 中立关系使用 ---|中立|
+   - 友好关系使用 ==>|友好| 粗线
+   - 臣服关系使用 ==>|臣服| 粗线
+8. 布局规则：
+   - 玩家国家在左侧中心位置
+   - 敌对势力在右侧
+   - 友好/臣服势力在左侧靠近玩家
+   - 中立势力在上下方
+9. 节点标签格式：
+   - 玩家："国名\\n稳定XX 经济XX 军事XX 声望XX"
+   - 派系："派系名(态度)\\n优势简述"
+
+【输出示例】
+flowchart LR
+  Player["大秦帝国\\n稳定65 经济70 军事80 声望55"]
+  North["北狄(敌对)\\n骑兵强盛"]
+  South["南越(求和)\\n物产丰饶"]
+  East["东海(中立)\\n海上贸易"]
+  West["西戎(臣服)\\n兵源充足"]
+  Player -->|敌对| North
+  Player -.->|求和| South
+  Player ---|中立| East
+  Player ==>|臣服| West
+  North ---|对峙| South
+
+【map_narrative规则】
+用50-100字简体中文描述当前战略态势，包括：主要威胁、外交格局、关键变化。语言要像古代军师的战略分析。${JSON_OUTPUT_INSTRUCTION}`;
+
+const MAP_SCHEMA_PROMPT = `
+
+【输出 JSON 结构】你必须严格按以下结构返回JSON：
+{
+  "mermaid_code": "Mermaid流程图代码字符串",
+  "map_narrative": "50-100字战略态势描述（简体中文）"
+}`;
+
+export async function generateMap(
+  scenario: ScenarioData,
+  historyLog: string[],
+  currentStats: GameStats,
+  turnCount: number,
+): Promise<MapData> {
+  const provider = getProvider();
+
+  const systemPrompt = provider.supportsStructuredOutput()
+    ? MAP_SYSTEM_PROMPT
+    : MAP_SYSTEM_PROMPT + MAP_SCHEMA_PROMPT;
+
+  const activeFactions = scenario.factions.filter((f) => !f.is_destroyed);
+  const destroyedFactions = scenario.factions.filter((f) => f.is_destroyed);
+
+  const contextMessage = `当前剧本：${scenario.title}
+玩家国家：${scenario.player_context.nation_name}
+玩家身份：${scenario.player_context.leader_title}
+执政基调：${scenario.play_style}
+当前回合：第${turnCount}回合
+
+当前属性：
+- 稳定性：${currentStats.stability}
+- 经济：${currentStats.economy}
+- 军事：${currentStats.military}
+- 国际声望：${currentStats.international_standing}
+
+活跃派系：
+${activeFactions.map((f) => `- ${f.name}（${f.attitude}）：${f.description}。优势：${f.strength}，弱点：${f.weakness}`).join("\n")}
+
+${destroyedFactions.length > 0 ? `已灭亡派系：\n${destroyedFactions.map((f) => `- ${f.name}（已灭亡）`).join("\n")}` : ""}
+
+近期历史：
+${historyLog.length > 0 ? historyLog.slice(-3).map((h, i) => `回合${historyLog.length - 2 + i}: ${h}`).join("\n") : "（无）"}`;
+
+  const messages: AIMessage[] = [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: contextMessage },
+  ];
+
+  return withRetry(
+    async () => {
+      const response = await provider.sendMessage(messages, {
+        responseFormat: "json",
+        responseSchema: mapSchema,
+        temperature: 0.7,
+        maxTokens: 10000,
+      });
+
+      const result = parseResponse<MapData>(response.content, provider);
+
+      if (!result.mermaid_code?.trim()) {
+        throw new Error("mermaid_code为空");
+      }
+      if (!result.map_narrative?.trim()) {
+        throw new Error("map_narrative为空");
+      }
+
+      return {
+        mermaid_code: result.mermaid_code,
+        map_narrative: result.map_narrative,
+        updated_at: turnCount,
+      };
     },
     { maxRetries: 3 },
   );
