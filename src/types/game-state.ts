@@ -12,19 +12,6 @@ export interface GameStats {
 
 export type GamePhase = "start" | "selection" | "playing" | "ended";
 
-export interface FactionChartData {
-  name: string;
-  power: number;
-  attitude: string;
-  is_destroyed?: boolean;
-}
-
-export interface MapData {
-  mermaid_code: string;
-  faction_chart: FactionChartData[];
-  updated_at: number;
-}
-
 export interface CounselMessage {
   role: "user" | "assistant";
   content: string;
@@ -44,7 +31,6 @@ export interface GameState {
   currentTurnResult: TurnResult | null;
   endGameAnalysis: EndGameAnalysis | null;
   turnResults: TurnResult[];
-  mapData: MapData | null;
 }
 
 export type GameOutcome = "victory" | "neutral" | "defeat";
@@ -63,7 +49,6 @@ export const INITIAL_GAME_STATE: GameState = {
   currentTurnResult: null,
   endGameAnalysis: null,
   turnResults: [],
-  mapData: null,
 };
 
 export function clampStat(value: number): number {

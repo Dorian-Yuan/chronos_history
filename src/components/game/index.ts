@@ -9,7 +9,4 @@ export { DisclaimerModal } from "./DisclaimerModal";
 export { SaveManager } from "./SaveManager";
 export { HistoryArchive } from "./HistoryArchive";
 export { ScenarioHintModal } from "./ScenarioHintModal";
-export { MapPanel } from "./MapPanel";
-export { MermaidDiagram } from "./MermaidDiagram";
-export { FactionChart } from "./FactionChart";
 export { CounselDialog } from "./CounselDialog";

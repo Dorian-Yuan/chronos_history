@@ -6,13 +6,17 @@ import type {
   PlayStyle,
   AdvisorRole,
   AdvisorData,
-  MapData,
   CounselMessage,
 } from "@/types";
 import type { AIMessage } from "@/types/ai-provider";
 import { createProvider, withRetry } from "@/lib/ai";
 import { useSettingsStore } from "@/stores";
-import { scenarioSchema, turnResultSchema, analysisSchema, mapSchema, counselSchema } from "./schemas";
+import {
+  scenarioSchema,
+  turnResultSchema,
+  analysisSchema,
+  counselSchema,
+} from "./schemas";
 import { checkObjectForSensitiveContent } from "./sensitive-content";
 
 const REQUIRED_ADVISOR_ROLES: AdvisorRole[] = [
@@ -85,9 +89,24 @@ function validateScenario(data: ScenarioData): void {
 
   if (data.play_style === "Conquest" && Array.isArray(data.factions)) {
     const internalKeywords = [
-      "主和", "主战", "改革", "保守", "宫廷", "宦官", "外戚",
-      "边军", "禁军", "军阀", "商盟", "行会", "商会",
-      "贵族", "地主", "农民", "百姓", "朝臣",
+      "主和",
+      "主战",
+      "改革",
+      "保守",
+      "宫廷",
+      "宦官",
+      "外戚",
+      "边军",
+      "禁军",
+      "军阀",
+      "商盟",
+      "行会",
+      "商会",
+      "贵族",
+      "地主",
+      "农民",
+      "百姓",
+      "朝臣",
     ];
     const internalFactions = data.factions.filter((f) => {
       const text = `${f.name} ${f.description} ${f.attitude}`;
@@ -465,10 +484,14 @@ const COUNSEL_SYSTEM_PROMPT = `你是Chronos历史推演引擎的问对密谈系
 
 const COUNSEL_SCHEMA_PROMPT = `
 
-【输出 JSON 结构】你必须严格按以下结构返回JSON：
+【输出 JSON 结构——极其重要】无论对话进行多少轮，你每次回复都必须严格按以下JSON格式返回，绝对不能返回任何非JSON内容：
 {
   "response": "顾问的私下回应（简体中文，100-200字）"
-}`;
+}
+注意：
+- 不要输出任何JSON以外的内容
+- 不要包含markdown标记（如\`\`\`json）、注释或解释文字
+- 不要在JSON前后添加任何额外文本`;
 
 export async function counselAdvisor(
   advisor: AdvisorData,
@@ -481,12 +504,18 @@ export async function counselAdvisor(
   const provider = getProvider();
 
   const roleLabel = ROLE_LABELS[advisor.role] || advisor.role;
-  const recentHistory = historyLog.length > 0
-    ? historyLog.slice(-2).map((h, i) => `回合${historyLog.length - 1 + i}: ${h}`).join("\n")
-    : "（无）";
+  const recentHistory =
+    historyLog.length > 0
+      ? historyLog
+          .slice(-2)
+          .map((h, i) => `回合${historyLog.length - 1 + i}: ${h}`)
+          .join("\n")
+      : "（无）";
 
-  const systemPrompt = COUNSEL_SYSTEM_PROMPT
-    .replace("{advisor_name}", advisor.name)
+  const systemPrompt = COUNSEL_SYSTEM_PROMPT.replace(
+    "{advisor_name}",
+    advisor.name,
+  )
     .replace("{role_label}", roleLabel)
     .replace("{role}", advisor.role)
     .replace("{bias}", advisor.bias)
@@ -508,10 +537,18 @@ export async function counselAdvisor(
   const messages: AIMessage[] = [
     { role: "system", content: fullSystemPrompt },
     ...conversationHistory.map((msg) => ({
-      role: msg.role === "user" ? "user" as const : "assistant" as const,
+      role: msg.role === "user" ? ("user" as const) : ("assistant" as const),
       content: msg.content,
     })),
   ];
+
+  if (conversationHistory.length >= 2) {
+    messages.push({
+      role: "user" as const,
+      content:
+        '（请继续严格以JSON格式回复：{"response": "你的回应"}，不要输出任何其他内容）',
+    });
+  }
 
   return withRetry(
     async () => {
@@ -522,7 +559,10 @@ export async function counselAdvisor(
         maxTokens: 2000,
       });
 
-      const result = parseResponse<{ response: string }>(response.content, provider);
+      const result = parseResponse<{ response: string }>(
+        response.content,
+        provider,
+      );
 
       if (!result.response?.trim()) {
         throw new Error("顾问回应为空");
@@ -699,7 +739,7 @@ export async function evaluateTurn(
 - 国际声望(international_standing)：${currentStats.international_standing}
 
 当前顾问名单（必须保持一致，除非满足极端更换条件）：
-${currentAdvisors && currentAdvisors.length > 0 ? currentAdvisors.map(a => `- ${a.role}：${a.name}`).join("\n") : scenario.initial_advisors.map(a => `- ${a.role}：${a.name}`).join("\n")}
+${currentAdvisors && currentAdvisors.length > 0 ? currentAdvisors.map((a) => `- ${a.role}：${a.name}`).join("\n") : scenario.initial_advisors.map((a) => `- ${a.role}：${a.name}`).join("\n")}
 
 历史日志（AI长期记忆）：
 ${historyLog.length > 0 ? historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n") : "（无）"}
@@ -799,157 +839,6 @@ ${historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n")}`;
       }
 
       return analysis;
-    },
-    { maxRetries: 3 },
-  );
-}
-
-const MAP_SYSTEM_PROMPT = `你是Chronos历史推演引擎的战略地图生成器。根据当前游戏状态，生成Mermaid流程图代码来展示战略态势，并评估各方势力实力。
-
-【语言规则——最高优先级】
-你返回的JSON中，mermaid_code中的节点标签必须使用简体中文。faction_chart中的势力名称和态度也必须使用简体中文。
-
-【Mermaid代码规则——极其重要】
-1. 必须使用 flowchart LR 语法（从左到右布局）
-2. 节点ID必须使用纯英文字母和数字，不能包含中文或特殊字符
-3. 节点标签使用方括号包裹中文，如：Player["玩家国家名"]
-4. 连线使用 --> 表示关系，可加文字如：-->|敌对|
-5. 严禁使用以下高级特性（兼容性差）：
-   - 严禁使用 subgraph
-   - 严禁使用 style 语句
-   - 严禁使用 classDef
-   - 严禁使用 click 回调
-   - 严禁使用 ::: 样式类
-   - 严禁使用 & 并行连接
-6. 节点形状规则：
-   - 玩家国家使用 [["玩家国家名"]] 双方括号
-   - 活跃派系使用 ["派系名(态度)"] 方括号，态度必须严格使用以下5种之一：(敌对)、(求和)、(中立)、(友好)、(臣服)
-   - 已灭亡派系使用 ("已灭亡:派系名") 圆括号
-7. 连线规则（标签必须严格使用以下5种之一）：
-   - 敌对关系使用 -->|敌对|
-   - 求和关系使用 -.->|求和|
-   - 中立关系使用 ---|中立|
-   - 友好关系使用 ==>|友好|
-   - 臣服关系使用 ==>|臣服|
-8. 布局规则：
-   - 玩家国家在左侧中心位置
-   - 敌对势力在右侧
-   - 友好/臣服势力在左侧靠近玩家
-   - 中立势力在上下方
-9. 节点标签格式：
-   - 玩家："国名"（仅显示国名，不显示属性数值）
-   - 派系："派系名(态度)\\n优势简述"
-
-【输出示例】
-flowchart LR
-  Player[["大秦帝国"]]
-  North["北狄(敌对)\\n骑兵强盛"]
-  South["南越(求和)\\n物产丰饶"]
-  East["东海(中立)\\n海上贸易"]
-  West["西戎(臣服)\\n兵源充足"]
-  Player -->|敌对| North
-  Player -.->|求和| South
-  Player ---|中立| East
-  Player ==>|臣服| West
-  North ---|对峙| South
-
-【势力实力评估规则】
-为每个势力评估0-100的实力值，评估依据：
-- 派系的优势描述和弱点描述
-- 当前态度和外交格局
-- 近期历史事件的影响
-- 玩家国家的实力基于四维属性的综合水平
-- 已灭亡派系实力值为0，is_destroyed为true
-- 态度必须与mermaid_code中的态度标签完全一致，严格使用：敌对/求和/中立/友好/臣服/已灭亡${JSON_OUTPUT_INSTRUCTION}`;
-
-const MAP_SCHEMA_PROMPT = `
-
-【输出 JSON 结构】你必须严格按以下结构返回JSON：
-{
-  "mermaid_code": "Mermaid流程图代码字符串",
-  "faction_chart": [
-    {"name": "势力名称", "power": 75, "attitude": "敌对", "is_destroyed": false},
-    {"name": "已灭亡势力", "power": 0, "attitude": "已灭亡", "is_destroyed": true}
-  ]
-}`;
-
-export async function generateMap(
-  scenario: ScenarioData,
-  historyLog: string[],
-  currentStats: GameStats,
-  turnCount: number,
-): Promise<MapData> {
-  const provider = getProvider();
-
-  const systemPrompt = provider.supportsStructuredOutput()
-    ? MAP_SYSTEM_PROMPT
-    : MAP_SYSTEM_PROMPT + MAP_SCHEMA_PROMPT;
-
-  const activeFactions = scenario.factions.filter((f) => !f.is_destroyed);
-  const destroyedFactions = scenario.factions.filter((f) => f.is_destroyed);
-
-  const avgStat = Math.round(
-    (currentStats.stability + currentStats.economy + currentStats.military + currentStats.international_standing) / 4,
-  );
-
-  const contextMessage = `当前剧本：${scenario.title}
-玩家国家：${scenario.player_context.nation_name}
-玩家身份：${scenario.player_context.leader_title}
-执政基调：${scenario.play_style}
-当前回合：第${turnCount}回合
-
-当前属性：
-- 稳定性：${currentStats.stability}
-- 经济：${currentStats.economy}
-- 军事：${currentStats.military}
-- 国际声望：${currentStats.international_standing}
-- 综合实力（四维均值）：${avgStat}
-
-活跃派系：
-${activeFactions.map((f) => `- ${f.name}（${f.attitude}）：${f.description}。优势：${f.strength}，弱点：${f.weakness}`).join("\n")}
-
-${destroyedFactions.length > 0 ? `已灭亡派系：\n${destroyedFactions.map((f) => `- ${f.name}（已灭亡）`).join("\n")}` : ""}
-
-近期历史：
-${historyLog.length > 0 ? historyLog.slice(-3).map((h, i) => `回合${historyLog.length - 2 + i}: ${h}`).join("\n") : "（无）"}`;
-
-  const messages: AIMessage[] = [
-    { role: "system", content: systemPrompt },
-    { role: "user", content: contextMessage },
-  ];
-
-  return withRetry(
-    async () => {
-      const response = await provider.sendMessage(messages, {
-        responseFormat: "json",
-        responseSchema: mapSchema,
-        temperature: 0.7,
-        maxTokens: 10000,
-      });
-
-      const result = parseResponse<MapData>(response.content, provider);
-
-      if (!result.mermaid_code?.trim()) {
-        throw new Error("mermaid_code为空");
-      }
-      if (!Array.isArray(result.faction_chart) || result.faction_chart.length === 0) {
-        throw new Error("faction_chart为空或格式错误");
-      }
-
-      const playerNation = scenario.player_context.nation_name;
-      const hasPlayer = result.faction_chart.some((f) => f.name === playerNation);
-      const factionChart = hasPlayer
-        ? result.faction_chart
-        : [
-            { name: playerNation, power: avgStat, attitude: "玩家", is_destroyed: false },
-            ...result.faction_chart,
-          ];
-
-      return {
-        mermaid_code: result.mermaid_code,
-        faction_chart: factionChart,
-        updated_at: turnCount,
-      };
     },
     { maxRetries: 3 },
   );

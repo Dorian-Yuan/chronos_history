@@ -18,7 +18,8 @@ export const scenarioSchema = {
         },
         leader_title: {
           type: "string" as const,
-          description: "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
+          description:
+            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
         },
         background_summary: {
           type: "string" as const,
@@ -50,7 +51,10 @@ export const scenarioSchema = {
       type: "string" as const,
       enum: ["Conquest", "Prosperity", "Reform", "Survival"],
     },
-    start_date: { type: "string" as const, description: "中文日期字符串（风格与时代一致，如中国朝代用年号格式）" },
+    start_date: {
+      type: "string" as const,
+      description: "中文日期字符串（风格与时代一致，如中国朝代用年号格式）",
+    },
     initial_advisors: {
       type: "array" as const,
       items: {
@@ -61,7 +65,11 @@ export const scenarioSchema = {
             type: "string" as const,
             enum: ["General", "Diplomat", "Intel", "Scholar", "Merchant"],
           },
-          name: { type: "string" as const, description: "真实人名（禁止奇幻风格，中国用姓+名如'陈伯年'，欧洲用名+姓，禁止'铁牙''影爪'等）" },
+          name: {
+            type: "string" as const,
+            description:
+              "真实人名（禁止奇幻风格，中国用姓+名如'陈伯年'，欧洲用名+姓，禁止'铁牙''影爪'等）",
+          },
           advice: { type: "string" as const, description: "建议（简体中文）" },
           bias: {
             type: "string" as const,
@@ -77,10 +85,15 @@ export const scenarioSchema = {
         type: "object" as const,
         additionalProperties: false,
         properties: {
-          name: { type: "string" as const, description: "2字势力简称（必须真实可信，禁止奇幻风格如'暗影''血月'）" },
+          name: {
+            type: "string" as const,
+            description:
+              "2字势力简称（必须真实可信，禁止奇幻风格如'暗影''血月'）",
+          },
           description: {
             type: "string" as const,
-            description: "势力描述（Conquest以外国势力为主，Prosperity以经济集团为主，Reform以内部政治力量为主，Survival内外兼有）",
+            description:
+              "势力描述（Conquest以外国势力为主，Prosperity以经济集团为主，Reform以内部政治力量为主，Survival内外兼有）",
           },
           strength: { type: "string" as const, description: "主要优势" },
           weakness: { type: "string" as const, description: "关键弱点" },
@@ -189,7 +202,8 @@ export const turnResultSchema = {
     },
     hidden_consequences: {
       type: "string" as const,
-      description: "回合总结（AI长期记忆）。必须明确记录：1)派系镇压/清理的累积次数和效果 2)派系态度变化的关键节点 3)玩家对某派系的持续政策 4)未解决的隐患。绝对禁止遗漏重要的派系状态变化",
+      description:
+        "回合总结（AI长期记忆）。必须明确记录：1)派系镇压/清理的累积次数和效果 2)派系态度变化的关键节点 3)玩家对某派系的持续政策 4)未解决的隐患。绝对禁止遗漏重要的派系状态变化",
     },
     is_game_over: { type: "boolean" as const },
     game_over_reason: {
@@ -266,32 +280,6 @@ export const analysisSchema = {
     "radar_stats",
     "turn_reviews",
   ],
-};
-
-export const mapSchema = {
-  type: "object" as const,
-  additionalProperties: false,
-  properties: {
-    mermaid_code: {
-      type: "string" as const,
-      description: "Mermaid flowchart code showing strategic map",
-    },
-    faction_chart: {
-      type: "array" as const,
-      items: {
-        type: "object" as const,
-        additionalProperties: false,
-        properties: {
-          name: { type: "string" as const, description: "势力名称" },
-          power: { type: "number" as const, minimum: 0, maximum: 100, description: "实力值0-100" },
-          attitude: { type: "string" as const, description: "态度（敌对/求和/中立/友好/臣服/已灭亡）" },
-          is_destroyed: { type: "boolean" as const, description: "是否已灭亡" },
-        },
-        required: ["name", "power", "attitude"],
-      },
-    },
-  },
-  required: ["mermaid_code", "faction_chart"],
 };
 
 export const counselSchema = {

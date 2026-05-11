@@ -5,7 +5,6 @@ import type {
   TurnResult,
   EndGameAnalysis,
   FactionData,
-  MapData,
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
 
@@ -15,8 +14,7 @@ export type GameAction =
   | { type: "PROCESS_TURN"; result: TurnResult }
   | { type: "GAME_OVER"; analysis: EndGameAnalysis }
   | { type: "LOAD_SAVE"; state: GameState }
-  | { type: "RESET" }
-  | { type: "SET_MAP_DATA"; mapData: MapData };
+  | { type: "RESET" };
 
 function applyStatsDelta(
   stats: GameStats,
@@ -137,12 +135,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "RESET":
       return { ...INITIAL_GAME_STATE };
-
-    case "SET_MAP_DATA":
-      return {
-        ...state,
-        mapData: action.mapData,
-      };
 
     default:
       return state;

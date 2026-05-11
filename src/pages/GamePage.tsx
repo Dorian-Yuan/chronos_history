@@ -3,7 +3,6 @@ import { useGameState, useGameDispatch } from "@/lib/game";
 import {
   evaluateTurn,
   analyzeGame,
-  generateMap,
   autoSave,
   addHistoryRecord,
 } from "@/lib/game";
@@ -11,25 +10,16 @@ import {
   ChroniclePanel,
   CabinetPanel,
   IntelligencePanel,
-  MapPanel,
   StatBars,
   GameInput,
   SaveManager,
 } from "@/components/game";
 import type { TurnResult, ScenarioData, FactionData } from "@/types";
 import { determineOutcome, checkGameOver, clampStat } from "@/types";
-import {
-  Settings,
-  Save,
-  BookOpen,
-  Users,
-  Radar,
-  Home,
-  Map,
-} from "lucide-react";
+import { Settings, Save, BookOpen, Users, Radar, Home } from "lucide-react";
 import { useUIStore } from "@/stores";
 
-type SideTab = "cabinet" | "intelligence" | "map";
+type SideTab = "cabinet" | "intelligence";
 
 function safeGetAdvisors(
   scenario: ScenarioData | null,
@@ -60,10 +50,17 @@ function safeGetDelta(turnResults: TurnResult[]) {
 }
 
 const TAB_CONFIG = {
-  chronicle: { icon: BookOpen, label: "编年史", colorVar: "--color-tab-chronicle" },
+  chronicle: {
+    icon: BookOpen,
+    label: "编年史",
+    colorVar: "--color-tab-chronicle",
+  },
   cabinet: { icon: Users, label: "内阁", colorVar: "--color-tab-cabinet" },
-  intelligence: { icon: Radar, label: "情报", colorVar: "--color-tab-intelligence" },
-  map: { icon: Map, label: "舆图", colorVar: "--color-tab-map" },
+  intelligence: {
+    icon: Radar,
+    label: "情报",
+    colorVar: "--color-tab-intelligence",
+  },
 } as const;
 
 export function GamePage() {
@@ -72,9 +69,8 @@ export function GamePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
-  const [mobileTab, setMobileTab] = useState<keyof typeof TAB_CONFIG>(
-    "chronicle",
-  );
+  const [mobileTab, setMobileTab] =
+    useState<keyof typeof TAB_CONFIG>("chronicle");
   const [showSaveManager, setShowSaveManager] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
 
@@ -102,9 +98,10 @@ export function GamePage() {
       setError(null);
 
       try {
-        const lastDateDisplay = turnResults.length > 0
-          ? turnResults[turnResults.length - 1].date_display
-          : undefined;
+        const lastDateDisplay =
+          turnResults.length > 0
+            ? turnResults[turnResults.length - 1].date_display
+            : undefined;
 
         const result = await evaluateTurn(
           scenario,
@@ -157,57 +154,6 @@ export function GamePage() {
             console.error("Failed to generate game analysis:", e);
           }
         }
-
-        try {
-          const updatedFactions = scenario.factions.map((f) => ({ ...f }));
-          for (const update of result.factions_update) {
-            if (update.is_destroyed) {
-              const idx = updatedFactions.findIndex((f) => f.name === update.name);
-              if (idx >= 0) {
-                updatedFactions[idx] = { ...updatedFactions[idx], is_destroyed: true, attitude: "已灭亡" };
-              }
-              continue;
-            }
-            const idx = updatedFactions.findIndex((f) => f.name === update.name);
-            if (idx >= 0) {
-              updatedFactions[idx] = {
-                ...updatedFactions[idx],
-                description: update.description ?? updatedFactions[idx].description,
-                strength: update.strength ?? updatedFactions[idx].strength,
-                weakness: update.weakness ?? updatedFactions[idx].weakness,
-                needs: update.needs ?? updatedFactions[idx].needs,
-                attitude: update.attitude ?? updatedFactions[idx].attitude,
-                is_new: false,
-              };
-            } else if (update.is_new) {
-              updatedFactions.push({
-                name: update.name,
-                description: update.description,
-                strength: update.strength,
-                weakness: update.weakness,
-                needs: update.needs,
-                attitude: update.attitude,
-                is_new: true,
-              });
-            }
-          }
-          const updatedScenario = { ...scenario, factions: updatedFactions };
-          const newStats = {
-            stability: clampStat(state.stats.stability + result.stats_delta.stability),
-            economy: clampStat(state.stats.economy + result.stats_delta.economy),
-            military: clampStat(state.stats.military + result.stats_delta.military),
-            international_standing: clampStat(state.stats.international_standing + result.stats_delta.international_standing),
-          };
-          const mapResult = await generateMap(
-            updatedScenario,
-            [...state.historyLog, result.hidden_consequences],
-            newStats,
-            state.turnCount + 1,
-          );
-          dispatch({ type: "SET_MAP_DATA", mapData: mapResult });
-        } catch (e) {
-          console.error("Failed to generate map:", e);
-        }
       } catch (e) {
         console.error("Turn evaluation failed:", e);
         const msg = e instanceof Error ? e.message : "推演失败";
@@ -241,7 +187,7 @@ export function GamePage() {
     tabKey: keyof typeof TAB_CONFIG,
     onClick: () => void,
     isActive: boolean,
-    indicatorPosition: "top" | "bottom" = "bottom"
+    indicatorPosition: "top" | "bottom" = "bottom",
   ) => {
     const config = TAB_CONFIG[tabKey];
     const Icon = config.icon;
@@ -354,17 +300,14 @@ export function GamePage() {
                 scenario={scenario}
                 stats={state.stats}
                 historyLog={state.historyLog}
-                currentSituation={turnResults.length > 0 ? turnResults[turnResults.length - 1].situation_update : ""}
+                currentSituation={
+                  turnResults.length > 0
+                    ? turnResults[turnResults.length - 1].situation_update
+                    : ""
+                }
               />
-            ) : mobileTab === "intelligence" ? (
-              <IntelligencePanel factions={currentFactions} />
             ) : (
-              <MapPanel
-                scenario={scenario}
-                stats={state.stats}
-                turnCount={state.turnCount}
-                historyLog={state.historyLog}
-              />
+              <IntelligencePanel factions={currentFactions} />
             )}
           </div>
         </div>
@@ -379,19 +322,13 @@ export function GamePage() {
               "cabinet",
               () => setSideTab("cabinet"),
               sideTab === "cabinet",
-              "bottom"
+              "bottom",
             )}
             {renderTabButton(
               "intelligence",
               () => setSideTab("intelligence"),
               sideTab === "intelligence",
-              "bottom"
-            )}
-            {renderTabButton(
-              "map",
-              () => setSideTab("map"),
-              sideTab === "map",
-              "bottom"
+              "bottom",
             )}
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -405,7 +342,11 @@ export function GamePage() {
                 scenario={scenario}
                 stats={state.stats}
                 historyLog={state.historyLog}
-                currentSituation={turnResults.length > 0 ? turnResults[turnResults.length - 1].situation_update : ""}
+                currentSituation={
+                  turnResults.length > 0
+                    ? turnResults[turnResults.length - 1].situation_update
+                    : ""
+                }
               />
             </div>
             <div
@@ -415,50 +356,36 @@ export function GamePage() {
             >
               <IntelligencePanel factions={currentFactions} />
             </div>
-            <div
-              id="panel-map"
-              role="tabpanel"
-              className={sideTab === "map" ? "" : "hidden"}
-            >
-              <MapPanel
-                scenario={scenario}
-                stats={state.stats}
-                turnCount={state.turnCount}
-                historyLog={state.historyLog}
-              />
-            </div>
           </div>
         </div>
       </div>
 
       <nav
         className="flex md:hidden border-t border-border pb-[env(safe-area-inset-bottom,0px)]"
-        style={{ background: "var(--color-glass-bg)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}
+        style={{
+          background: "var(--color-glass-bg)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        }}
         aria-label="游戏面板"
       >
         {renderTabButton(
           "chronicle",
           () => setMobileTab("chronicle"),
           mobileTab === "chronicle",
-          "top"
+          "top",
         )}
         {renderTabButton(
           "cabinet",
           () => setMobileTab("cabinet"),
           mobileTab === "cabinet",
-          "top"
+          "top",
         )}
         {renderTabButton(
           "intelligence",
           () => setMobileTab("intelligence"),
           mobileTab === "intelligence",
-          "top"
-        )}
-        {renderTabButton(
-          "map",
-          () => setMobileTab("map"),
-          mobileTab === "map",
-          "top"
+          "top",
         )}
       </nav>
 
