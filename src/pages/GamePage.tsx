@@ -226,22 +226,15 @@ export function GamePage() {
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
         <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card p-3 shadow-sm">
-          <div className="flex items-center gap-3.5 min-w-0 pl-1.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-hover bg-bg-tertiary text-text-tertiary">
-              <User size={20} strokeWidth={1.5} />
-            </div>
-            <div className="flex flex-col justify-center min-w-0 py-0.5">
-              <div className="text-[10px] uppercase tracking-[0.15em] text-text-tertiary mb-1 truncate leading-none">
-                {t("game.currentIdentity")}
-              </div>
-              <div className="flex items-center gap-2.5 truncate">
-                <span className="text-base font-serif font-bold text-text-primary truncate leading-none mt-0.5">
-                  {nationName}
-                </span>
-                <span className="text-[11px] font-serif font-medium text-accent-primary px-2 py-0.5 rounded-md bg-accent-primary/10 border border-accent-primary/20 shrink-0 leading-none">
-                  {leaderTitle}
-                </span>
-              </div>
+          <div className="flex items-center gap-4 min-w-0 pl-1">
+            <User size={22} strokeWidth={1.5} className="text-text-tertiary shrink-0" />
+            <div className="flex items-baseline gap-3 min-w-0 overflow-hidden">
+              <span className="text-lg font-serif font-bold text-text-primary truncate">
+                {nationName}
+              </span>
+              <span className="text-sm font-serif text-accent-primary opacity-80 shrink-0">
+                // {leaderTitle}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 ml-2 shrink-0 pl-3 border-l border-border/50">
