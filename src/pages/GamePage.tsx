@@ -226,21 +226,21 @@ export function GamePage() {
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
         <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card pl-5 pr-3 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-border-hover bg-bg-tertiary">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-border-hover bg-bg-tertiary">
               <User size={18} className="text-text-tertiary" />
             </div>
-            <div>
-              <div className="text-xs uppercase tracking-[0.15em] text-text-tertiary">
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] uppercase tracking-[0.15em] text-text-tertiary leading-none mb-1 truncate">
                 {t("game.currentIdentity")}
               </div>
-              <div className="text-lg font-serif font-bold text-text-primary">
+              <div className="text-base font-serif font-bold text-text-primary leading-tight truncate">
                 {nationName}
               </div>
-              <div className="text-sm font-serif text-accent-primary">{leaderTitle}</div>
+              <div className="text-xs font-serif text-accent-primary leading-tight mt-0.5 truncate">{leaderTitle}</div>
             </div>
           </div>
-          <div className="flex items-center gap-1 ml-2">
+          <div className="flex items-center gap-1 ml-2 shrink-0">
             <button
               onClick={() => dispatch({ type: "RESET" })}
               className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"

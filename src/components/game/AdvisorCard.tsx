@@ -103,7 +103,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
       </div>
 
       {advisor.hidden_motive && showMotive && (
-        <div className="mt-2 rounded border border-border bg-bg-card px-4 py-3">
+        <div className="mt-3.5 rounded border border-border bg-bg-card px-4 py-3">
           <p className="text-xs font-serif italic leading-relaxed text-accent-secondary">
             {advisor.hidden_motive}
           </p>
