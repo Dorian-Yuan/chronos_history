@@ -120,6 +120,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentTurnResult: result,
         scenario: newScenario,
         turnResults: [...state.turnResults, result],
+        // 清除上一回合的顾问咨询记录，每回合开始时重置
         counselSessions: [],
       };
     }
@@ -135,6 +136,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...action.state,
         turnResults: action.state.turnResults ?? [],
+        counselSessions: action.state.counselSessions ?? [],
       };
 
     case "RESET":

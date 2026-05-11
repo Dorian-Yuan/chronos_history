@@ -32,7 +32,7 @@ export function CabinetPanel({
   const dispatch = useGameDispatch();
 
   const getCounselMessages = (role: AdvisorRole): CounselMessage[] => {
-    const session = gameState.counselSessions.find(
+    const session = (gameState.counselSessions ?? []).find(
       (s) => s.advisorRole === role,
     );
     return session?.messages ?? [];
