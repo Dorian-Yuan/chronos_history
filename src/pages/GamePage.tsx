@@ -198,8 +198,7 @@ export function GamePage() {
         onClick={onClick}
         role="tab"
         aria-selected={isActive}
-        className="flex flex-col items-center justify-center gap-0.5 flex-1 pt-2 relative transition-colors"
-        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0.5rem))" }}
+        className="flex flex-col items-center justify-center gap-0.5 flex-1 pt-2 pb-2 relative transition-colors"
       >
         <Icon
           size={18}
@@ -214,7 +213,7 @@ export function GamePage() {
         </span>
         {isActive && (
           <div
-            className="absolute bottom-0 h-[2px] w-8 rounded-full"
+            className="absolute bottom-1 h-[2px] w-8 rounded-full"
             style={{ backgroundColor: activeColor }}
           />
         )}
@@ -345,7 +344,7 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border"
+        className="flex md:hidden border-t border-border safe-bottom"
         style={{ background: "var(--color-glass-bg)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}
         aria-label="游戏面板"
       >
