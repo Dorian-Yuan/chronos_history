@@ -82,11 +82,11 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         <span className="text-sm font-serif text-text-secondary">// {advisor.name}</span>
       </div>
 
-      <p className="mt-2 text-sm font-serif text-text-primary font-medium leading-relaxed">
+      <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-5 flex items-center justify-between">
         <div className="text-xs font-serif text-text-tertiary">
           倾向：{advisor.bias}
         </div>
@@ -103,7 +103,7 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
       </div>
 
       {advisor.hidden_motive && showMotive && (
-        <div className="mt-4 rounded-md border border-border bg-bg-card p-3.5">
+        <div className="mt-5 rounded-md border border-border bg-bg-card py-4 pl-5 pr-4">
           <p className="text-xs font-serif italic leading-relaxed text-accent-secondary">
             {advisor.hidden_motive}
           </p>

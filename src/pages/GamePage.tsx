@@ -19,7 +19,6 @@ import { determineOutcome, checkGameOver, clampStat } from "@/types";
 import {
   Settings,
   Save,
-  User,
   BookOpen,
   Users,
   Radar,
@@ -223,9 +222,8 @@ export function GamePage() {
   return (
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card p-3 shadow-sm">
-          <div className="flex items-center gap-4 min-w-0 pl-1">
-            <User size={22} strokeWidth={1.5} className="text-text-tertiary shrink-0" />
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card py-5 px-4 shadow-sm">
+          <div className="flex items-center min-w-0">
             <div className="flex items-baseline gap-3 min-w-0 overflow-hidden">
               <span className="text-lg font-serif font-bold text-text-primary truncate">
                 {nationName}
