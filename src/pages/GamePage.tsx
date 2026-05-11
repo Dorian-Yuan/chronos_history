@@ -301,7 +301,7 @@ export function GamePage() {
                 state.turnResults.length > 0
                   ? state.turnResults[state.turnResults.length - 1]
                       .decision_options || []
-                  : []
+                  : scenario?.initial_decision_options || []
               }
             />
           </div>

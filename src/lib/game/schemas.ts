@@ -116,6 +116,28 @@ export const scenarioSchema = {
         ],
       },
     },
+    initial_decision_options: {
+      type: "array" as const,
+      items: {
+        type: "object" as const,
+        additionalProperties: false,
+        properties: {
+          title: {
+            type: "string" as const,
+            description: "决策选项标题（简体中文，2-6字）",
+          },
+          description: {
+            type: "string" as const,
+            description: "决策选项简述（简体中文，30-60字）",
+          },
+          recommended_advisor: {
+            type: "string" as const,
+            description: "推荐此选择的顾问角色名（如'将军''外交官'）",
+          },
+        },
+        required: ["title", "description", "recommended_advisor"],
+      },
+    },
   },
   required: [
     "id",
@@ -128,6 +150,7 @@ export const scenarioSchema = {
     "start_date",
     "initial_advisors",
     "factions",
+    "initial_decision_options",
   ],
 };
 

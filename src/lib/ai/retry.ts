@@ -6,8 +6,8 @@ export interface RetryOptions {
 
 const defaultRetryOptions: RetryOptions = {
   maxRetries: 3,
-  baseDelayMs: 1000,
-  maxDelayMs: 10000,
+  baseDelayMs: 500,
+  maxDelayMs: 8000,
 };
 
 export async function withRetry<T>(

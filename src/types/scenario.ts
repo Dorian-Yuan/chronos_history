@@ -1,17 +1,5 @@
 import type { PlayStyle } from "./play-style";
-
-export interface PlayerContext {
-  nation_name: string;
-  leader_title: string;
-  background_summary: string;
-}
-
-export interface InitialStats {
-  stability: number;
-  economy: number;
-  military: number;
-  international_standing: number;
-}
+import type { DecisionOption } from "./turn-result";
 
 export type AdvisorRole =
   | "General"
@@ -19,6 +7,12 @@ export type AdvisorRole =
   | "Intel"
   | "Scholar"
   | "Merchant";
+
+export interface PlayerContext {
+  nation_name: string;
+  leader_title: string;
+  background_summary: string;
+}
 
 export interface AdvisorData {
   role: AdvisorRole;
@@ -45,10 +39,16 @@ export interface ScenarioData {
   title: string;
   description: string;
   player_context: PlayerContext;
-  initial_stats: InitialStats;
+  initial_stats: {
+    stability: number;
+    economy: number;
+    military: number;
+    international_standing: number;
+  };
   hidden_real_event: string;
   play_style: PlayStyle;
   start_date: string;
   initial_advisors: AdvisorData[];
   factions: FactionData[];
+  initial_decision_options?: DecisionOption[];
 }

@@ -4,7 +4,7 @@ import { X, Check } from "lucide-react";
 
 interface DecisionOptionsModalProps {
   options: DecisionOption[];
-  onConfirm: (selectedTitles: string[]) => void;
+  onConfirm: (selectedItems: { title: string; description: string }[]) => void;
   onCancel: () => void;
 }
 
@@ -47,10 +47,13 @@ export function DecisionOptionsModal({
   };
 
   const handleConfirm = () => {
-    const selectedTitles = Array.from(selectedIndices)
+    const selectedItems = Array.from(selectedIndices)
       .sort()
-      .map((i) => options[i].title);
-    onConfirm(selectedTitles);
+      .map((i) => ({
+        title: options[i].title,
+        description: options[i].description,
+      }));
+    onConfirm(selectedItems);
   };
 
   return (
@@ -78,41 +81,43 @@ export function DecisionOptionsModal({
           <p className="text-xs text-text-tertiary font-serif">
             选择一项或多项决策方向，确认后将填入输入框
           </p>
-          {options.map((option, index) => {
-            const isSelected = selectedIndices.has(index);
-            return (
-              <button
-                key={index}
-                onClick={() => toggleOption(index)}
-                className={`w-full text-left rounded-lg border-l-[3px] px-4 py-3 transition-all ${
-                  isSelected
-                    ? "border-l-accent-primary bg-accent-primary/5"
-                    : "border-l-border bg-bg-card hover:bg-bg-hover"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-serif font-bold text-text-primary">
-                        {option.title}
-                      </span>
-                      <span className="badge bg-accent-secondary/10 text-accent-secondary border border-accent-secondary/20">
-                        {option.recommended_advisor}荐
-                      </span>
+          <div className="space-y-3">
+            {options.map((option, index) => {
+              const isSelected = selectedIndices.has(index);
+              return (
+                <button
+                  key={index}
+                  onClick={() => toggleOption(index)}
+                  className={`w-full text-left rounded-lg border-l-[3px] px-4 py-3 transition-all ${
+                    isSelected
+                      ? "border-l-accent-primary bg-accent-primary/5"
+                      : "border-l-border bg-bg-card hover:bg-bg-hover"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-serif font-bold text-text-primary">
+                          {option.title}
+                        </span>
+                        <span className="badge bg-accent-secondary/10 text-accent-secondary border border-accent-secondary/20">
+                          {option.recommended_advisor}荐
+                        </span>
+                      </div>
+                      <p className="text-xs font-serif text-text-secondary leading-relaxed">
+                        {option.description}
+                      </p>
                     </div>
-                    <p className="text-xs font-serif text-text-secondary leading-relaxed">
-                      {option.description}
-                    </p>
+                    {isSelected && (
+                      <div className="shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-accent-primary/20">
+                        <Check size={12} className="text-accent-primary" />
+                      </div>
+                    )}
                   </div>
-                  {isSelected && (
-                    <div className="shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-accent-primary/20">
-                      <Check size={12} className="text-accent-primary" />
-                    </div>
-                  )}
-                </div>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="modal-footer flex-row gap-3">

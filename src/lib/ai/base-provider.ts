@@ -39,15 +39,31 @@ export abstract class BaseAIProvider implements AIProvider {
     }
     cleaned = cleaned.trim();
 
+    cleaned = cleaned.replace(/\/\/.*$/gm, "");
+    cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, "");
+    cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
+
     try {
       return JSON.parse(cleaned);
     } catch {
-      // fallback: extract JSON object from text
       const jsonStart = cleaned.indexOf("{");
       const jsonEnd = cleaned.lastIndexOf("}");
 
       if (jsonStart !== -1 && jsonEnd > jsonStart) {
-        const extracted = cleaned.slice(jsonStart, jsonEnd + 1);
+        let extracted = cleaned.slice(jsonStart, jsonEnd + 1);
+
+        const openBraces = (extracted.match(/{/g) || []).length;
+        const closeBraces = (extracted.match(/}/g) || []).length;
+        if (closeBraces < openBraces) {
+          extracted += "}".repeat(openBraces - closeBraces);
+        }
+
+        const openBrackets = (extracted.match(/\[/g) || []).length;
+        const closeBrackets = (extracted.match(/]/g) || []).length;
+        if (closeBrackets < openBrackets) {
+          extracted += "]".repeat(openBrackets - closeBrackets);
+        }
+
         try {
           return JSON.parse(extracted);
         } catch {

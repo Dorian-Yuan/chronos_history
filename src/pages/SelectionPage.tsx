@@ -48,6 +48,7 @@ export function SelectionPage() {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<PlayStyle | null>(null);
+  const [progressText, setProgressText] = useState("正在生成剧本...");
 
   const handleSelect = async (playStyle: PlayStyle, userHint?: string) => {
     setGenerating(true);
@@ -55,7 +56,9 @@ export function SelectionPage() {
     setSelectedStyle(null);
 
     try {
-      const scenario = await generateScenario(playStyle, userHint);
+      const scenario = await generateScenario(playStyle, userHint, (stage) => {
+        setProgressText(stage);
+      });
       dispatch({ type: "SET_SCENARIO", scenario });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "生成剧本失败，请重试";
@@ -97,7 +100,9 @@ export function SelectionPage() {
               style={{ animationDelay: "0.4s" }}
             />
           </div>
-          <p className="text-sm font-serif text-text-secondary">正在生成剧本...</p>
+          <p className="text-sm font-serif text-text-secondary">
+            {progressText}
+          </p>
         </div>
       ) : (
         <div className="grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-2">
