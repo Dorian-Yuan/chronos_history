@@ -1,5 +1,12 @@
 import { useState } from "react";
-import type { AdvisorData, ScenarioData, GameStats } from "@/types";
+import type {
+  AdvisorData,
+  ScenarioData,
+  GameStats,
+  CounselMessage,
+  AdvisorRole,
+} from "@/types";
+import { useGameState, useGameDispatch } from "@/lib/game";
 import { AdvisorCard } from "./AdvisorCard";
 import { CounselDialog } from "./CounselDialog";
 
@@ -11,8 +18,35 @@ interface CabinetPanelProps {
   currentSituation: string;
 }
 
-export function CabinetPanel({ advisors, scenario, stats, historyLog, currentSituation }: CabinetPanelProps) {
-  const [counselAdvisor, setCounselAdvisor] = useState<AdvisorData | null>(null);
+export function CabinetPanel({
+  advisors,
+  scenario,
+  stats,
+  historyLog,
+  currentSituation,
+}: CabinetPanelProps) {
+  const [counselAdvisor, setCounselAdvisor] = useState<AdvisorData | null>(
+    null,
+  );
+  const gameState = useGameState();
+  const dispatch = useGameDispatch();
+
+  const getCounselMessages = (role: AdvisorRole): CounselMessage[] => {
+    const session = gameState.counselSessions.find(
+      (s) => s.advisorRole === role,
+    );
+    return session?.messages ?? [];
+  };
+
+  const updateCounselMessages = (
+    role: AdvisorRole,
+    messages: CounselMessage[],
+  ) => {
+    dispatch({
+      type: "UPDATE_COUNSEL_SESSION",
+      session: { advisorRole: role, messages },
+    });
+  };
 
   if (!advisors.length) {
     return (
@@ -46,6 +80,10 @@ export function CabinetPanel({ advisors, scenario, stats, historyLog, currentSit
           stats={stats}
           historyLog={historyLog}
           currentSituation={currentSituation}
+          initialMessages={getCounselMessages(counselAdvisor.role)}
+          onMessagesChange={(messages) =>
+            updateCounselMessages(counselAdvisor.role, messages)
+          }
           onClose={() => setCounselAdvisor(null)}
         />
       )}

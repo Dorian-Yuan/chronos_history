@@ -31,6 +31,7 @@ export interface GameState {
   currentTurnResult: TurnResult | null;
   endGameAnalysis: EndGameAnalysis | null;
   turnResults: TurnResult[];
+  counselSessions: CounselSession[];
 }
 
 export type GameOutcome = "victory" | "neutral" | "defeat";
@@ -49,6 +50,7 @@ export const INITIAL_GAME_STATE: GameState = {
   currentTurnResult: null,
   endGameAnalysis: null,
   turnResults: [],
+  counselSessions: [],
 };
 
 export function clampStat(value: number): number {

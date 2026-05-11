@@ -41,16 +41,7 @@
     "noData": "暂无数据",
     "opinionConflict": "⚠ 观点冲突",
     "yearBC": "BC",
-    "currentIdentity": "当前身份",
-    "mapTab": "舆图",
-    "mapGenerate": "绘制舆图",
-    "mapRegenerate": "重绘",
-    "mapGenerating": "正在绘制战略舆图...",
-    "mapEmpty": "战略舆图尚未绘制",
-    "mapEmptyHint": "点击下方按钮生成当前战略态势图",
-    "mapRenderError": "舆图渲染失败",
-    "mapLoadingEngine": "加载舆图引擎...",
-    "mapTurnInfo": "第{turn}回合绘制"
+    "currentIdentity": "当前身份"
   },
   "relation": {
     "ally": "盟友",

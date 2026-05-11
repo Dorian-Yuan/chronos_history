@@ -1,7 +1,22 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import type { AdvisorData, AdvisorRole, CounselMessage, ScenarioData, GameStats } from "@/types";
+import type {
+  AdvisorData,
+  AdvisorRole,
+  CounselMessage,
+  ScenarioData,
+  GameStats,
+} from "@/types";
 import { counselAdvisor } from "@/lib/game";
-import { Shield, Scroll, Eye, BookOpen, Coins, MessageCircle, X, Send } from "lucide-react";
+import {
+  Shield,
+  Scroll,
+  Eye,
+  BookOpen,
+  Coins,
+  MessageCircle,
+  X,
+  Send,
+} from "lucide-react";
 
 interface CounselDialogProps {
   advisor: AdvisorData;
@@ -9,12 +24,21 @@ interface CounselDialogProps {
   stats: GameStats;
   historyLog: string[];
   currentSituation: string;
+  initialMessages?: CounselMessage[];
+  onMessagesChange?: (messages: CounselMessage[]) => void;
   onClose: () => void;
 }
 
-const ROLE_CONFIG: Record<AdvisorRole, { label: string; icon: typeof Shield; colorVar: string }> = {
+const ROLE_CONFIG: Record<
+  AdvisorRole,
+  { label: string; icon: typeof Shield; colorVar: string }
+> = {
   General: { label: "将军", icon: Shield, colorVar: "--color-role-general" },
-  Diplomat: { label: "外交官", icon: Scroll, colorVar: "--color-role-diplomat" },
+  Diplomat: {
+    label: "外交官",
+    icon: Scroll,
+    colorVar: "--color-role-diplomat",
+  },
   Intel: { label: "密探", icon: Eye, colorVar: "--color-role-intel" },
   Scholar: { label: "学者", icon: BookOpen, colorVar: "--color-role-scholar" },
   Merchant: { label: "商人", icon: Coins, colorVar: "--color-role-merchant" },
@@ -26,10 +50,14 @@ export function CounselDialog({
   stats,
   historyLog,
   currentSituation,
+  initialMessages,
+  onMessagesChange,
   onClose,
 }: CounselDialogProps) {
   const config = ROLE_CONFIG[advisor.role];
-  const [messages, setMessages] = useState<CounselMessage[]>([]);
+  const [messages, setMessages] = useState<CounselMessage[]>(
+    initialMessages ?? [],
+  );
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +93,7 @@ export function CounselDialog({
     const userMessage: CounselMessage = { role: "user", content: trimmed };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
+    onMessagesChange?.(newMessages);
     setInput("");
     setIsLoading(true);
     setError(null);
@@ -79,8 +108,13 @@ export function CounselDialog({
         newMessages,
       );
 
-      const assistantMessage: CounselMessage = { role: "assistant", content: response };
-      setMessages((prev) => [...prev, assistantMessage]);
+      const assistantMessage: CounselMessage = {
+        role: "assistant",
+        content: response,
+      };
+      const updatedMessages = [...newMessages, assistantMessage];
+      setMessages(updatedMessages);
+      onMessagesChange?.(updatedMessages);
     } catch (e) {
       console.error("[CounselDialog] Failed to get response:", e);
       const errorMsg = e instanceof Error ? e.message : "问对失败";
@@ -88,7 +122,17 @@ export function CounselDialog({
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, advisor, scenario, stats, historyLog, currentSituation]);
+  }, [
+    input,
+    isLoading,
+    messages,
+    advisor,
+    scenario,
+    stats,
+    historyLog,
+    currentSituation,
+    onMessagesChange,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -103,7 +147,11 @@ export function CounselDialog({
 
   return (
     <div className="modal-overlay animate-fade-in" onClick={handleOverlayClick}>
-      <div ref={modalRef} className="modal-content max-w-lg flex flex-col" style={{ maxHeight: "80vh" }}>
+      <div
+        ref={modalRef}
+        className="modal-content max-w-lg flex flex-col"
+        style={{ maxHeight: "80vh" }}
+      >
         <div className="modal-header shrink-0">
           <div className="flex items-center gap-2">
             <div
@@ -128,7 +176,7 @@ export function CounselDialog({
           </button>
         </div>
 
-        <div className="modal-body flex-1 overflow-y-auto min-h-0 space-y-3 py-3">
+        <div className="modal-body flex-1 overflow-y-auto min-h-0 space-y-4 py-3">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-6 text-text-tertiary">
               <MessageCircle size={24} className="mb-2 opacity-30" />
@@ -150,7 +198,11 @@ export function CounselDialog({
                     ? "bg-accent-primary/15 text-text-primary"
                     : "bg-bg-tertiary text-text-secondary"
                 }`}
-                style={msg.role === "assistant" ? { borderLeft: `2px solid ${roleColor}` } : undefined}
+                style={
+                  msg.role === "assistant"
+                    ? { borderLeft: `2px solid ${roleColor}` }
+                    : undefined
+                }
               >
                 {msg.content}
               </div>
@@ -158,16 +210,19 @@ export function CounselDialog({
           ))}
 
           {isLoading && (
-            <div className="flex justify-start">
+            <div className="flex justify-start items-center gap-2">
               <div
-                className="max-w-[80%] rounded-lg px-3 py-2 bg-bg-tertiary"
+                className="rounded-lg px-3 py-2 bg-bg-tertiary"
                 style={{ borderLeft: `2px solid ${roleColor}` }}
               >
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: roleColor }} />
-                  <span className="text-[10px] text-text-tertiary font-serif">{advisor.name}正在低语...</span>
-                </div>
+                <span className="text-[10px] text-text-tertiary font-serif">
+                  {advisor.name}正在低语...
+                </span>
               </div>
+              <div
+                className="w-2 h-2 rounded-full animate-pulse shrink-0"
+                style={{ backgroundColor: roleColor }}
+              />
             </div>
           )}
 
@@ -180,7 +235,7 @@ export function CounselDialog({
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="shrink-0 border-t border-border px-3 py-2.5">
+        <div className="shrink-0 border-t border-border px-4 py-2.5">
           <div className="flex items-end gap-2">
             <textarea
               ref={inputRef}

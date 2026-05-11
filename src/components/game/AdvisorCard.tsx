@@ -1,6 +1,13 @@
 import { useState } from "react";
 import type { AdvisorData, AdvisorRole } from "@/types";
-import { Shield, Scroll, Eye, BookOpen, Coins, MessageCircle } from "lucide-react";
+import {
+  Shield,
+  Scroll,
+  Eye,
+  BookOpen,
+  Coins,
+  MessageCircle,
+} from "lucide-react";
 
 interface AdvisorCardProps {
   advisor: AdvisorData;
@@ -80,19 +87,20 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
         <span className="text-sm" style={{ color: roleColor }}>
           {config.label}
         </span>
-        <span className="text-sm font-serif text-text-secondary">// {advisor.name}</span>
+        <span className="text-sm font-serif text-text-secondary">
+          // {advisor.name}
+        </span>
       </div>
 
       <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-5 flex items-center justify-between">
+      <div className="mt-5">
         <div className="text-xs font-serif text-text-tertiary">
           倾向：{advisor.bias}
         </div>
-
-        <div className="flex items-center gap-2">
+        <div className="mt-2 flex items-center gap-2">
           {onCounsel && (
             <button
               onClick={() => onCounsel(advisor)}

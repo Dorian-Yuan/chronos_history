@@ -5,6 +5,7 @@ import type {
   TurnResult,
   EndGameAnalysis,
   FactionData,
+  CounselSession,
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
 
@@ -14,7 +15,8 @@ export type GameAction =
   | { type: "PROCESS_TURN"; result: TurnResult }
   | { type: "GAME_OVER"; analysis: EndGameAnalysis }
   | { type: "LOAD_SAVE"; state: GameState }
-  | { type: "RESET" };
+  | { type: "RESET" }
+  | { type: "UPDATE_COUNSEL_SESSION"; session: CounselSession };
 
 function applyStatsDelta(
   stats: GameStats,
@@ -93,6 +95,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentTurnResult: null,
         endGameAnalysis: null,
         turnResults: [],
+        counselSessions: [],
       };
     }
 
@@ -117,6 +120,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentTurnResult: result,
         scenario: newScenario,
         turnResults: [...state.turnResults, result],
+        counselSessions: [],
       };
     }
 
@@ -135,6 +139,22 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "RESET":
       return { ...INITIAL_GAME_STATE };
+
+    case "UPDATE_COUNSEL_SESSION": {
+      const existing = state.counselSessions.findIndex(
+        (s) => s.advisorRole === action.session.advisorRole,
+      );
+      const sessions = [...state.counselSessions];
+      if (existing >= 0) {
+        sessions[existing] = action.session;
+      } else {
+        sessions.push(action.session);
+      }
+      return {
+        ...state,
+        counselSessions: sessions,
+      };
+    }
 
     default:
       return state;
