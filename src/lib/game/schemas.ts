@@ -276,10 +276,32 @@ export const mapSchema = {
       type: "string" as const,
       description: "Mermaid flowchart code showing strategic map",
     },
-    map_narrative: {
-      type: "string" as const,
-      description: "Brief strategic situation description in Chinese (50-100 chars)",
+    faction_chart: {
+      type: "array" as const,
+      items: {
+        type: "object" as const,
+        additionalProperties: false,
+        properties: {
+          name: { type: "string" as const, description: "势力名称" },
+          power: { type: "number" as const, minimum: 0, maximum: 100, description: "实力值0-100" },
+          attitude: { type: "string" as const, description: "态度（敌对/求和/中立/友好/臣服/已灭亡）" },
+          is_destroyed: { type: "boolean" as const, description: "是否已灭亡" },
+        },
+        required: ["name", "power", "attitude"],
+      },
     },
   },
-  required: ["mermaid_code", "map_narrative"],
+  required: ["mermaid_code", "faction_chart"],
+};
+
+export const counselSchema = {
+  type: "object" as const,
+  additionalProperties: false,
+  properties: {
+    response: {
+      type: "string" as const,
+      description: "顾问的私下回应（简体中文，100-200字）",
+    },
+  },
+  required: ["response"],
 };

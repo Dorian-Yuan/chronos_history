@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { AdvisorData, AdvisorRole } from "@/types";
-import { Shield, Scroll, Eye, BookOpen, Coins } from "lucide-react";
+import { Shield, Scroll, Eye, BookOpen, Coins, MessageCircle } from "lucide-react";
 
 interface AdvisorCardProps {
   advisor: AdvisorData;
+  onCounsel?: (advisor: AdvisorData) => void;
 }
 
 const ROLE_CONFIG: Record<
@@ -53,7 +54,7 @@ const ROLE_CONFIG: Record<
   },
 };
 
-export function AdvisorCard({ advisor }: AdvisorCardProps) {
+export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
   const config = ROLE_CONFIG[advisor.role];
   const [showMotive, setShowMotive] = useState(false);
   if (!config) return null;
@@ -91,15 +92,28 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
           倾向：{advisor.bias}
         </div>
 
-        {advisor.hidden_motive && (
-          <button
-            onClick={() => setShowMotive(!showMotive)}
-            className="flex items-center gap-1 text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
-            aria-label={showMotive ? "隐藏秘密动机" : "查看秘密动机"}
-          >
-            {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {onCounsel && (
+            <button
+              onClick={() => onCounsel(advisor)}
+              className="flex items-center gap-1 text-xs font-serif text-accent-secondary/70 hover:text-accent-secondary transition-colors"
+              aria-label={`与${advisor.name}密谈`}
+            >
+              <MessageCircle size={11} />
+              密谈
+            </button>
+          )}
+
+          {advisor.hidden_motive && (
+            <button
+              onClick={() => setShowMotive(!showMotive)}
+              className="flex items-center gap-1 text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
+              aria-label={showMotive ? "隐藏秘密动机" : "查看秘密动机"}
+            >
+              {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
+            </button>
+          )}
+        </div>
       </div>
 
       {advisor.hidden_motive && showMotive && (

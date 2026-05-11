@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useGameState, useGameDispatch, generateMap } from "@/lib/game";
 import { MermaidDiagram } from "./MermaidDiagram";
+import { FactionChart } from "./FactionChart";
 import { RefreshCw, Map as MapIcon } from "lucide-react";
 import type { MapData, ScenarioData, GameStats } from "@/types";
 
@@ -87,12 +88,20 @@ export function MapPanel({ scenario, stats, turnCount, historyLog }: MapPanelPro
           <div className="flex flex-col gap-3">
             <MermaidDiagram chart={mapData.mermaid_code} />
 
-            {mapData.map_narrative && (
-              <div className="rounded-lg border border-border bg-bg-secondary p-3">
-                <p className="text-xs font-serif text-text-secondary leading-relaxed italic">
-                  {mapData.map_narrative}
-                </p>
-              </div>
+            <div className="flex items-center gap-2 flex-wrap px-1">
+              {ATTITUDE_LEGEND.map((item) => (
+                <div key={item.label} className="flex items-center gap-1">
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-[10px] text-text-tertiary">{item.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {mapData.faction_chart && mapData.faction_chart.length > 0 && (
+              <FactionChart data={mapData.faction_chart} playerNation={scenario?.player_context.nation_name} />
             )}
 
             {mapData.updated_at > 0 && (
@@ -111,18 +120,7 @@ export function MapPanel({ scenario, stats, turnCount, historyLog }: MapPanelPro
       </div>
 
       <div className="border-t border-border px-4 py-2.5">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            {ATTITUDE_LEGEND.map((item) => (
-              <div key={item.label} className="flex items-center gap-1">
-                <div
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-[10px] text-text-tertiary">{item.label}</span>
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center justify-end">
           <button
             onClick={handleGenerate}
             disabled={isGenerating}

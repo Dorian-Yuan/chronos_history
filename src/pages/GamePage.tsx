@@ -349,7 +349,13 @@ export function GamePage() {
             className={`flex-1 flex-col overflow-y-auto md:hidden ${mobileTab === "chronicle" ? "hidden" : "flex"}`}
           >
             {mobileTab === "cabinet" ? (
-              <CabinetPanel advisors={currentAdvisors} />
+              <CabinetPanel
+                advisors={currentAdvisors}
+                scenario={scenario}
+                stats={state.stats}
+                historyLog={state.historyLog}
+                currentSituation={turnResults.length > 0 ? turnResults[turnResults.length - 1].situation_update : ""}
+              />
             ) : mobileTab === "intelligence" ? (
               <IntelligencePanel factions={currentFactions} />
             ) : (
@@ -394,7 +400,13 @@ export function GamePage() {
               role="tabpanel"
               className={sideTab === "cabinet" ? "" : "hidden"}
             >
-              <CabinetPanel advisors={currentAdvisors} />
+              <CabinetPanel
+                advisors={currentAdvisors}
+                scenario={scenario}
+                stats={state.stats}
+                historyLog={state.historyLog}
+                currentSituation={turnResults.length > 0 ? turnResults[turnResults.length - 1].situation_update : ""}
+              />
             </div>
             <div
               id="panel-intelligence"

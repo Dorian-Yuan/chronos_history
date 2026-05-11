@@ -5,4 +5,4 @@ export * from "./end-game";
 export * from "./game-state";
 export * from "./save";
 export * from "./ai-provider";
-export type { MapData } from "./game-state";
+export type { MapData, FactionChartData, CounselMessage, CounselSession } from "./game-state";

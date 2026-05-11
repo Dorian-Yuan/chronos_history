@@ -1,4 +1,4 @@
-import type { ScenarioData } from "./scenario";
+import type { ScenarioData, AdvisorRole } from "./scenario";
 import type { TurnResult } from "./turn-result";
 import type { EndGameAnalysis } from "./end-game";
 import { getAppConfig } from "@/config";
@@ -12,10 +12,27 @@ export interface GameStats {
 
 export type GamePhase = "start" | "selection" | "playing" | "ended";
 
+export interface FactionChartData {
+  name: string;
+  power: number;
+  attitude: string;
+  is_destroyed?: boolean;
+}
+
 export interface MapData {
   mermaid_code: string;
-  map_narrative: string;
+  faction_chart: FactionChartData[];
   updated_at: number;
+}
+
+export interface CounselMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface CounselSession {
+  advisorRole: AdvisorRole;
+  messages: CounselMessage[];
 }
 
 export interface GameState {
