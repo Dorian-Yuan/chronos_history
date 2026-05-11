@@ -26,7 +26,6 @@ import {
   Home,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
-import { useTranslation } from "@/hooks/useTranslation";
 
 type SideTab = "cabinet" | "intelligence";
 
@@ -67,7 +66,6 @@ const TAB_CONFIG = {
 export function GamePage() {
   const state = useGameState();
   const dispatch = useGameDispatch();
-  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
