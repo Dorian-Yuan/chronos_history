@@ -5,8 +5,17 @@ import {
   DisclaimerModal,
   SaveManager,
   HistoryArchive,
+  EndingCompendium,
 } from "@/components/game";
-import { Settings, Archive, Save, Globe, BookOpen, FolderOpen } from "lucide-react";
+import {
+  Settings,
+  Archive,
+  Save,
+  Globe,
+  BookOpen,
+  FolderOpen,
+  Trophy,
+} from "lucide-react";
 import { useUIStore } from "@/stores";
 
 export function StartPage() {
@@ -14,6 +23,7 @@ export function StartPage() {
   const state = useGameState();
   const [showSaveManager, setShowSaveManager] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showCompendium, setShowCompendium] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
 
   const canContinue = hasAutoSave();
@@ -60,31 +70,39 @@ export function StartPage() {
             继续游戏
           </button>
         )}
+
+        <button
+          onClick={() => setShowCompendium(true)}
+          className="btn-secondary w-full h-14 text-base"
+        >
+          <Trophy size={18} />
+          结局图鉴
+        </button>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 z-10 safe-bottom">
         <div className="flex gap-8 justify-center pb-8">
-        <button
-          onClick={() => setShowSaveManager(true)}
-          className="btn-ghost py-2.5 text-sm"
-        >
-          <Save size={14} />
-          存档
-        </button>
-        <button
-          onClick={() => setShowHistory(true)}
-          className="btn-ghost py-2.5 text-sm"
-        >
-          <Archive size={14} />
-          档案
-        </button>
-        <button
-          onClick={() => setSettingsOpen(true)}
-          className="btn-ghost py-2.5 text-sm"
-        >
-          <Settings size={14} />
-          设置
-        </button>
+          <button
+            onClick={() => setShowSaveManager(true)}
+            className="btn-ghost py-2.5 text-sm"
+          >
+            <Save size={14} />
+            存档
+          </button>
+          <button
+            onClick={() => setShowHistory(true)}
+            className="btn-ghost py-2.5 text-sm"
+          >
+            <Archive size={14} />
+            档案
+          </button>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="btn-ghost py-2.5 text-sm"
+          >
+            <Settings size={14} />
+            设置
+          </button>
         </div>
       </div>
 
@@ -99,6 +117,10 @@ export function StartPage() {
       )}
 
       {showHistory && <HistoryArchive onClose={() => setShowHistory(false)} />}
+
+      {showCompendium && (
+        <EndingCompendium onClose={() => setShowCompendium(false)} />
+      )}
     </main>
   );
 }

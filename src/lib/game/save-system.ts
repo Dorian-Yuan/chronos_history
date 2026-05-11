@@ -1,9 +1,16 @@
-import type { GameState, SaveData, HistoryRecord } from "@/types";
+import type {
+  GameState,
+  SaveData,
+  HistoryRecord,
+  CompendiumEntry,
+} from "@/types";
 import { SAVE_VERSION, MAX_HISTORY_RECORDS } from "@/types";
 
 const AUTOSAVE_KEY = "chronos_autosave";
 const SAVE_KEY_PREFIX = "chronos_save_";
 const HISTORY_KEY = "chronos_history";
+const COMPENDIUM_PERSONA_KEY = "chronos_compendium_persona";
+const COMPENDIUM_HISTORY_KEY = "chronos_compendium_history";
 
 function saveToLocalStorage(key: string, data: unknown): void {
   try {
@@ -120,4 +127,44 @@ export function importSave(jsonString: string): SaveData | null {
   } catch {
     return null;
   }
+}
+
+export function addToPersonaCompendium(
+  personaTitle: string,
+  personaDescription: string,
+): void {
+  const entries =
+    loadFromLocalStorage<CompendiumEntry[]>(COMPENDIUM_PERSONA_KEY) || [];
+  if (entries.some((e) => e.title === personaTitle)) return;
+  entries.push({
+    id: `persona_${Date.now()}`,
+    title: personaTitle,
+    description: personaDescription,
+    timestamp: Date.now(),
+  });
+  saveToLocalStorage(COMPENDIUM_PERSONA_KEY, entries);
+}
+
+export function addToHistoryCompendium(
+  eventTitle: string,
+  outcomeSummary: string,
+): void {
+  const entries =
+    loadFromLocalStorage<CompendiumEntry[]>(COMPENDIUM_HISTORY_KEY) || [];
+  if (entries.some((e) => e.title === eventTitle)) return;
+  entries.push({
+    id: `history_${Date.now()}`,
+    title: eventTitle,
+    description: outcomeSummary,
+    timestamp: Date.now(),
+  });
+  saveToLocalStorage(COMPENDIUM_HISTORY_KEY, entries);
+}
+
+export function getPersonaCompendium(): CompendiumEntry[] {
+  return loadFromLocalStorage<CompendiumEntry[]>(COMPENDIUM_PERSONA_KEY) || [];
+}
+
+export function getHistoryCompendium(): CompendiumEntry[] {
+  return loadFromLocalStorage<CompendiumEntry[]>(COMPENDIUM_HISTORY_KEY) || [];
 }

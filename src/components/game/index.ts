@@ -10,3 +10,5 @@ export { SaveManager } from "./SaveManager";
 export { HistoryArchive } from "./HistoryArchive";
 export { ScenarioHintModal } from "./ScenarioHintModal";
 export { CounselDialog } from "./CounselDialog";
+export { EndingCompendium } from "./EndingCompendium";
+export { DecisionOptionsModal } from "./DecisionOptionsModal";

@@ -26,5 +26,12 @@ export interface HistoryRecord {
   timestamp: number;
 }
 
+export interface CompendiumEntry {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: number;
+}
+
 export const MAX_HISTORY_RECORDS = 50;
 export const SAVE_VERSION = 1;

@@ -100,7 +100,7 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
         <div className="text-xs font-serif text-text-tertiary">
           倾向：{advisor.bias}
         </div>
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-2 flex items-center justify-between">
           {onCounsel && (
             <button
               onClick={() => onCounsel(advisor)}

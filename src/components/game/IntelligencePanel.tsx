@@ -45,13 +45,26 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 {faction.is_destroyed ? (
-                  <Skull size={14} className="text-text-tertiary" aria-hidden="true" />
+                  <Skull
+                    size={14}
+                    className="text-text-tertiary"
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <Swords size={14} className="text-text-tertiary" aria-hidden="true" />
+                  <Swords
+                    size={14}
+                    className="text-text-tertiary"
+                    aria-hidden="true"
+                  />
                 )}
                 <span className="text-base font-serif font-bold text-text-primary">
                   {faction.name}
                 </span>
+                {faction.leader && (
+                  <span className="text-sm font-serif text-text-secondary">
+                    // {faction.leader}
+                  </span>
+                )}
               </div>
               <span className={`badge ${getAttitudeStyle(faction.attitude)}`}>
                 {faction.attitude}
@@ -70,19 +83,43 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
 
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <TrendingUp size={13} className="shrink-0 text-accent-primary" aria-hidden="true" />
-                <span className="text-sm font-semibold text-accent-primary shrink-0">优势：</span>
-                <span className="text-sm font-serif text-text-secondary">{faction.strength}</span>
+                <TrendingUp
+                  size={13}
+                  className="shrink-0 text-accent-primary"
+                  aria-hidden="true"
+                />
+                <span className="text-sm font-semibold text-accent-primary shrink-0">
+                  优势：
+                </span>
+                <span className="text-sm font-serif text-text-secondary">
+                  {faction.strength}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <AlertTriangle size={13} className="shrink-0 text-accent-secondary" aria-hidden="true" />
-                <span className="text-sm font-semibold text-accent-secondary shrink-0">弱点：</span>
-                <span className="text-sm font-serif text-text-secondary">{faction.weakness}</span>
+                <AlertTriangle
+                  size={13}
+                  className="shrink-0 text-accent-secondary"
+                  aria-hidden="true"
+                />
+                <span className="text-sm font-semibold text-accent-secondary shrink-0">
+                  弱点：
+                </span>
+                <span className="text-sm font-serif text-text-secondary">
+                  {faction.weakness}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <Target size={13} className="shrink-0 text-accent-danger" aria-hidden="true" />
-                <span className="text-sm font-semibold text-accent-danger shrink-0">急需：</span>
-                <span className="text-sm font-serif text-accent-danger">{faction.needs}</span>
+                <Target
+                  size={13}
+                  className="shrink-0 text-accent-danger"
+                  aria-hidden="true"
+                />
+                <span className="text-sm font-semibold text-accent-danger shrink-0">
+                  急需：
+                </span>
+                <span className="text-sm font-serif text-accent-danger">
+                  {faction.needs}
+                </span>
               </div>
             </div>
           </li>

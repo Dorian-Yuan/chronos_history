@@ -27,4 +27,6 @@ export interface EndGameAnalysis {
   persona_description: string;
   radar_stats: RadarStat[];
   turn_reviews: TurnReview[];
+  modern_echo: string;
+  alternative_history: string;
 }

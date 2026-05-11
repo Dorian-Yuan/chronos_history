@@ -30,6 +30,7 @@ export interface AdvisorData {
 
 export interface FactionData {
   name: string;
+  leader?: string;
   description: string;
   strength: string;
   weakness: string;

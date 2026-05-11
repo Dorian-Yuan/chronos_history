@@ -60,6 +60,7 @@ function updateFactions(
         weakness: update.weakness ?? result[idx].weakness,
         needs: update.needs ?? result[idx].needs,
         attitude: update.attitude ?? result[idx].attitude,
+        leader: update.leader ?? result[idx].leader,
         is_new: false,
       };
     } else if (update.is_new) {
@@ -70,6 +71,7 @@ function updateFactions(
         weakness: update.weakness,
         needs: update.needs,
         attitude: update.attitude,
+        leader: update.leader,
         is_new: true,
       });
     }

@@ -5,6 +5,8 @@ import {
   analyzeGame,
   autoSave,
   addHistoryRecord,
+  addToPersonaCompendium,
+  addToHistoryCompendium,
 } from "@/lib/game";
 import {
   ChroniclePanel,
@@ -150,6 +152,15 @@ export function GamePage() {
               personaTitle: analysis.persona_title,
               timestamp: Date.now(),
             });
+
+            addToPersonaCompendium(
+              analysis.persona_title,
+              analysis.persona_description,
+            );
+            addToHistoryCompendium(
+              scenario.hidden_real_event,
+              analysis.real_outcome_summary,
+            );
           } catch (e) {
             console.error("Failed to generate game analysis:", e);
           }
@@ -223,16 +234,14 @@ export function GamePage() {
   return (
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card py-8 px-5 shadow-sm min-h-[90px]">
-          <div className="flex items-center min-w-0">
-            <div className="flex items-baseline gap-3 min-w-0 overflow-hidden">
-              <span className="text-xl font-serif font-bold text-text-primary truncate">
-                {nationName}
-              </span>
-              <span className="text-base font-serif text-accent-primary opacity-80 shrink-0">
-                // {leaderTitle}
-              </span>
-            </div>
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card py-5 px-5 shadow-sm min-h-[90px]">
+          <div className="flex flex-col gap-1 min-w-0 overflow-hidden">
+            <span className="text-xl font-serif font-bold text-text-primary truncate">
+              {nationName}
+            </span>
+            <span className="text-sm font-serif text-accent-primary opacity-80 truncate">
+              // {leaderTitle}
+            </span>
           </div>
           <div className="flex items-center gap-1.5 ml-2 shrink-0 pl-3 border-l border-border/50">
             <button
@@ -288,6 +297,12 @@ export function GamePage() {
               onSubmit={handleSubmit}
               disabled={isLoading || state.phase === "ended"}
               placeholder={`下达指令...（外交、经济、军事等）`}
+              decisionOptions={
+                state.turnResults.length > 0
+                  ? state.turnResults[state.turnResults.length - 1]
+                      .decision_options || []
+                  : []
+              }
             />
           </div>
 

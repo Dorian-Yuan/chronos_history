@@ -99,6 +99,11 @@ export const scenarioSchema = {
           weakness: { type: "string" as const, description: "关键弱点" },
           needs: { type: "string" as const, description: "急需什么" },
           attitude: { type: "string" as const, description: "当前立场" },
+          leader: {
+            type: "string" as const,
+            description:
+              "势力领袖姓名（必须符合对应文明的命名传统，与顾问命名规则一致，禁止奇幻风格）",
+          },
         },
         required: [
           "name",
@@ -107,6 +112,7 @@ export const scenarioSchema = {
           "weakness",
           "needs",
           "attitude",
+          "leader",
         ],
       },
     },
@@ -140,6 +146,11 @@ export const turnResultSchema = {
       description: "报纸/诏令标题（简体中文）",
     },
     rumor: { type: "string" as const, description: "民间流言（简体中文）" },
+    historian_commentary: {
+      type: "string" as const,
+      description:
+        "史官注疏：以后世史官视角，用文言或半文言风格评价本回合决策，暗含褒贬，偶尔暗示未来事件（简体中文，50-100字）",
+    },
     stats_delta: {
       type: "object" as const,
       additionalProperties: false,
@@ -187,6 +198,7 @@ export const turnResultSchema = {
           attitude: { type: "string" as const },
           is_new: { type: "boolean" as const },
           is_destroyed: { type: "boolean" as const },
+          leader: { type: "string" as const },
         },
         required: [
           "name",
@@ -197,6 +209,7 @@ export const turnResultSchema = {
           "attitude",
           "is_new",
           "is_destroyed",
+          "leader",
         ],
       },
     },
@@ -204,6 +217,28 @@ export const turnResultSchema = {
       type: "string" as const,
       description:
         "回合总结（AI长期记忆）。必须明确记录：1)派系镇压/清理的累积次数和效果 2)派系态度变化的关键节点 3)玩家对某派系的持续政策 4)未解决的隐患。绝对禁止遗漏重要的派系状态变化",
+    },
+    decision_options: {
+      type: "array" as const,
+      items: {
+        type: "object" as const,
+        additionalProperties: false,
+        properties: {
+          title: {
+            type: "string" as const,
+            description: "决策选项标题（简体中文，2-6字）",
+          },
+          description: {
+            type: "string" as const,
+            description: "决策选项简述（简体中文，30-60字）",
+          },
+          recommended_advisor: {
+            type: "string" as const,
+            description: "推荐此选择的顾问角色名（如'将军''外交官'）",
+          },
+        },
+        required: ["title", "description", "recommended_advisor"],
+      },
     },
     is_game_over: { type: "boolean" as const },
     game_over_reason: {
@@ -217,10 +252,12 @@ export const turnResultSchema = {
     "date_display",
     "headline",
     "rumor",
+    "historian_commentary",
     "stats_delta",
     "advisors",
     "factions_update",
     "hidden_consequences",
+    "decision_options",
     "is_game_over",
   ],
 };
@@ -268,6 +305,16 @@ export const analysisSchema = {
         required: ["turn", "summary", "commentary"],
       },
     },
+    modern_echo: {
+      type: "string" as const,
+      description:
+        "现代视角叙事：从2026年的视角回望玩家统治的历史影响（简体中文，100-200字）",
+    },
+    alternative_history: {
+      type: "string" as const,
+      description:
+        "平行历史演化：推演在玩家统治下，该国未来50年的蝴蝶效应发展路径（简体中文，200-400字）",
+    },
   },
   required: [
     "real_event_title",
@@ -279,6 +326,8 @@ export const analysisSchema = {
     "persona_description",
     "radar_stats",
     "turn_reviews",
+    "modern_echo",
+    "alternative_history",
   ],
 };
 

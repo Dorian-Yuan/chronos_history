@@ -94,6 +94,24 @@ export function EndGameReport({
         </div>
       </div>
 
+      {analysis.modern_echo && (
+        <div className="rounded-lg border border-border bg-bg-card p-5">
+          <div className="section-label">历史余响</div>
+          <div className="font-serif text-sm leading-relaxed text-text-secondary italic">
+            {analysis.modern_echo}
+          </div>
+        </div>
+      )}
+
+      {analysis.alternative_history && (
+        <div className="rounded-lg border border-border bg-bg-card p-5">
+          <div className="section-label">平行历史演化</div>
+          <div className="font-serif text-sm leading-relaxed text-text-secondary">
+            {analysis.alternative_history}
+          </div>
+        </div>
+      )}
+
       <div className="rounded-lg border border-border bg-bg-card p-5">
         <div className="section-label">对比分析</div>
         <div className="font-serif text-sm leading-relaxed text-text-secondary">

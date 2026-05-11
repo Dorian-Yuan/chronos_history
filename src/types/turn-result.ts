@@ -1,5 +1,11 @@
 import type { AdvisorData, FactionData } from "./scenario";
 
+export interface DecisionOption {
+  title: string;
+  description: string;
+  recommended_advisor: string;
+}
+
 export interface StatsDelta {
   stability: number;
   economy: number;
@@ -18,10 +24,12 @@ export interface TurnResult {
   date_display: string;
   headline: string;
   rumor: string;
+  historian_commentary: string;
   stats_delta: StatsDelta;
   advisors: AdvisorData[];
   factions_update: FactionUpdate[];
   hidden_consequences: string;
+  decision_options: DecisionOption[];
   is_game_over: boolean;
   game_over_reason?: string;
 }

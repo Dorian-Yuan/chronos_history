@@ -34,7 +34,9 @@ export function ChroniclePanel({
         >
           {turnCount === 1 && turnResults.length === 0 && (
             <div className="space-y-4 animate-fade-in">
-              <div className="section-label">{scenario.start_date || "元年"}</div>
+              <div className="section-label">
+                {scenario.start_date || "元年"}
+              </div>
 
               {scenario.player_context?.nation_name && (
                 <div className="flex items-center gap-2">
@@ -79,7 +81,9 @@ export function ChroniclePanel({
 
           {turnResults.map((result, idx) => (
             <article key={idx} className="mb-6 space-y-4">
-              <div className="section-label">第{idx + 1}回合 · {result.date_display}</div>
+              <div className="section-label">
+                第{idx + 1}回合 · {result.date_display}
+              </div>
 
               <div className="text-lg font-serif font-bold text-text-primary leading-snug">
                 {result.headline}
@@ -88,6 +92,17 @@ export function ChroniclePanel({
               {result.rumor && (
                 <div className="font-serif text-xs italic text-text-tertiary leading-relaxed">
                   民间传言：{result.rumor}
+                </div>
+              )}
+
+              {result.historian_commentary && (
+                <div className="border-l-[3px] border-accent-secondary bg-accent-secondary/5 px-4 py-3 rounded-r-lg">
+                  <div className="font-serif font-bold text-xs text-accent-secondary tracking-widest uppercase mb-1">
+                    史官注疏
+                  </div>
+                  <div className="font-serif text-sm text-accent-secondary leading-relaxed italic">
+                    {result.historian_commentary}
+                  </div>
                 </div>
               )}
 

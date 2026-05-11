@@ -27,4 +27,8 @@ export {
   getHistoryRecords,
   exportSave,
   importSave,
+  addToPersonaCompendium,
+  addToHistoryCompendium,
+  getPersonaCompendium,
+  getHistoryCompendium,
 } from "./save-system";
