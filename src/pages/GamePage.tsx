@@ -225,42 +225,46 @@ export function GamePage() {
   return (
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card pl-5 pr-3 py-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-border-hover bg-bg-tertiary">
-              <User size={18} className="text-text-tertiary" />
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card p-3 shadow-sm">
+          <div className="flex items-center gap-3.5 min-w-0 pl-1.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border-hover bg-bg-tertiary text-text-tertiary">
+              <User size={20} strokeWidth={1.5} />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] uppercase tracking-[0.15em] text-text-tertiary leading-none mb-1 truncate">
+            <div className="flex flex-col justify-center min-w-0 py-0.5">
+              <div className="text-[10px] uppercase tracking-[0.15em] text-text-tertiary mb-1 truncate leading-none">
                 {t("game.currentIdentity")}
               </div>
-              <div className="text-base font-serif font-bold text-text-primary leading-tight truncate">
-                {nationName}
+              <div className="flex items-center gap-2.5 truncate">
+                <span className="text-base font-serif font-bold text-text-primary truncate leading-none mt-0.5">
+                  {nationName}
+                </span>
+                <span className="text-[11px] font-serif font-medium text-accent-primary px-2 py-0.5 rounded-md bg-accent-primary/10 border border-accent-primary/20 shrink-0 leading-none">
+                  {leaderTitle}
+                </span>
               </div>
-              <div className="text-xs font-serif text-accent-primary leading-tight mt-0.5 truncate">{leaderTitle}</div>
             </div>
           </div>
-          <div className="flex items-center gap-1 ml-2 shrink-0">
+          <div className="flex items-center gap-1.5 ml-2 shrink-0 pl-3 border-l border-border/50">
             <button
               onClick={() => dispatch({ type: "RESET" })}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-8 h-8"
               aria-label="返回主页"
             >
-              <Home size={17} />
+              <Home size={18} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => setShowSaveManager(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-8 h-8"
               aria-label="存档管理"
             >
-              <Save size={17} />
+              <Save size={18} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-8 h-8"
               aria-label="设置"
             >
-              <Settings size={17} />
+              <Settings size={18} strokeWidth={1.5} />
             </button>
           </div>
         </div>
