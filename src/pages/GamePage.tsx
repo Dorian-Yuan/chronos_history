@@ -189,6 +189,7 @@ export function GamePage() {
     tabKey: "chronicle" | SideTab,
     onClick: () => void,
     isActive: boolean,
+    indicatorPosition: "top" | "bottom" = "bottom"
   ) => {
     const config = TAB_CONFIG[tabKey];
     const Icon = config.icon;
@@ -213,7 +214,7 @@ export function GamePage() {
         </span>
         {isActive && (
           <div
-            className="absolute bottom-1 h-[2px] w-8 rounded-full"
+            className={`absolute ${indicatorPosition === "top" ? "top-0" : "bottom-0"} h-[2px] w-8 rounded-full`}
             style={{ backgroundColor: activeColor }}
           />
         )}
@@ -270,7 +271,7 @@ export function GamePage() {
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 flex flex-col overflow-hidden">
           <div
-            className={`flex-1 flex-col overflow-hidden md:flex ${mobileTab !== "chronicle" ? "hidden" : "flex"}`}
+            className={`flex-1 flex-col overflow-hidden md:flex gap-3 ${mobileTab !== "chronicle" ? "hidden" : "flex"}`}
           >
             {error && (
               <div className="mx-5 mt-3 rounded-lg border border-status-error-border bg-status-error-bg px-4 py-2.5 text-xs text-status-error-text flex items-center justify-between">
@@ -317,11 +318,13 @@ export function GamePage() {
               "cabinet",
               () => setSideTab("cabinet"),
               sideTab === "cabinet",
+              "bottom"
             )}
             {renderTabButton(
               "intelligence",
               () => setSideTab("intelligence"),
               sideTab === "intelligence",
+              "bottom"
             )}
           </div>
           <div className="flex-1 overflow-y-auto">
@@ -344,7 +347,7 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border safe-bottom"
+        className="flex md:hidden border-t border-border pb-[env(safe-area-inset-bottom,0px)]"
         style={{ background: "var(--color-glass-bg)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}
         aria-label="游戏面板"
       >
@@ -352,16 +355,19 @@ export function GamePage() {
           "chronicle",
           () => setMobileTab("chronicle"),
           mobileTab === "chronicle",
+          "top"
         )}
         {renderTabButton(
           "cabinet",
           () => setMobileTab("cabinet"),
           mobileTab === "cabinet",
+          "top"
         )}
         {renderTabButton(
           "intelligence",
           () => setMobileTab("intelligence"),
           mobileTab === "intelligence",
+          "top"
         )}
       </nav>
 

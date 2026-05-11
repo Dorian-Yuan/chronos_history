@@ -40,8 +40,8 @@ export function GameInput({ onSubmit, disabled, placeholder }: GameInputProps) {
   };
 
   return (
-    <div className="bg-bg-card px-5 py-3">
-      <div className="flex items-center gap-2.5 rounded-[var(--radius-lg)] border border-border bg-bg-secondary pl-4 pr-1.5 py-1.5">
+    <div className="px-5 pb-4 pt-1">
+      <div className="flex items-center gap-2.5 rounded-[var(--radius-xl)] border border-border bg-bg-card shadow-sm pl-4 pr-1.5 py-1.5 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all">
         <textarea
           ref={textareaRef}
           value={input}
