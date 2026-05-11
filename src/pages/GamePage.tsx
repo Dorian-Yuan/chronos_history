@@ -222,13 +222,13 @@ export function GamePage() {
   return (
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card py-7 px-4 shadow-sm">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card py-8 px-5 shadow-sm min-h-[90px]">
           <div className="flex items-center min-w-0">
             <div className="flex items-baseline gap-3 min-w-0 overflow-hidden">
-              <span className="text-lg font-serif font-bold text-text-primary truncate">
+              <span className="text-xl font-serif font-bold text-text-primary truncate">
                 {nationName}
               </span>
-              <span className="text-sm font-serif text-accent-primary opacity-80 shrink-0">
+              <span className="text-base font-serif text-accent-primary opacity-80 shrink-0">
                 // {leaderTitle}
               </span>
             </div>
