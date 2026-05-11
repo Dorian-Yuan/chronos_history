@@ -52,7 +52,7 @@ function applyMapColors(container: HTMLElement) {
     });
   });
 
-  edgePaths.forEach((path, index) => {
+  edgePaths.forEach((path) => {
     const pathParent = path.closest("g.edgePath");
     if (!pathParent) return;
 
@@ -68,7 +68,7 @@ function applyMapColors(container: HTMLElement) {
     }
 
     if (!attitude) {
-      for (const [labelIdx, att] of edgeAttitudes) {
+      for (const [, att] of edgeAttitudes) {
         attitude = att;
         break;
       }
