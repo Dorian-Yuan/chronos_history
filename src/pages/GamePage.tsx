@@ -199,7 +199,7 @@ export function GamePage() {
         onClick={onClick}
         role="tab"
         aria-selected={isActive}
-        className="flex flex-col items-center justify-center gap-0.5 flex-1 pt-2 pb-2 relative transition-colors"
+        className="flex flex-col items-center justify-center gap-1 flex-1 py-3 relative transition-colors"
       >
         <Icon
           size={18}
