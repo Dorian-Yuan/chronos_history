@@ -8,3 +8,4 @@ export { GameInput } from "./GameInput";
 export { DisclaimerModal } from "./DisclaimerModal";
 export { SaveManager } from "./SaveManager";
 export { HistoryArchive } from "./HistoryArchive";
+export { ScenarioHintModal } from "./ScenarioHintModal";

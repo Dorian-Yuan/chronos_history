@@ -4,6 +4,7 @@ import { generateScenario } from "@/lib/game";
 import type { PlayStyle } from "@/types";
 import { PLAY_STYLES } from "@/types";
 import { Swords, Coins, BookOpen, Shield } from "lucide-react";
+import { ScenarioHintModal } from "@/components/game";
 
 const STYLE_ICONS: Record<PlayStyle, typeof Swords> = {
   Conquest: Swords,
@@ -46,13 +47,15 @@ export function SelectionPage() {
   const dispatch = useGameDispatch();
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<PlayStyle | null>(null);
 
-  const handleSelect = async (playStyle: PlayStyle) => {
+  const handleSelect = async (playStyle: PlayStyle, userHint?: string) => {
     setGenerating(true);
     setError(null);
+    setSelectedStyle(null);
 
     try {
-      const scenario = await generateScenario(playStyle);
+      const scenario = await generateScenario(playStyle, userHint);
       dispatch({ type: "SET_SCENARIO", scenario });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "生成剧本失败，请重试";
@@ -104,7 +107,7 @@ export function SelectionPage() {
             return (
               <button
                 key={style.id}
-                onClick={() => handleSelect(style.id)}
+                onClick={() => setSelectedStyle(style.id)}
                 className={`group card-interactive p-4 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
@@ -138,6 +141,14 @@ export function SelectionPage() {
         >
           {error}
         </div>
+      )}
+
+      {selectedStyle && (
+        <ScenarioHintModal
+          playStyle={selectedStyle}
+          onConfirm={(hint) => handleSelect(selectedStyle, hint)}
+          onCancel={() => setSelectedStyle(null)}
+        />
       )}
     </main>
   );

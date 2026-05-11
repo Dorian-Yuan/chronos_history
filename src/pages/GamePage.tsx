@@ -101,6 +101,10 @@ export function GamePage() {
       setError(null);
 
       try {
+        const lastDateDisplay = turnResults.length > 0
+          ? turnResults[turnResults.length - 1].date_display
+          : undefined;
+
         const result = await evaluateTurn(
           scenario,
           state.historyLog,
@@ -108,6 +112,7 @@ export function GamePage() {
           state.stats,
           state.turnCount,
           currentAdvisors,
+          lastDateDisplay,
         );
 
         dispatch({ type: "PROCESS_TURN", result });
@@ -193,7 +198,8 @@ export function GamePage() {
         onClick={onClick}
         role="tab"
         aria-selected={isActive}
-        className="flex flex-col items-center justify-center gap-0.5 flex-1 py-2 relative transition-colors"
+        className="flex flex-col items-center justify-center gap-0.5 flex-1 pt-2 relative transition-colors"
+        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0.5rem))" }}
       >
         <Icon
           size={18}
@@ -339,7 +345,8 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border glass safe-bottom"
+        className="flex md:hidden border-t border-border"
+        style={{ background: "var(--color-glass-bg)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)" }}
         aria-label="游戏面板"
       >
         {renderTabButton(

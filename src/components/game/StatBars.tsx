@@ -36,7 +36,7 @@ function getBarColorVar(value: number): string {
 
 export function StatBars({ stats, delta }: StatBarsProps) {
   return (
-    <div className="px-5 pb-5 border-b border-border">
+    <div className="px-5">
       <div
         className="grid grid-cols-2 gap-x-5 gap-y-3 rounded-lg border border-border bg-bg-card p-4"
         role="group"
