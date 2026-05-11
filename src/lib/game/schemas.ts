@@ -189,7 +189,7 @@ export const turnResultSchema = {
     },
     hidden_consequences: {
       type: "string" as const,
-      description: "回合总结（AI长期记忆）",
+      description: "回合总结（AI长期记忆）。必须明确记录：1)派系镇压/清理的累积次数和效果 2)派系态度变化的关键节点 3)玩家对某派系的持续政策 4)未解决的隐患。绝对禁止遗漏重要的派系状态变化",
     },
     is_game_over: { type: "boolean" as const },
     game_over_reason: {

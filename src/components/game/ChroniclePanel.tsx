@@ -79,7 +79,7 @@ export function ChroniclePanel({
 
           {turnResults.map((result, idx) => (
             <article key={idx} className="mb-6 space-y-4">
-              <div className="section-label">{result.date_display}</div>
+              <div className="section-label">第{idx + 1}回合 · {result.date_display}</div>
 
               <div className="text-lg font-serif font-bold text-text-primary leading-snug">
                 {result.headline}
