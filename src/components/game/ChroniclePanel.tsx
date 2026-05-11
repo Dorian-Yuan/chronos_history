@@ -57,7 +57,7 @@ export function ChroniclePanel({
 
               {scenario.description && (
                 <div className="border-l-[3px] border-accent-primary bg-accent-primary/5 px-4 py-3 rounded-r-lg my-4">
-                  <div className="text-xs font-semibold text-accent-primary tracking-wider uppercase mb-1">
+                  <div className="font-serif font-bold text-sm text-accent-primary tracking-widest uppercase mb-1">
                     当前危机
                   </div>
                   <div className="font-serif text-sm text-accent-primary leading-relaxed">
@@ -99,7 +99,7 @@ export function ChroniclePanel({
 
               {result.situation_update && (
                 <div className="border-l-[3px] border-accent-primary bg-accent-primary/5 px-4 py-3 rounded-r-lg my-4">
-                  <div className="text-xs font-semibold uppercase tracking-wider text-accent-primary mb-1">
+                  <div className="font-serif font-bold text-sm text-accent-primary tracking-widest uppercase mb-1">
                     最新情报
                   </div>
                   <div className="font-serif text-sm text-accent-primary leading-relaxed">

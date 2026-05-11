@@ -47,7 +47,7 @@ export function StatBars({ stats, delta }: StatBarsProps) {
           const deltaValue = delta?.[key] ?? 0;
 
           return (
-            <div key={key} className="space-y-2">
+            <div key={key} className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-text-secondary flex items-center gap-1.5">
                   <Icon size={11} className="text-text-tertiary" />

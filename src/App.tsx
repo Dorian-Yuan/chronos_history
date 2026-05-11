@@ -6,7 +6,6 @@ import { SelectionPage } from "@/pages/SelectionPage";
 import { GamePage } from "@/pages/GamePage";
 import { EndPage } from "@/pages/EndPage";
 import { SettingsPanel, WelcomeSetup } from "@/components/settings";
-import { Toast } from "@/components/Toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { initLocale } from "@/i18n";
 import { registerServiceWorker } from "@/lib/sw-register";
@@ -128,7 +127,6 @@ function AppContent() {
           </div>
         </div>
         <SettingsPanel />
-        <Toast />
       </GameProvider>
     </HashRouter>
   );

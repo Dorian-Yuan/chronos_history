@@ -86,12 +86,12 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-2 text-xs font-serif text-text-tertiary">
-        倾向：{advisor.bias}
-      </div>
+      <div className="mt-2 flex items-center justify-between">
+        <div className="text-xs font-serif text-text-tertiary">
+          倾向：{advisor.bias}
+        </div>
 
-      {advisor.hidden_motive && (
-        <div className="mt-2">
+        {advisor.hidden_motive && (
           <button
             onClick={() => setShowMotive(!showMotive)}
             className="text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
@@ -99,8 +99,8 @@ export function AdvisorCard({ advisor }: AdvisorCardProps) {
           >
             {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {advisor.hidden_motive && showMotive && (
         <div className="mt-2 rounded border border-border bg-bg-card px-4 py-3">

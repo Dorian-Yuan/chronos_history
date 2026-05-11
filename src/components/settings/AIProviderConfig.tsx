@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSettingsStore } from "@/stores";
-import { useUIStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getAIProviders } from "@/config";
 import { getProviderDefaultConfig, createProvider } from "@/lib/ai";
@@ -13,7 +12,6 @@ export function AIProviderConfig() {
   const { t } = useTranslation();
   const aiProvider = useSettingsStore((s) => s.aiProvider);
   const setAIProvider = useSettingsStore((s) => s.setAIProvider);
-  const showToast = useUIStore((s) => s.showToast);
   const providers = getAIProviders();
 
   const [providerId, setProviderId] = useState(
@@ -47,7 +45,7 @@ export function AIProviderConfig() {
       const provider = createProvider(setting);
       if (!provider.validateConfig()) {
         setTestStatus("error");
-        showToast("配置不完整", "error");
+        alert("配置不完整");
         return;
       }
 
@@ -66,14 +64,13 @@ export function AIProviderConfig() {
 
       if (response.content) {
         setTestStatus("success");
-        showToast("连接成功", "success");
       } else {
         setTestStatus("error");
-        showToast("空响应", "error");
+        alert("空响应");
       }
     } catch (e) {
       setTestStatus("error");
-      showToast(e instanceof Error ? e.message : "连接失败", "error");
+      alert(e instanceof Error ? e.message : "连接失败");
     }
   };
 

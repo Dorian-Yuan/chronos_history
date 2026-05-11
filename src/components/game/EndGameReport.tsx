@@ -75,19 +75,19 @@ export function EndGameReport({
       </div>
 
       <div className={`rounded-lg p-5 ${outcomeConfig.bgClass}`}>
-        <div className="text-sm font-semibold text-accent-primary mb-3">
+        <div className="font-serif text-sm font-semibold text-accent-primary mb-3">
           真实历史：{analysis.real_event_title}
         </div>
         <div className="space-y-2.5 text-sm">
           <div>
             <span className="text-text-tertiary">历史结果：</span>
-            <span className="text-text-secondary">
+            <span className="font-serif text-text-secondary">
               {analysis.real_outcome_summary}
             </span>
           </div>
           <div>
             <span className="text-text-tertiary">你的结果：</span>
-            <span className="text-text-secondary">
+            <span className="font-serif text-text-secondary">
               {analysis.user_outcome_summary}
             </span>
           </div>
@@ -101,7 +101,7 @@ export function EndGameReport({
         </div>
         <div className="mt-4 text-sm">
           <span className="text-text-tertiary">相似历史人物：</span>
-          <span className="text-accent-primary font-medium">
+          <span className="font-serif text-accent-primary font-medium">
             {analysis.similar_historical_figure}
           </span>
         </div>
@@ -139,7 +139,7 @@ export function EndGameReport({
                   {review.turn}
                 </div>
                 <div className="flex-1 space-y-2">
-                  <div className="text-sm text-text-secondary">
+                  <div className="font-serif text-sm text-text-secondary">
                     {review.summary}
                   </div>
                   <div className="font-serif text-xs italic text-text-tertiary">

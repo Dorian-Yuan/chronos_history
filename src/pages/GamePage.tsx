@@ -225,7 +225,7 @@ export function GamePage() {
   return (
     <div className="flex h-full flex-col gap-3">
       <header className="px-5 pt-4">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card px-5 py-3">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card pl-5 pr-3 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-border-hover bg-bg-tertiary">
               <User size={18} className="text-text-tertiary" />
@@ -243,21 +243,21 @@ export function GamePage() {
           <div className="flex items-center gap-1 ml-2">
             <button
               onClick={() => dispatch({ type: "RESET" })}
-              className="btn-ghost p-1"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"
               aria-label="返回主页"
             >
               <Home size={17} />
             </button>
             <button
               onClick={() => setShowSaveManager(true)}
-              className="btn-ghost p-1"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"
               aria-label="存档管理"
             >
               <Save size={17} />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="btn-ghost p-1"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-7 h-7"
               aria-label="设置"
             >
               <Settings size={17} />
