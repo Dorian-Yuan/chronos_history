@@ -246,21 +246,21 @@ export function GamePage() {
           <div className="flex items-center gap-1.5 ml-2 shrink-0 pl-3 border-l border-border/50">
             <button
               onClick={() => dispatch({ type: "RESET" })}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-8 h-8"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-8 h-8"
               aria-label="返回主页"
             >
               <Home size={18} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => setShowSaveManager(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-8 h-8"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-8 h-8"
               aria-label="存档管理"
             >
               <Save size={18} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-colors w-8 h-8"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-8 h-8"
               aria-label="设置"
             >
               <Settings size={18} strokeWidth={1.5} />
@@ -376,12 +376,7 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border pb-[env(safe-area-inset-bottom,0px)]"
-        style={{
-          background: "var(--color-glass-bg)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-        }}
+        className="flex md:hidden border-t border-border pb-[env(safe-area-inset-bottom,0px)] glass"
         aria-label="游戏面板"
       >
         {renderTabButton(

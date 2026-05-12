@@ -93,12 +93,12 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
 
       <div className="relative w-full max-w-sm mx-auto animate-fade-in">
         {step === 0 && (
-          <div className="text-center space-y-10">
+          <div className="text-center space-y-6">
             <div className="space-y-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-bg-tertiary/60 border border-border mb-2">
                 <Sparkles size={30} className="text-accent-primary" />
               </div>
-              <h1 className="font-display text-5xl font-bold tracking-[0.1em] text-text-primary">
+              <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">
                 CHRONOS
               </h1>
               <p className="font-serif text-base text-text-secondary">
@@ -126,7 +126,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
 
             <div className="space-y-5">
               <div>
-                <label className="mb-2 block text-sm font-medium text-text-secondary">
+                <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
                   {t("settings.aiProvider")}
                 </label>
                 <select
@@ -163,7 +163,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-text-secondary">
+                <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
                   {t("settings.baseUrl")}
                 </label>
                 <input
@@ -184,7 +184,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-text-secondary">
+                <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
                   {t("settings.model")}
                 </label>
                 <input
@@ -200,7 +200,7 @@ export function WelcomeSetup({ onComplete }: WelcomeSetupProps) {
               </div>
             </div>
 
-            <div className="pt-8">
+            <div className="pt-6">
               <button
                 onClick={handleSaveAndTest}
                 disabled={!apiKey.trim() || testStatus === "testing"}

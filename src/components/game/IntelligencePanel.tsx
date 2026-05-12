@@ -8,10 +8,10 @@ interface IntelligencePanelProps {
 const ATTITUDE_STYLES: Record<string, string> = {
   敌对: "bg-status-error-bg text-status-error-text border border-status-error-border",
   求和: "bg-status-info-bg text-status-info-text border border-status-info-border",
-  中立: "bg-bg-tertiary text-text-secondary",
+  中立: "bg-bg-tertiary text-text-secondary border border-border",
   友好: "bg-status-success-bg text-status-success-text border border-status-success-border",
   臣服: "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
-  已灭亡: "bg-bg-tertiary text-text-tertiary line-through",
+  已灭亡: "bg-bg-tertiary text-text-tertiary line-through border border-border",
 };
 
 function getAttitudeStyle(attitude: string): string {
@@ -38,7 +38,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
         {factions.map((faction, idx) => (
           <li
             key={`${faction.name}-${idx}`}
-            className={`rounded-lg border border-border bg-bg-secondary p-4 transition-all ${
+            className={`rounded-lg border border-border bg-bg-card p-5 transition-all ${
               faction.is_destroyed ? "opacity-40" : ""
             } ${faction.is_new ? "ring-1 ring-accent-primary/30" : ""}`}
           >

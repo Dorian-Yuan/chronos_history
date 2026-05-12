@@ -44,7 +44,7 @@ export function StartPage() {
       <DisclaimerModal />
 
       <div className="absolute top-[28%] left-0 right-0 z-10 flex flex-col items-center gap-6 animate-fade-in">
-        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-full bg-bg-tertiary">
+        <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-xl bg-bg-tertiary/60 border border-border">
           <Globe size={32} className="text-text-primary" strokeWidth={1.5} />
         </div>
         <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">

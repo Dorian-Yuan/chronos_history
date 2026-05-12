@@ -12,7 +12,7 @@ import type { AIMessage } from "@/types/ai-provider";
 import { createProvider, withRetry } from "@/lib/ai";
 import { useSettingsStore } from "@/stores";
 import {
-  scenarioSchema,
+  scenarioCoreSchema,
   turnResultSchema,
   analysisSchema,
   counselSchema,
@@ -376,7 +376,7 @@ export async function generateScenario(
         ],
         {
           responseFormat: "json",
-          responseSchema: scenarioSchema,
+          responseSchema: scenarioCoreSchema,
           temperature: 0.85,
           maxTokens: 2048,
         },

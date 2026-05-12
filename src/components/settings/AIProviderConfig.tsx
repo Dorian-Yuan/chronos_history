@@ -85,7 +85,7 @@ export function AIProviderConfig() {
 
   return (
     <div className="space-y-5">
-      <div className="section-label mb-3">{t("settings.apiConfig")}</div>
+      <div className="section-label">{t("settings.apiConfig")}</div>
 
       <div>
         <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
@@ -160,7 +160,7 @@ export function AIProviderConfig() {
         />
       </div>
 
-      <div className="pt-10">
+      <div className="pt-6">
         <button
           onClick={handleSaveAndTest}
           disabled={!apiKey.trim() || testStatus === "testing"}
@@ -187,7 +187,6 @@ export function AIProviderConfig() {
                   : "保存并测试"}
           </span>
         </button>
-
       </div>
     </div>
   );

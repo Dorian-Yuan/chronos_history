@@ -1,3 +1,73 @@
+export const scenarioCoreSchema = {
+  type: "object" as const,
+  additionalProperties: false,
+  properties: {
+    id: { type: "string" as const },
+    title: { type: "string" as const, description: "4字中文标题" },
+    description: {
+      type: "string" as const,
+      description: "匿名化的情境描述（简体中文）",
+    },
+    player_context: {
+      type: "object" as const,
+      additionalProperties: false,
+      properties: {
+        nation_name: {
+          type: "string" as const,
+          description: "玩家国家/派系名称",
+        },
+        leader_title: {
+          type: "string" as const,
+          description:
+            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
+        },
+        background_summary: {
+          type: "string" as const,
+          description: "背景简介",
+        },
+      },
+      required: ["nation_name", "leader_title", "background_summary"],
+    },
+    initial_stats: {
+      type: "object" as const,
+      additionalProperties: false,
+      properties: {
+        stability: { type: "number" as const, minimum: 0, maximum: 100 },
+        economy: { type: "number" as const, minimum: 0, maximum: 100 },
+        military: { type: "number" as const, minimum: 0, maximum: 100 },
+        international_standing: {
+          type: "number" as const,
+          minimum: 0,
+          maximum: 100,
+        },
+      },
+      required: ["stability", "economy", "military", "international_standing"],
+    },
+    hidden_real_event: {
+      type: "string" as const,
+      description: "真实历史事件名称（隐藏，结局揭示）",
+    },
+    play_style: {
+      type: "string" as const,
+      enum: ["Conquest", "Prosperity", "Reform", "Survival"],
+    },
+    start_date: {
+      type: "string" as const,
+      description: "中文日期字符串（风格与时代一致，如中国朝代用年号格式）",
+    },
+  },
+  required: [
+    "id",
+    "title",
+    "description",
+    "player_context",
+    "initial_stats",
+    "hidden_real_event",
+    "play_style",
+    "start_date",
+  ],
+};
+
 export const scenarioSchema = {
   type: "object" as const,
   additionalProperties: false,

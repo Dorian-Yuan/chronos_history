@@ -256,7 +256,7 @@ select,
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-border-hover);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -496,7 +496,7 @@ select,
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   border: 1px solid var(--color-border);
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem;
 }
 
 .noise-bg::before {
@@ -543,7 +543,7 @@ select,
   width: 36px;
   height: 2px;
   background: linear-gradient(90deg, var(--color-accent-primary), transparent);
-  border-radius: 1px;
+  border-radius: var(--radius-sm);
 }
 
 .touch-target {
@@ -644,7 +644,7 @@ select,
   background: var(--color-btn-secondary-bg);
   color: var(--color-btn-secondary-text);
   font-weight: 500;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   padding: 0.625rem 1.25rem;
   transition: all var(--transition-fast);
 }
@@ -764,7 +764,7 @@ select,
 .badge {
   display: inline-flex;
   align-items: center;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 3px 8px;
   font-size: 0.6875rem;
   font-weight: 600;

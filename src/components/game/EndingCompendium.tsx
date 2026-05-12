@@ -125,7 +125,7 @@ export function EndingCompendium({ onClose }: EndingCompendiumProps) {
               {currentEntries.map((entry) => (
                 <li
                   key={entry.id}
-                  className="rounded-lg border border-border bg-bg-card p-4"
+                  className="rounded-lg border border-border bg-bg-card p-5"
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-sm font-serif font-bold text-text-primary">
@@ -144,7 +144,7 @@ export function EndingCompendium({ onClose }: EndingCompendiumProps) {
           )}
         </div>
 
-        <div className="px-5 py-3 border-t border-border text-center">
+        <div className="modal-footer text-center">
           <span className="text-xs text-text-tertiary font-serif">
             已收集 {personaEntries.length} 个画像 · {historyEntries.length}{" "}
             个历史事件

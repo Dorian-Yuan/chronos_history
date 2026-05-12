@@ -28,9 +28,12 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
   }, []);
 
   const OUTCOME_STYLES: Record<string, string> = {
-    victory: "bg-status-success-bg text-status-success-text border border-status-success-border",
-    neutral: "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
-    defeat: "bg-status-error-bg text-status-error-text border border-status-error-border",
+    victory:
+      "bg-status-success-bg text-status-success-text border border-status-success-border",
+    neutral:
+      "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
+    defeat:
+      "bg-status-error-bg text-status-error-text border border-status-error-border",
   };
 
   return (
@@ -67,7 +70,7 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
                   className="rounded-lg border border-border bg-bg-card p-5"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-text-primary">
+                    <span className="text-sm font-bold text-text-primary">
                       {record.scenarioTitle}
                     </span>
                     <span

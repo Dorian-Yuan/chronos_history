@@ -9,6 +9,7 @@ export {
   counselAdvisor,
 } from "./ai-calls";
 export {
+  scenarioCoreSchema,
   scenarioSchema,
   turnResultSchema,
   analysisSchema,

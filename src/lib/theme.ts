@@ -97,7 +97,8 @@ const themes: Record<string, ThemeConfig> = {
       "--shadow-md": "0 4px 12px rgba(0, 0, 0, 0.12)",
       "--shadow-lg": "0 10px 30px rgba(0, 0, 0, 0.15)",
       "--shadow-glow": "0 0 24px rgba(26, 158, 107, 0.08)",
-      "--shadow-card": "0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(26, 158, 107, 0.03)",
+      "--shadow-card":
+        "0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(26, 158, 107, 0.03)",
     },
   },
 };
@@ -123,7 +124,14 @@ export function setTheme(name: string): void {
     });
     localStorage.setItem("chronos_prev_theme", name);
 
-    const themeColor = name === "light" ? "#f0ece4" : "#0A0A0A";
+    const themeColor =
+      name === "light"
+        ? getComputedStyle(root)
+            .getPropertyValue("--color-bg-primary")
+            .trim() || "#f0ece4"
+        : getComputedStyle(root)
+            .getPropertyValue("--color-bg-primary")
+            .trim() || "#0A0A0A";
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute("content", themeColor);

@@ -74,7 +74,7 @@ export function GameInput({
           <button
             onClick={() => setShowDecisionModal(true)}
             disabled={disabled}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-secondary text-text-inverse disabled:opacity-20 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-secondary/90"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-secondary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-secondary/90"
             aria-label="决策选择"
           >
             <Lightbulb size={15} />
@@ -98,7 +98,7 @@ export function GameInput({
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || disabled}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-20 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90"
           aria-label="发送决策"
         >
           <Send size={15} />

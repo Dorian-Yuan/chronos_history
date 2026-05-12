@@ -74,7 +74,7 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
 
   return (
     <div
-      className="rounded-lg border bg-bg-secondary p-4 transition-all hover:border-border-hover"
+      className="rounded-lg border bg-bg-card p-5 transition-all hover:border-border-hover"
       style={{ borderColor: roleBorderColor }}
     >
       <div className="flex items-center gap-2.5">

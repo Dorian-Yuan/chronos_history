@@ -113,7 +113,7 @@ export function SelectionPage() {
               <button
                 key={style.id}
                 onClick={() => setSelectedStyle(style.id)}
-                className={`group card-interactive p-4 text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
+                className={`group card-interactive text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
                 <div className="flex items-center gap-2.5 mb-2">
