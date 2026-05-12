@@ -19,7 +19,12 @@ export type GameAction =
   | { type: "LOAD_SAVE"; state: GameState }
   | { type: "RESET" }
   | { type: "UPDATE_COUNSEL_SESSION"; session: CounselSession }
-  | { type: "START_COURT_DEBATE"; topic: string; totalRounds: number }
+  | {
+      type: "START_COURT_DEBATE";
+      topic: string;
+      totalRounds: number;
+      turnNumber: number;
+    }
   | { type: "ADD_COURT_DEBATE_MESSAGE"; message: CourtDebateMessage }
   | { type: "ADVANCE_COURT_DEBATE_ROUND" }
   | { type: "FINISH_COURT_DEBATE" }
@@ -130,7 +135,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         scenario: newScenario,
         turnResults: [...state.turnResults, result],
         counselSessions: [],
-        courtDebate: null,
       };
     }
 
@@ -141,13 +145,23 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         endGameAnalysis: action.analysis,
       };
 
-    case "LOAD_SAVE":
+    case "LOAD_SAVE": {
+      const loaded = action.state;
+      const courtDebateSessions =
+        loaded.courtDebateSessions ??
+        ((loaded as unknown as Record<string, unknown>).courtDebate
+          ? [
+              (loaded as unknown as Record<string, unknown>)
+                .courtDebate as CourtDebateSession,
+            ]
+          : []);
       return {
-        ...action.state,
-        turnResults: action.state.turnResults ?? [],
-        counselSessions: action.state.counselSessions ?? [],
-        courtDebate: action.state.courtDebate ?? null,
+        ...loaded,
+        turnResults: loaded.turnResults ?? [],
+        counselSessions: loaded.counselSessions ?? [],
+        courtDebateSessions,
       };
+    }
 
     case "RESET":
       return { ...INITIAL_GAME_STATE };
@@ -175,50 +189,60 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentRound: 0,
         messages: [],
         isFinished: false,
+        turnNumber: action.turnNumber,
       };
       return {
         ...state,
-        courtDebate: session,
+        courtDebateSessions: [...state.courtDebateSessions, session],
       };
     }
 
     case "ADD_COURT_DEBATE_MESSAGE": {
-      if (!state.courtDebate) return state;
+      if (state.courtDebateSessions.length === 0) return state;
+      const sessions = [...state.courtDebateSessions];
+      const lastIdx = sessions.length - 1;
+      sessions[lastIdx] = {
+        ...sessions[lastIdx],
+        messages: [...sessions[lastIdx].messages, action.message],
+      };
       return {
         ...state,
-        courtDebate: {
-          ...state.courtDebate,
-          messages: [...state.courtDebate.messages, action.message],
-        },
+        courtDebateSessions: sessions,
       };
     }
 
     case "ADVANCE_COURT_DEBATE_ROUND": {
-      if (!state.courtDebate) return state;
+      if (state.courtDebateSessions.length === 0) return state;
+      const sessions = [...state.courtDebateSessions];
+      const lastIdx = sessions.length - 1;
+      sessions[lastIdx] = {
+        ...sessions[lastIdx],
+        currentRound: sessions[lastIdx].currentRound + 1,
+      };
       return {
         ...state,
-        courtDebate: {
-          ...state.courtDebate,
-          currentRound: state.courtDebate.currentRound + 1,
-        },
+        courtDebateSessions: sessions,
       };
     }
 
     case "FINISH_COURT_DEBATE": {
-      if (!state.courtDebate) return state;
+      if (state.courtDebateSessions.length === 0) return state;
+      const sessions = [...state.courtDebateSessions];
+      const lastIdx = sessions.length - 1;
+      sessions[lastIdx] = {
+        ...sessions[lastIdx],
+        isFinished: true,
+      };
       return {
         ...state,
-        courtDebate: {
-          ...state.courtDebate,
-          isFinished: true,
-        },
+        courtDebateSessions: sessions,
       };
     }
 
     case "CLEAR_COURT_DEBATE":
       return {
         ...state,
-        courtDebate: null,
+        courtDebateSessions: [],
       };
 
     default:

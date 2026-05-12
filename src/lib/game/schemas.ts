@@ -143,7 +143,8 @@ export const scenarioSchema = {
           advice: { type: "string" as const, description: "建议（简体中文）" },
           bias: {
             type: "string" as const,
-            description: "倾向描述（简体中文）",
+            description:
+              "倾向（前4字为核心总结，共15字以内，如'主战派：主张以武力解决'）",
           },
         },
         required: ["role", "name", "advice", "bias"],
@@ -271,7 +272,11 @@ export const turnResultSchema = {
           },
           name: { type: "string" as const },
           advice: { type: "string" as const },
-          bias: { type: "string" as const },
+          bias: {
+            type: "string" as const,
+            description:
+              "倾向（前4字为核心总结，共15字以内，如'主战派：主张以武力解决'）",
+          },
           hidden_motive: { type: "string" as const },
         },
         required: ["role", "name", "advice", "bias"],

@@ -27,7 +27,7 @@ interface CourtDebatePanelProps {
   turnCount: number;
   turnResults: TurnResult[];
   advisors: AdvisorData[];
-  courtDebateSession: CourtDebateSession | null;
+  courtDebateSessions: CourtDebateSession[];
 }
 
 const ROLE_CONFIG: Record<
@@ -74,7 +74,7 @@ export function CourtDebatePanel({
   turnCount,
   turnResults,
   advisors,
-  courtDebateSession,
+  courtDebateSessions,
 }: CourtDebatePanelProps) {
   const dispatch = useGameDispatch();
   const [input, setInput] = useState("");
@@ -88,14 +88,30 @@ export function CourtDebatePanel({
       ? turnResults[turnResults.length - 1].date_display
       : scenario.start_date;
 
-  const isDebating =
-    courtDebateSession !== null && !courtDebateSession.isFinished;
+  const activeSession =
+    courtDebateSessions.length > 0
+      ? courtDebateSessions[courtDebateSessions.length - 1]
+      : null;
+
+  const isDebating = activeSession !== null && !activeSession.isFinished;
+
+  const adjustHeight = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    adjustHeight();
+  }, [input, adjustHeight]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [courtDebateSession?.messages, isLoading]);
+  }, [courtDebateSessions, isLoading]);
 
   const handleSubmit = useCallback(async () => {
     const trimmed = input.trim();
@@ -106,7 +122,12 @@ export function CourtDebatePanel({
 
     const totalRounds = Math.floor(Math.random() * 3) + 3;
 
-    dispatch({ type: "START_COURT_DEBATE", topic: trimmed, totalRounds });
+    dispatch({
+      type: "START_COURT_DEBATE",
+      topic: trimmed,
+      totalRounds,
+      turnNumber: turnCount,
+    });
 
     const userMessage: CourtDebateMessage = {
       role: "user",
@@ -116,7 +137,14 @@ export function CourtDebatePanel({
 
     const localMessages: CourtDebateMessage[] = [userMessage];
 
+    const previousDebateMessages = courtDebateSessions.flatMap(
+      (s) => s.messages,
+    );
+
     setInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
 
     try {
       for (let round = 0; round < totalRounds; round++) {
@@ -129,7 +157,7 @@ export function CourtDebatePanel({
           currentSituation,
           currentDateDisplay,
           advisors,
-          localMessages,
+          [...previousDebateMessages, ...localMessages],
           remainingRounds,
         );
 
@@ -169,6 +197,8 @@ export function CourtDebatePanel({
     currentDateDisplay,
     advisors,
     dispatch,
+    turnCount,
+    courtDebateSessions,
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -177,10 +207,6 @@ export function CourtDebatePanel({
       handleSubmit();
     }
   };
-
-  const messages = courtDebateSession?.messages ?? [];
-  const currentRound = courtDebateSession?.currentRound ?? 0;
-  const totalRounds = courtDebateSession?.totalRounds ?? 0;
 
   const getRoleColor = (role?: AdvisorRole) => {
     if (!role) return "var(--color-text-tertiary)";
@@ -194,121 +220,171 @@ export function CourtDebatePanel({
     return config?.label ?? role;
   };
 
-  return (
-    <div className="flex flex-col h-full">
-      <div className="section-label">
-        第{turnCount}回合 · {currentDateDisplay}
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5 pb-2 min-h-0" ref={scrollRef}>
-        {messages.length === 0 && !isLoading && (
-          <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
-            <MessageCircle size={24} className="mb-2 opacity-30" />
-            <p className="text-xs font-serif">
-              {scenario.player_context?.leader_title || "阁下"}
-              ，可在朝堂上提出议题，令群臣廷议
-            </p>
-            <p className="text-[10px] mt-1 text-text-tertiary/60 font-serif">
-              廷议结果仅供决策参考
-            </p>
-          </div>
-        )}
-
-        {messages.map((msg, index) => {
-          if (msg.role === "user") {
-            return (
-              <div key={index} className="flex justify-end mb-3">
-                <div className="max-w-[80%] rounded-lg text-xs font-serif leading-relaxed bg-accent-primary/15 text-text-primary px-3 py-2">
-                  {msg.content}
-                </div>
-              </div>
-            );
-          }
-
-          const roleColor = getRoleColor(msg.advisorRole);
-          const roleLabel = getRoleLabel(msg.advisorRole);
-          const stanceConfig = msg.stance ? STANCE_CONFIG[msg.stance] : null;
-
-          return (
-            <div key={index} className="flex justify-start mb-3">
-              <div className="max-w-[80%]">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span
-                    className="text-[10px] font-serif font-semibold"
-                    style={{ color: roleColor }}
-                  >
-                    {roleLabel}
-                  </span>
-                  <span
-                    className="text-[10px] font-serif"
-                    style={{ color: roleColor }}
-                  >
-                    // {msg.advisorName}
-                  </span>
-                  {stanceConfig && (
-                    <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded font-serif ${stanceConfig.bgColorClass} ${stanceConfig.colorClass}`}
-                    >
-                      {stanceConfig.label}
-                    </span>
-                  )}
-                </div>
-                <div
-                  className="rounded-lg text-xs font-serif leading-relaxed bg-bg-tertiary text-text-secondary px-3 py-2"
-                  style={{ borderLeft: `3px solid ${roleColor}` }}
-                >
-                  {msg.content}
-                </div>
-              </div>
+  const renderMessages = (messages: CourtDebateMessage[]) => {
+    return messages.map((msg, index) => {
+      if (msg.role === "user") {
+        return (
+          <div key={index} className="flex justify-end mb-3">
+            <div className="max-w-[80%] rounded-lg text-xs font-serif leading-relaxed bg-accent-primary/15 text-text-primary px-3 py-2">
+              {msg.content}
             </div>
-          );
-        })}
+          </div>
+        );
+      }
 
-        {isLoading && courtDebateSession && !courtDebateSession.isFinished && (
-          <div className="flex justify-start items-center gap-2 mb-3">
-            <div className="rounded-lg px-3 py-2 bg-bg-tertiary">
-              <span className="text-[10px] text-text-tertiary font-serif">
-                {currentRound > 0 ? "群臣商议中..." : "群臣准备陈词..."}
+      const roleColor = getRoleColor(msg.advisorRole);
+      const roleLabel = getRoleLabel(msg.advisorRole);
+      const stanceConfig = msg.stance ? STANCE_CONFIG[msg.stance] : null;
+
+      return (
+        <div key={index} className="flex justify-start mb-3">
+          <div className="max-w-[80%]">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span
+                className="text-[10px] font-serif font-semibold"
+                style={{ color: roleColor }}
+              >
+                {roleLabel}
               </span>
+              <span
+                className="text-[10px] font-serif"
+                style={{ color: roleColor }}
+              >
+                {msg.advisorName}
+              </span>
+              {stanceConfig && (
+                <span
+                  className={`text-[9px] px-1.5 py-0.5 rounded font-serif ${stanceConfig.bgColorClass} ${stanceConfig.colorClass}`}
+                >
+                  {stanceConfig.label}
+                </span>
+              )}
             </div>
             <div
-              className="w-2 h-2 rounded-full animate-pulse shrink-0"
-              style={{
-                backgroundColor: "var(--color-tab-court-debate, #c9a84c)",
-              }}
-            />
+              className="rounded-lg text-xs font-serif leading-relaxed bg-bg-tertiary text-text-secondary px-3 py-2"
+              style={{ borderLeft: `3px solid ${roleColor}` }}
+            >
+              {msg.content}
+            </div>
           </div>
-        )}
+        </div>
+      );
+    });
+  };
 
-        {error && (
-          <div className="rounded-md border border-status-error-border bg-status-error-bg px-3 py-2 mb-3">
-            <p className="text-[10px] text-status-error-text">{error}</p>
+  const hasAnyContent = courtDebateSessions.length > 0 || isLoading;
+
+  return (
+    <div
+      className="flex-1 flex flex-col min-h-0"
+      style={{
+        paddingLeft: "1.25rem",
+        paddingRight: "1.25rem",
+        paddingTop: "0.5rem",
+        paddingBottom: 0,
+      }}
+    >
+      <div className="rounded-lg border border-border bg-bg-card flex-1 flex flex-col min-h-0">
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-4"
+          role="log"
+          aria-label="廷议"
+          aria-live="polite"
+        >
+          {!hasAnyContent && (
+            <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
+              <MessageCircle size={24} className="mb-2 opacity-30" />
+              <p className="text-xs font-serif">
+                {scenario.player_context?.leader_title || "阁下"}
+                ，可在朝堂上提出议题，令群臣廷议
+              </p>
+              <p className="text-[10px] mt-1 text-text-tertiary/60 font-serif">
+                廷议结果仅供决策参考
+              </p>
+            </div>
+          )}
+
+          {courtDebateSessions.map((session, sessionIdx) => {
+            const isLast = sessionIdx === courtDebateSessions.length - 1;
+            const turnDate =
+              turnResults.length > 0 && session.turnNumber <= turnResults.length
+                ? (turnResults[session.turnNumber - 1]?.date_display ??
+                  currentDateDisplay)
+                : currentDateDisplay;
+
+            return (
+              <div key={sessionIdx}>
+                <div className="section-label">
+                  第{session.turnNumber}回合 · {turnDate}
+                  {courtDebateSessions.length > 1 && ` · 廷议${sessionIdx + 1}`}
+                </div>
+
+                {session.topic && (
+                  <div className="flex justify-end mb-3">
+                    <div className="max-w-[80%] rounded-lg text-xs font-serif leading-relaxed bg-accent-primary/15 text-text-primary px-3 py-2">
+                      {session.topic}
+                    </div>
+                  </div>
+                )}
+
+                {renderMessages(
+                  session.messages.filter((m) => m.role !== "user"),
+                )}
+
+                {isLoading && isLast && !session.isFinished && (
+                  <div className="flex justify-start items-center gap-2 mb-3">
+                    <div className="rounded-lg px-3 py-2 bg-bg-tertiary">
+                      <span className="text-[10px] text-text-tertiary font-serif">
+                        {session.currentRound > 0
+                          ? "群臣商议中..."
+                          : "群臣准备陈词..."}
+                      </span>
+                    </div>
+                    <div
+                      className="w-2 h-2 rounded-full animate-pulse shrink-0"
+                      style={{
+                        backgroundColor:
+                          "var(--color-tab-court-debate, #c9a84c)",
+                      }}
+                    />
+                  </div>
+                )}
+
+                {session.isFinished && (
+                  <div className="text-[10px] text-accent-primary font-serif text-center mb-2">
+                    廷议已结束 · 共{session.totalRounds}轮
+                  </div>
+                )}
+
+                {!isLast && <div className="h-px bg-border my-4" />}
+              </div>
+            );
+          })}
+
+          {error && (
+            <div className="rounded-md border border-status-error-border bg-status-error-bg px-3 py-2 mb-3">
+              <p className="text-[10px] text-status-error-text">{error}</p>
+            </div>
+          )}
+        </div>
+
+        {isDebating && activeSession && (
+          <div className="px-4 py-1 border-t border-border/50">
+            <div className="text-[10px] text-text-tertiary font-serif text-center">
+              廷议进行中 · 第{activeSession.currentRound}/
+              {activeSession.totalRounds}轮
+            </div>
           </div>
         )}
       </div>
-
-      {courtDebateSession && !courtDebateSession.isFinished && (
-        <div className="px-5 py-1">
-          <div className="text-[10px] text-text-tertiary font-serif text-center">
-            廷议进行中 · 第{currentRound}/{totalRounds}轮
-          </div>
-        </div>
-      )}
-
-      {courtDebateSession?.isFinished && (
-        <div className="px-5 py-1">
-          <div className="text-[10px] text-accent-primary font-serif text-center">
-            廷议已结束 · 共{totalRounds}轮
-          </div>
-        </div>
-      )}
 
       <div
         style={{
-          paddingLeft: "1.25rem",
-          paddingRight: "1.25rem",
+          paddingLeft: 0,
+          paddingRight: 0,
           paddingBottom: "0.5rem",
-          paddingTop: "0.25rem",
+          paddingTop: "0.5rem",
           width: "100%",
           boxSizing: "border-box",
         }}

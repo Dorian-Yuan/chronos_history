@@ -416,7 +416,7 @@ export function GamePage() {
                 turnCount={state.turnCount}
                 turnResults={turnResults}
                 advisors={currentAdvisors}
-                courtDebateSession={state.courtDebate}
+                courtDebateSessions={state.courtDebateSessions}
               />
             ) : (
               <IntelligencePanel factions={currentFactions} />
@@ -484,7 +484,7 @@ export function GamePage() {
                 turnCount={state.turnCount}
                 turnResults={turnResults}
                 advisors={currentAdvisors}
-                courtDebateSession={state.courtDebate}
+                courtDebateSessions={state.courtDebateSessions}
               />
             </div>
             <div

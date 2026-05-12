@@ -285,7 +285,7 @@ const SCENARIO_DETAILS_SCHEMA_PROMPT = `
       "role": "General",
       "name": "真实人名（禁止奇幻风格，中国用姓+名，欧洲用名+姓，必须全为中文）",
       "advice": "建议（简体中文）",
-      "bias": "倾向描述"
+      "bias": "倾向（前4字为核心总结，共15字以内，如'主战派：主张以武力解决'）"
     },
     { "role": "Diplomat", ... },
     { "role": "Intel", ... },
@@ -329,7 +329,7 @@ const TURN_SCHEMA_PROMPT = `
       "role": "General或Diplomat或Intel或Scholar或Merchant",
       "name": "顾问名",
       "advice": "建议",
-      "bias": "倾向",
+      "bias": "倾向（前4字为核心总结，共15字以内，如'主战派：主张以武力解决'）",
       "hidden_motive": "秘密动机"
     }
   ],

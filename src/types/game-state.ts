@@ -36,6 +36,7 @@ export interface CourtDebateSession {
   currentRound: number;
   messages: CourtDebateMessage[];
   isFinished: boolean;
+  turnNumber: number;
 }
 
 export interface GameState {
@@ -48,7 +49,7 @@ export interface GameState {
   endGameAnalysis: EndGameAnalysis | null;
   turnResults: TurnResult[];
   counselSessions: CounselSession[];
-  courtDebate: CourtDebateSession | null;
+  courtDebateSessions: CourtDebateSession[];
 }
 
 export type GameOutcome = "victory" | "neutral" | "defeat";
@@ -68,7 +69,7 @@ export const INITIAL_GAME_STATE: GameState = {
   endGameAnalysis: null,
   turnResults: [],
   counselSessions: [],
-  courtDebate: null,
+  courtDebateSessions: [],
 };
 
 export function clampStat(value: number): number {
