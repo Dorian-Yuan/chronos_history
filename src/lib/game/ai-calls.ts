@@ -229,6 +229,17 @@ function validateTurnResult(data: TurnResult): void {
     errors.push("factions_update缺失");
   }
 
+  const VALID_ATTITUDES = ["敌对", "求和", "中立", "友好", "臣服"];
+  if (Array.isArray(data.factions_update)) {
+    for (const faction of data.factions_update) {
+      if (faction.attitude && !VALID_ATTITUDES.includes(faction.attitude)) {
+        errors.push(
+          `派系"${faction.name}"的attitude值"${faction.attitude}"不合法，只能取：${VALID_ATTITUDES.join("、")}`,
+        );
+      }
+    }
+  }
+
   if (errors.length > 0) {
     throw new Error(`回合结果验证失败: ${errors.join("; ")}`);
   }
@@ -300,7 +311,7 @@ const SCENARIO_DETAILS_SCHEMA_PROMPT = `
       "strength": "主要优势",
       "weakness": "关键弱点",
       "needs": "急需什么",
-      "attitude": "当前立场（6字以内，如：敌对、臣服、求和、中立、友好等）"
+      "attitude": "当前立场（只能取：敌对、求和、中立、友好、臣服，禁止其他值）"
     }
   ],
   "initial_decision_options": [
@@ -340,7 +351,7 @@ const TURN_SCHEMA_PROMPT = `
       "strength": "优势",
       "weakness": "弱点",
       "needs": "需求",
-      "attitude": "立场（6字以内，如：敌对、臣服、求和、中立、友好等，可适当注解）",
+      "attitude": "立场（只能取：敌对、求和、中立、友好、臣服，禁止其他值）",
       "is_new": 布尔值,
       "is_destroyed": 布尔值,
       "leader": "领袖姓名（必须与上一回合保持一致，除非满足更换条件）"
@@ -770,7 +781,7 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 - rumor：民间流言，暗示潜在危机
 - historian_commentary：史官注疏，文言/半文言，50-100字，春秋笔法，偶尔暗示未来，禁止剧透
 - decision_options：2-3个，涵盖不同方向，含陷阱选项，recommended_advisor须是5位顾问之一
-- hidden_consequences：AI长期记忆，必须记录派系镇压累积次数、态度变化节点、玩家持续政策、未解决隐患
+- hidden_consequences：AI长期记忆，必须记录派系镇压累积次数、态度变化节点、玩家持续政策、未解决隐患、玩家政策的取消/变更
 
 【稳定性总则——极其重要】
 顾问稳定性：
@@ -784,12 +795,19 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 - 未更换时必须与"当前派系"一致
 
 派系态度锁定：
-- attitude必须在6字以内（如：敌对、臣服、求和、中立、友好等）
+- attitude只能取以下5个值之一：敌对、求和、中立、友好、臣服。禁止使用其他任何值（如"即将归附""倾向臣服""表面臣服"等均不允许）
 - 臣服→敌对：禁止直接跳转，须至少2回合过渡
 - 臣服叛乱条件（须同时满足）：stability<50 + 连续2回合忽视 + 前8回合绝对不可叛乱
 - 敌对→臣服：须"敌对→求和→中立→友好→臣服"渐进3-4回合
-- 清理效果累积：第1次表面臣服，第2次大幅削弱，第3次+可消灭
+- 清理效果累积：第1次臣服（表面归顺），第2次大幅削弱，第3次+可消灭
 - 活跃派系总数≤6
+
+【政策延续性——极其重要】
+- 玩家每回合的行动即为当回合政策，无持续性命令系统
+- 若玩家明确取消/变更之前的政策，必须在hidden_consequences中明确标注"XX政策已取消"或"XX政策已变更为YY"
+- 后续回合不得再提及或执行已取消的政策，除非叙事需要交代善后收尾
+- 禁止假设玩家有未声明的持续性政策
+- 近期玩家行动中若有与历史政策矛盾的指令，以最新指令为准，旧政策自动失效
 
 【生成后自检——极其重要】
 返回JSON前，逐项检查：
@@ -799,7 +817,7 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 4. stats_delta每项是否在-10到10之间？
 5. historian_commentary是否为文言/半文言风格，50-100字？
 6. 所有文本字段是否为简体中文？
-7. factions_update中每个派系的attitude是否在6字以内？
+7. factions_update中每个派系的attitude是否为5个合法值之一（敌对、求和、中立、友好、臣服）？
 不通过则修正后再输出${JSON_OUTPUT_INSTRUCTION}`;
 
 export async function evaluateTurn(
@@ -810,12 +828,18 @@ export async function evaluateTurn(
   turnCount: number,
   currentAdvisors?: { role: string; name: string }[],
   currentDateDisplay?: string,
+  recentPlayerActions?: string[],
 ): Promise<TurnResult> {
   const provider = getProvider();
 
   const systemPrompt = provider.supportsStructuredOutput()
     ? TURN_SYSTEM_PROMPT
     : TURN_SYSTEM_PROMPT + TURN_SCHEMA_PROMPT;
+
+  const recentActionsSection =
+    recentPlayerActions && recentPlayerActions.length > 0
+      ? `\n近期玩家行动（以最新为准，旧行动若与新行动矛盾则已自动失效）：\n${recentPlayerActions.map((a, i) => `- 回合${turnCount - recentPlayerActions.length + i}：${a}`).join("\n")}\n`
+      : "";
 
   const contextMessage = `当前剧本：${scenario.title}
 玩家国家：${scenario.player_context.nation_name}
@@ -836,7 +860,7 @@ ${currentAdvisors && currentAdvisors.length > 0 ? currentAdvisors.map((a) => `- 
 
 历史日志（AI长期记忆）：
 ${historyLog.length > 0 ? historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n") : "（无）"}
-
+${recentActionsSection}
 当前派系：
 ${scenario.factions.map((f) => `- ${f.name}（领袖：${f.leader || "未知"}，${f.attitude}）：${f.description}`).join("\n")}
 

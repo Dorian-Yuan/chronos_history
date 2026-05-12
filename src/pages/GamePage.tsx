@@ -121,6 +121,8 @@ export function GamePage() {
             ? turnResults[turnResults.length - 1].date_display
             : undefined;
 
+        const recentActions = state.playerActions.slice(-3);
+
         const result = await evaluateTurn(
           scenario,
           state.historyLog,
@@ -129,9 +131,10 @@ export function GamePage() {
           state.turnCount,
           currentAdvisors,
           lastDateDisplay,
+          recentActions,
         );
 
-        dispatch({ type: "PROCESS_TURN", result });
+        dispatch({ type: "PROCESS_TURN", result, playerAction: action });
 
         if (checkGameOver(state, result)) {
           try {

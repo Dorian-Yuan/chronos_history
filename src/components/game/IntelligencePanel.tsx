@@ -14,8 +14,38 @@ const ATTITUDE_STYLES: Record<string, string> = {
   已灭亡: "bg-bg-tertiary text-text-tertiary line-through border border-border",
 };
 
+const ATTITUDE_FALLBACK_MAP: Record<string, string> = {
+  即将归附: "友好",
+  倾向臣服: "友好",
+  即将臣服: "友好",
+  表面臣服: "臣服",
+  归附: "臣服",
+  归顺: "臣服",
+  降服: "臣服",
+  倾向敌对: "敌对",
+  敌视: "敌对",
+  仇恨: "敌对",
+  敌意: "敌对",
+  亲近: "友好",
+  友善: "友好",
+  亲善: "友好",
+  和平: "求和",
+  议和: "求和",
+  示好: "求和",
+  冷淡: "中立",
+  疏远: "中立",
+  观望: "中立",
+};
+
 function getAttitudeStyle(attitude: string): string {
-  return ATTITUDE_STYLES[attitude] || "bg-bg-tertiary text-text-secondary";
+  if (ATTITUDE_STYLES[attitude]) return ATTITUDE_STYLES[attitude];
+  const normalized = ATTITUDE_FALLBACK_MAP[attitude];
+  if (normalized && ATTITUDE_STYLES[normalized])
+    return ATTITUDE_STYLES[normalized];
+  for (const key of Object.keys(ATTITUDE_STYLES)) {
+    if (attitude.includes(key)) return ATTITUDE_STYLES[key];
+  }
+  return "bg-bg-tertiary text-text-secondary";
 }
 
 export function IntelligencePanel({ factions }: IntelligencePanelProps) {

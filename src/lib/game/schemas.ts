@@ -314,7 +314,7 @@ export const turnResultSchema = {
     hidden_consequences: {
       type: "string" as const,
       description:
-        "回合总结（AI长期记忆）。必须明确记录：1)派系镇压/清理的累积次数和效果 2)派系态度变化的关键节点 3)玩家对某派系的持续政策 4)未解决的隐患。绝对禁止遗漏重要的派系状态变化",
+        "回合总结（AI长期记忆）。必须明确记录：1)派系镇压/清理的累积次数和效果 2)派系态度变化的关键节点 3)玩家对某派系的持续政策 4)未解决的隐患 5)玩家政策的取消/变更（必须明确标注[XX政策已取消]或[XX政策已变更为YY]）。绝对禁止遗漏重要的派系状态变化",
     },
     decision_options: {
       type: "array" as const,

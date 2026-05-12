@@ -14,7 +14,7 @@ import { INITIAL_GAME_STATE, clampStat } from "@/types";
 export type GameAction =
   | { type: "ENTER_SELECTION" }
   | { type: "SET_SCENARIO"; scenario: ScenarioData }
-  | { type: "PROCESS_TURN"; result: TurnResult }
+  | { type: "PROCESS_TURN"; result: TurnResult; playerAction: string }
   | { type: "GAME_OVER"; analysis: EndGameAnalysis }
   | { type: "LOAD_SAVE"; state: GameState }
   | { type: "RESET" }
@@ -44,6 +44,40 @@ function applyStatsDelta(
   };
 }
 
+const VALID_ATTITUDES = ["敌对", "求和", "中立", "友好", "臣服"];
+
+const ATTITUDE_NORMALIZE_MAP: Record<string, string> = {
+  即将归附: "友好",
+  倾向臣服: "友好",
+  即将臣服: "友好",
+  表面臣服: "臣服",
+  归附: "臣服",
+  归顺: "臣服",
+  降服: "臣服",
+  倾向敌对: "敌对",
+  敌视: "敌对",
+  仇恨: "敌对",
+  敌意: "敌对",
+  亲近: "友好",
+  友善: "友好",
+  亲善: "友好",
+  和平: "求和",
+  议和: "求和",
+  示好: "求和",
+  冷淡: "中立",
+  疏远: "中立",
+  观望: "中立",
+};
+
+function normalizeAttitude(attitude: string): string {
+  if (VALID_ATTITUDES.includes(attitude)) return attitude;
+  if (ATTITUDE_NORMALIZE_MAP[attitude]) return ATTITUDE_NORMALIZE_MAP[attitude];
+  for (const valid of VALID_ATTITUDES) {
+    if (attitude.includes(valid)) return valid;
+  }
+  return "中立";
+}
+
 function updateFactions(
   currentFactions: FactionData[],
   updates: TurnResult["factions_update"],
@@ -71,7 +105,7 @@ function updateFactions(
         strength: update.strength ?? result[idx].strength,
         weakness: update.weakness ?? result[idx].weakness,
         needs: update.needs ?? result[idx].needs,
-        attitude: update.attitude ?? result[idx].attitude,
+        attitude: normalizeAttitude(update.attitude ?? result[idx].attitude),
         leader: update.leader ?? result[idx].leader,
         is_new: false,
       };
@@ -82,7 +116,7 @@ function updateFactions(
         strength: update.strength,
         weakness: update.weakness,
         needs: update.needs,
-        attitude: update.attitude,
+        attitude: normalizeAttitude(update.attitude),
         leader: update.leader,
         is_new: true,
       });
@@ -110,6 +144,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         endGameAnalysis: null,
         turnResults: [],
         counselSessions: [],
+        playerActions: [],
       };
     }
 
@@ -135,6 +170,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         scenario: newScenario,
         turnResults: [...state.turnResults, result],
         counselSessions: [],
+        playerActions: [...state.playerActions, action.playerAction],
       };
     }
 
@@ -160,6 +196,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         turnResults: loaded.turnResults ?? [],
         counselSessions: loaded.counselSessions ?? [],
         courtDebateSessions,
+        playerActions: loaded.playerActions ?? [],
       };
     }
 
