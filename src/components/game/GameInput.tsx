@@ -24,7 +24,8 @@ export function GameInput({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 100)}px`;
+      // ~5 lines of text at ~1.5rem line-height * 5 = 120px
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
     }
   }, []);
 
@@ -69,7 +70,7 @@ export function GameInput({
 
   return (
     <div className="px-5 py-2">
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-end gap-2.5">
         {hasDecisionOptions && (
           <button
             onClick={() => setShowDecisionModal(true)}
@@ -81,7 +82,10 @@ export function GameInput({
           </button>
         )}
 
-        <div className="flex-1 flex items-center rounded-[var(--radius-md)] border border-border bg-bg-card shadow-sm px-3 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all h-9">
+        <div
+          className="flex-1 flex items-center rounded-[var(--radius-md)] border border-border bg-bg-card shadow-sm px-3 py-1.5 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all"
+          style={{ minHeight: "2.25rem" }}
+        >
           <textarea
             ref={textareaRef}
             value={input}
@@ -90,7 +94,8 @@ export function GameInput({
             placeholder={placeholder || "下达指令..."}
             aria-label="决策输入"
             rows={1}
-            className="flex-1 resize-none bg-transparent text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none self-center leading-none"
+            className="flex-1 resize-none bg-transparent text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none leading-relaxed"
+            style={{ maxHeight: "120px", overflowY: "auto" }}
             disabled={disabled}
           />
         </div>
@@ -98,7 +103,7 @@ export function GameInput({
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || disabled}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90 self-end"
           aria-label="发送决策"
         >
           <Send size={15} />

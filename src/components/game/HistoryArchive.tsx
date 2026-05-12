@@ -63,14 +63,14 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
               暂无历史记录
             </div>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-3">
               {records.map((record) => (
                 <li
                   key={record.id}
-                  className="rounded-lg border border-border bg-bg-card p-5"
+                  className="rounded-lg border border-border bg-bg-card p-4"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-bold text-text-primary">
+                    <span className="text-sm font-bold font-serif text-text-primary">
                       {record.scenarioTitle}
                     </span>
                     <span
@@ -83,11 +83,11 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
                           : "存续"}
                     </span>
                   </div>
-                  <div className="text-xs text-text-tertiary leading-relaxed">
+                  <div className="text-xs text-text-tertiary font-serif leading-relaxed">
                     {record.nationName} · {record.leaderTitle} ·{" "}
                     {record.turnCount}回合
                   </div>
-                  <div className="text-xs text-text-tertiary mt-1.5">
+                  <div className="text-xs text-text-tertiary font-serif mt-1.5">
                     {record.personaTitle} · 历史原型：{record.realEventTitle}
                   </div>
                   <div className="text-xs text-text-tertiary/60 mt-2">

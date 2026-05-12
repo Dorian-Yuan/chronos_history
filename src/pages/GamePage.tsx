@@ -12,7 +12,6 @@ import {
   ChroniclePanel,
   CabinetPanel,
   IntelligencePanel,
-  StatBars,
   GameInput,
   SaveManager,
 } from "@/components/game";
@@ -233,43 +232,103 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <header className="px-5 pt-4">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg-card py-5 px-5 shadow-sm min-h-[90px]">
-          <div className="flex flex-col gap-1 min-w-0 overflow-hidden">
-            <span className="text-xl font-serif font-bold text-text-primary truncate">
+      {/* Merged identity + stat bar card */}
+      <div className="mx-5 mt-4 rounded-lg border border-border bg-bg-card shadow-sm">
+        {/* Identity row */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex flex-col gap-0.5 min-w-0 overflow-hidden">
+            <span className="text-base font-serif font-bold text-text-primary truncate">
               {nationName}
             </span>
-            <span className="text-sm font-serif text-accent-primary opacity-80 truncate">
+            <span className="text-xs font-serif text-accent-primary opacity-80 truncate">
               // {leaderTitle}
             </span>
           </div>
-          <div className="flex items-center gap-1.5 ml-2 shrink-0 pl-3 border-l border-border/50">
+          <div className="flex items-center gap-1 ml-2 shrink-0 pl-3 border-l border-border/50">
             <button
               onClick={() => dispatch({ type: "RESET" })}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-8 h-8"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
               aria-label="返回主页"
             >
-              <Home size={18} strokeWidth={1.5} />
+              <Home size={16} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => setShowSaveManager(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-8 h-8"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
               aria-label="存档管理"
             >
-              <Save size={18} strokeWidth={1.5} />
+              <Save size={16} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-8 h-8"
+              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
               aria-label="设置"
             >
-              <Settings size={18} strokeWidth={1.5} />
+              <Settings size={16} strokeWidth={1.5} />
             </button>
           </div>
         </div>
-      </header>
-
-      <StatBars stats={state.stats} delta={currentDelta} />
+        {/* Divider */}
+        <div className="h-px bg-border mx-4" />
+        {/* Stat bars */}
+        <div
+          className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 py-3"
+          role="group"
+          aria-label="国家属性"
+        >
+          {[
+            { key: "stability" as const, label: "稳定性", icon: "Scale" },
+            { key: "economy" as const, label: "经济", icon: "Coins" },
+            { key: "military" as const, label: "军事", icon: "Swords" },
+            {
+              key: "international_standing" as const,
+              label: "国际声望",
+              icon: "Globe",
+            },
+          ].map(({ key, label }) => {
+            const value = state.stats[key];
+            const deltaValue = currentDelta?.[key] ?? 0;
+            const barColor =
+              value >= 70
+                ? "var(--color-accent-primary)"
+                : "var(--color-accent-secondary)";
+            return (
+              <div key={key}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium text-text-secondary">
+                    {label}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="font-mono text-xs font-semibold text-text-primary">
+                      {value}
+                    </span>
+                    {deltaValue !== 0 && (
+                      <span
+                        className={`font-mono text-xs font-medium ${deltaValue > 0 ? "text-accent-primary" : "text-accent-danger"}`}
+                      >
+                        {deltaValue > 0 ? `+${deltaValue}` : deltaValue}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div
+                  className="h-1 w-full overflow-hidden rounded-sm bg-bg-tertiary"
+                  role="progressbar"
+                  aria-valuenow={value}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${label}: ${value}`}
+                >
+                  <div
+                    className="h-full rounded-sm transition-all duration-700"
+                    style={{ width: `${value}%`, backgroundColor: barColor }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -376,7 +435,12 @@ export function GamePage() {
       </div>
 
       <nav
-        className="flex md:hidden border-t border-border pb-[env(safe-area-inset-bottom,0px)] glass"
+        className="flex md:hidden border-t border-border pb-[env(safe-area-inset-bottom,0px)]"
+        style={{
+          background: "var(--color-glass-bg)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        }}
         aria-label="游戏面板"
       >
         {renderTabButton(

@@ -112,20 +112,20 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
           </button>
         </div>
 
-        <div className="modal-body space-y-4">
+        <div className="modal-body space-y-3">
           {Array.from({ length: 5 }, (_, i) => {
             const save = saves.find((s) => s.slotIndex === i);
             return (
               <div
                 key={i}
-                className="flex items-center gap-4 rounded-lg border border-border bg-bg-card px-5 py-3"
+                className="flex items-center gap-3 rounded-lg border border-border bg-bg-card px-4 py-2"
               >
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold font-serif text-text-primary">
                     存档 {i + 1}
                   </div>
                   {save ? (
-                    <div className="text-xs text-text-tertiary mt-1 truncate">
+                    <div className="text-xs text-text-tertiary mt-0.5 truncate font-serif">
                       {save.data.metadata.scenarioTitle} ·{" "}
                       {save.data.metadata.nationName} · 第
                       {save.data.metadata.turnCount}回合 ·{" "}

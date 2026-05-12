@@ -125,7 +125,7 @@ export function EndingCompendium({ onClose }: EndingCompendiumProps) {
               {currentEntries.map((entry) => (
                 <li
                   key={entry.id}
-                  className="rounded-lg border border-border bg-bg-card p-5"
+                  className="rounded-lg border border-border bg-bg-card p-4"
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-sm font-serif font-bold text-text-primary">

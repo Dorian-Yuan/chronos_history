@@ -96,7 +96,7 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
         &ldquo;{advisor.advice}&rdquo;
       </p>
 
-      <div className="mt-6">
+      <div className="mt-3">
         <div className="text-xs font-serif text-text-tertiary">
           倾向：{advisor.bias}
         </div>
