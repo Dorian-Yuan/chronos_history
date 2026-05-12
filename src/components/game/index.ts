@@ -13,3 +13,4 @@ export { CounselDialog } from "./CounselDialog";
 export { EndingCompendium } from "./EndingCompendium";
 export { DecisionOptionsModal } from "./DecisionOptionsModal";
 export { CourtDebatePanel } from "./CourtDebatePanel";
+export { EndGameConfirmModal } from "./EndGameConfirmModal";

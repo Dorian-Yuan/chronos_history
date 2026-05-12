@@ -10,6 +10,7 @@ import type {
   CourtDebateSession,
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
+import { getAppConfig } from "@/config";
 
 export type GameAction =
   | { type: "ENTER_SELECTION" }
@@ -33,13 +34,26 @@ export type GameAction =
 function applyStatsDelta(
   stats: GameStats,
   delta: TurnResult["stats_delta"],
+  turnCount: number,
 ): GameStats {
+  const config = getAppConfig();
+  const isEarlyGame = turnCount <= config.earlyGameProtectionTurns;
+
+  const applyDelta = (current: number, change: number): number => {
+    let result = current + change;
+    if (isEarlyGame && result < 10) {
+      result = Math.max(10, current);
+    }
+    return clampStat(result);
+  };
+
   return {
-    stability: clampStat(stats.stability + delta.stability),
-    economy: clampStat(stats.economy + delta.economy),
-    military: clampStat(stats.military + delta.military),
-    international_standing: clampStat(
-      stats.international_standing + delta.international_standing,
+    stability: applyDelta(stats.stability, delta.stability),
+    economy: applyDelta(stats.economy, delta.economy),
+    military: applyDelta(stats.military, delta.military),
+    international_standing: applyDelta(
+      stats.international_standing,
+      delta.international_standing,
     ),
   };
 }
@@ -150,7 +164,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "PROCESS_TURN": {
       const result = action.result;
-      const newStats = applyStatsDelta(state.stats, result.stats_delta);
+      const newStats = applyStatsDelta(
+        state.stats,
+        result.stats_delta,
+        state.turnCount,
+      );
       const newScenario = state.scenario
         ? {
             ...state.scenario,

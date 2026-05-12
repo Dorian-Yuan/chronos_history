@@ -15,6 +15,7 @@ import {
   GameInput,
   SaveManager,
   CourtDebatePanel,
+  EndGameConfirmModal,
 } from "@/components/game";
 import type { TurnResult, ScenarioData, FactionData } from "@/types";
 import { determineOutcome, checkGameOver, clampStat } from "@/types";
@@ -29,6 +30,7 @@ import {
   Coins,
   Swords,
   Globe,
+  Flag,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
 
@@ -90,6 +92,7 @@ export function GamePage() {
   const [mobileTab, setMobileTab] =
     useState<keyof typeof TAB_CONFIG>("chronicle");
   const [showSaveManager, setShowSaveManager] = useState(false);
+  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
 
   const scenario = state.scenario;
@@ -203,6 +206,45 @@ export function GamePage() {
     [isLoading, scenario, state, dispatch],
   );
 
+  const handleEndGame = useCallback(async () => {
+    if (!scenario || state.phase !== "playing") return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const analysis = await analyzeGame(scenario, state.historyLog);
+      dispatch({ type: "GAME_OVER", analysis });
+
+      const outcome = determineOutcome(state.stats);
+      addHistoryRecord({
+        id: `history_${Date.now()}`,
+        scenarioTitle: scenario.title,
+        nationName: scenario.player_context.nation_name,
+        leaderTitle: scenario.player_context.leader_title,
+        turnCount: state.turnCount,
+        outcome,
+        realEventTitle: scenario.hidden_real_event,
+        personaTitle: analysis.persona_title,
+        timestamp: Date.now(),
+      });
+
+      addToPersonaCompendium(
+        analysis.persona_title,
+        analysis.persona_description,
+      );
+      addToHistoryCompendium(
+        scenario.hidden_real_event,
+        analysis.real_outcome_summary,
+      );
+    } catch (e) {
+      console.error("Failed to end game:", e);
+      const msg = e instanceof Error ? e.message : "结束推演失败";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+      setShowEndGameConfirm(false);
+    }
+  }, [scenario, state, dispatch]);
+
   if (!scenario) {
     return (
       <main className="flex h-full items-center justify-center">
@@ -276,6 +318,15 @@ export function GamePage() {
               >
                 <Home size={16} strokeWidth={1.5} />
               </button>
+              {state.turnCount >= 8 && state.phase === "playing" && (
+                <button
+                  onClick={() => setShowEndGameConfirm(true)}
+                  className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-accent-primary transition-all w-7 h-7"
+                  aria-label="结束推演"
+                >
+                  <Flag size={16} strokeWidth={1.5} />
+                </button>
+              )}
               <button
                 onClick={() => setShowSaveManager(true)}
                 className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
@@ -556,6 +607,14 @@ export function GamePage() {
             setShowSaveManager(false);
           }}
           onClose={() => setShowSaveManager(false)}
+        />
+      )}
+
+      {showEndGameConfirm && (
+        <EndGameConfirmModal
+          turnCount={state.turnCount}
+          onConfirm={handleEndGame}
+          onCancel={() => setShowEndGameConfirm(false)}
         />
       )}
     </div>

@@ -79,8 +79,8 @@ export function clampStat(value: number): number {
 }
 
 export function determineOutcome(stats: GameStats): GameOutcome {
-  const anyZero = Object.values(stats).some((v) => v <= 0);
-  if (anyZero) return "defeat";
+  const anyLow = Object.values(stats).some((v) => v <= 10);
+  if (anyLow) return "defeat";
   const avg = Object.values(stats).reduce((a, b) => a + b, 0) / 4;
   if (avg >= 65) return "victory";
   if (avg >= 40) return "neutral";
@@ -93,11 +93,11 @@ export function checkGameOver(
 ): boolean {
   const config = getAppConfig();
   const nextTurn = state.turnCount + 1;
-  const anyStatZero = Object.values(state.stats).some((v) => v <= 0);
+  const anyStatLow = Object.values(state.stats).some((v) => v <= 10);
   const hardCap = nextTurn > config.maxTurns;
-  const collapse = anyStatZero && nextTurn > config.minTurnsBeforeEnd;
+  const collapse = anyStatLow && nextTurn > config.minTurnsBeforeEnd;
   const aiEnded =
     turnResult.is_game_over && nextTurn > config.minTurnsBeforeEnd;
-  const perfectVictory = Object.values(state.stats).every((v) => v >= 100);
+  const perfectVictory = Object.values(state.stats).every((v) => v >= 95);
   return hardCap || collapse || aiEnded || perfectVictory;
 }
