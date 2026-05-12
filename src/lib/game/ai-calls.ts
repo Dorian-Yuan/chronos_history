@@ -298,7 +298,7 @@ const SCENARIO_DETAILS_SCHEMA_PROMPT = `
       "strength": "主要优势",
       "weakness": "关键弱点",
       "needs": "急需什么",
-      "attitude": "当前立场"
+      "attitude": "当前立场（6字以内，如：敌对、臣服、求和、中立、友好等）"
     }
   ],
   "initial_decision_options": [
@@ -338,7 +338,7 @@ const TURN_SCHEMA_PROMPT = `
       "strength": "优势",
       "weakness": "弱点",
       "needs": "需求",
-      "attitude": "立场",
+      "attitude": "立场（6字以内，如：敌对、臣服、求和、中立、友好等，可适当注解）",
       "is_new": 布尔值,
       "is_destroyed": 布尔值,
       "leader": "领袖姓名（必须与上一回合保持一致，除非满足更换条件）"
@@ -490,6 +490,7 @@ export async function generateScenario(
 4. 派系名真实可信，禁止奇幻风格
 5. 2-3个initial_decision_options
 6. 派系构成须符合基调：Conquest至少3外部，Prosperity经济集团为主，Reform至少3内部，Survival内外兼有
+7. 派系attitude字段必须在6字以内（如：敌对、臣服、求和、中立、友好等）
 
 【生成后自检】
 1. 是否5个顾问且角色齐全？
@@ -497,6 +498,7 @@ export async function generateScenario(
 3. 人名是否符合文明传统？无奇幻风格？
 4. 派系构成是否符合基调？
 5. 是否有2-3个initial_decision_options？
+6. 派系attitude是否在6字以内？
 不通过则修正后再输出${JSON_OUTPUT_INSTRUCTION}`;
 
   const detailsSchemaPrompt = structuredOutputSupported
@@ -780,6 +782,7 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 - 未更换时必须与"当前派系"一致
 
 派系态度锁定：
+- attitude必须在6字以内（如：敌对、臣服、求和、中立、友好等）
 - 臣服→敌对：禁止直接跳转，须至少2回合过渡
 - 臣服叛乱条件（须同时满足）：stability<50 + 连续2回合忽视 + 前8回合绝对不可叛乱
 - 敌对→臣服：须"敌对→求和→中立→友好→臣服"渐进3-4回合
@@ -794,6 +797,7 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 4. stats_delta每项是否在-10到10之间？
 5. historian_commentary是否为文言/半文言风格，50-100字？
 6. 所有文本字段是否为简体中文？
+7. factions_update中每个派系的attitude是否在6字以内？
 不通过则修正后再输出${JSON_OUTPUT_INSTRUCTION}`;
 
 export async function evaluateTurn(
