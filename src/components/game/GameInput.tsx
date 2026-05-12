@@ -69,22 +69,46 @@ export function GameInput({
   const hasDecisionOptions = decisionOptions.length > 0;
 
   return (
-    <div className="px-5 py-2">
-      <div className="flex items-end gap-2.5">
+    <div
+      style={{
+        paddingLeft: "1.25rem",
+        paddingRight: "1.25rem",
+        paddingBottom: "0.5rem",
+        paddingTop: "0.5rem",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        className="flex items-end gap-2.5"
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          gap: "0.625rem",
+          width: "100%",
+        }}
+      >
         {hasDecisionOptions && (
           <button
             onClick={() => setShowDecisionModal(true)}
             disabled={disabled}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-secondary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-secondary/90"
             aria-label="决策选择"
+            style={{ width: "2.25rem", height: "2.25rem", flexShrink: 0 }}
           >
             <Lightbulb size={15} />
           </button>
         )}
 
         <div
-          className="flex-1 flex items-center rounded-[var(--radius-md)] border border-border bg-bg-card shadow-sm px-3 py-1.5 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all"
-          style={{ minHeight: "2.25rem" }}
+          className="flex items-center rounded-[var(--radius-md)] border border-border bg-bg-card shadow-sm px-3 py-1.5 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all"
+          style={{
+            minHeight: "2.25rem",
+            flex: "1 1 0%",
+            minWidth: 0,
+            display: "flex",
+            alignItems: "center",
+          }}
         >
           <textarea
             ref={textareaRef}
@@ -105,6 +129,7 @@ export function GameInput({
           disabled={!input.trim() || disabled}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90 self-end"
           aria-label="发送决策"
+          style={{ width: "2.25rem", height: "2.25rem", flexShrink: 0 }}
         >
           <Send size={15} />
         </button>

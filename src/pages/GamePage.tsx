@@ -243,8 +243,11 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col gap-2">
-      {/* Merged identity + stat bar card - use px-5 wrapper to match ChroniclePanel/GameInput alignment */}
-      <div className="px-5 mt-4">
+      {/* Merged identity + stat bar card - inline padding ensures pixel-exact alignment with chronicle and input */}
+      <div
+        className="mt-4"
+        style={{ paddingLeft: "1.25rem", paddingRight: "1.25rem" }}
+      >
         <div className="rounded-lg border border-border bg-bg-card shadow-sm">
           {/* Identity row */}
           <div className="flex items-center justify-between px-4 py-3">

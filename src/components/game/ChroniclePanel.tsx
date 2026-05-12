@@ -23,7 +23,15 @@ export function ChroniclePanel({
   }, [turnResults, isLoading]);
 
   return (
-    <div className="flex-1 px-5 py-2 flex flex-col min-h-0">
+    <div
+      className="flex-1 flex flex-col min-h-0"
+      style={{
+        paddingLeft: "1.25rem",
+        paddingRight: "1.25rem",
+        paddingTop: "0.5rem",
+        paddingBottom: 0,
+      }}
+    >
       <div className="rounded-lg border border-border bg-bg-card flex-1 flex flex-col min-h-0">
         <div
           ref={scrollRef}
