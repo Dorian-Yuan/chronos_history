@@ -6,6 +6,8 @@ import type {
   EndGameAnalysis,
   FactionData,
   CounselSession,
+  CourtDebateMessage,
+  CourtDebateSession,
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
 
@@ -16,7 +18,12 @@ export type GameAction =
   | { type: "GAME_OVER"; analysis: EndGameAnalysis }
   | { type: "LOAD_SAVE"; state: GameState }
   | { type: "RESET" }
-  | { type: "UPDATE_COUNSEL_SESSION"; session: CounselSession };
+  | { type: "UPDATE_COUNSEL_SESSION"; session: CounselSession }
+  | { type: "START_COURT_DEBATE"; topic: string; totalRounds: number }
+  | { type: "ADD_COURT_DEBATE_MESSAGE"; message: CourtDebateMessage }
+  | { type: "ADVANCE_COURT_DEBATE_ROUND" }
+  | { type: "FINISH_COURT_DEBATE" }
+  | { type: "CLEAR_COURT_DEBATE" };
 
 function applyStatsDelta(
   stats: GameStats,
@@ -122,8 +129,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentTurnResult: result,
         scenario: newScenario,
         turnResults: [...state.turnResults, result],
-        // 清除上一回合的顾问咨询记录，每回合开始时重置
         counselSessions: [],
+        courtDebate: null,
       };
     }
 
@@ -139,6 +146,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...action.state,
         turnResults: action.state.turnResults ?? [],
         counselSessions: action.state.counselSessions ?? [],
+        courtDebate: action.state.courtDebate ?? null,
       };
 
     case "RESET":
@@ -159,6 +167,59 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         counselSessions: sessions,
       };
     }
+
+    case "START_COURT_DEBATE": {
+      const session: CourtDebateSession = {
+        topic: action.topic,
+        totalRounds: action.totalRounds,
+        currentRound: 0,
+        messages: [],
+        isFinished: false,
+      };
+      return {
+        ...state,
+        courtDebate: session,
+      };
+    }
+
+    case "ADD_COURT_DEBATE_MESSAGE": {
+      if (!state.courtDebate) return state;
+      return {
+        ...state,
+        courtDebate: {
+          ...state.courtDebate,
+          messages: [...state.courtDebate.messages, action.message],
+        },
+      };
+    }
+
+    case "ADVANCE_COURT_DEBATE_ROUND": {
+      if (!state.courtDebate) return state;
+      return {
+        ...state,
+        courtDebate: {
+          ...state.courtDebate,
+          currentRound: state.courtDebate.currentRound + 1,
+        },
+      };
+    }
+
+    case "FINISH_COURT_DEBATE": {
+      if (!state.courtDebate) return state;
+      return {
+        ...state,
+        courtDebate: {
+          ...state.courtDebate,
+          isFinished: true,
+        },
+      };
+    }
+
+    case "CLEAR_COURT_DEBATE":
+      return {
+        ...state,
+        courtDebate: null,
+      };
 
     default:
       return state;

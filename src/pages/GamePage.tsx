@@ -14,6 +14,7 @@ import {
   IntelligencePanel,
   GameInput,
   SaveManager,
+  CourtDebatePanel,
 } from "@/components/game";
 import type { TurnResult, ScenarioData, FactionData } from "@/types";
 import { determineOutcome, checkGameOver, clampStat } from "@/types";
@@ -31,7 +32,7 @@ import {
 } from "lucide-react";
 import { useUIStore } from "@/stores";
 
-type SideTab = "cabinet" | "intelligence";
+type SideTab = "cabinet" | "intelligence" | "courtDebate";
 
 function safeGetAdvisors(
   scenario: ScenarioData | null,
@@ -68,6 +69,11 @@ const TAB_CONFIG = {
     colorVar: "--color-tab-chronicle",
   },
   cabinet: { icon: Users, label: "内阁", colorVar: "--color-tab-cabinet" },
+  courtDebate: {
+    icon: Scale,
+    label: "廷议",
+    colorVar: "--color-tab-court-debate",
+  },
   intelligence: {
     icon: Radar,
     label: "情报",
@@ -397,6 +403,21 @@ export function GamePage() {
                     : ""
                 }
               />
+            ) : mobileTab === "courtDebate" ? (
+              <CourtDebatePanel
+                scenario={scenario}
+                stats={state.stats}
+                historyLog={state.historyLog}
+                currentSituation={
+                  turnResults.length > 0
+                    ? turnResults[turnResults.length - 1].situation_update
+                    : ""
+                }
+                turnCount={state.turnCount}
+                turnResults={turnResults}
+                advisors={currentAdvisors}
+                courtDebateSession={state.courtDebate}
+              />
             ) : (
               <IntelligencePanel factions={currentFactions} />
             )}
@@ -413,6 +434,12 @@ export function GamePage() {
               "cabinet",
               () => setSideTab("cabinet"),
               sideTab === "cabinet",
+              "bottom",
+            )}
+            {renderTabButton(
+              "courtDebate",
+              () => setSideTab("courtDebate"),
+              sideTab === "courtDebate",
               "bottom",
             )}
             {renderTabButton(
@@ -438,6 +465,26 @@ export function GamePage() {
                     ? turnResults[turnResults.length - 1].situation_update
                     : ""
                 }
+              />
+            </div>
+            <div
+              id="panel-court-debate"
+              role="tabpanel"
+              className={sideTab === "courtDebate" ? "" : "hidden"}
+            >
+              <CourtDebatePanel
+                scenario={scenario}
+                stats={state.stats}
+                historyLog={state.historyLog}
+                currentSituation={
+                  turnResults.length > 0
+                    ? turnResults[turnResults.length - 1].situation_update
+                    : ""
+                }
+                turnCount={state.turnCount}
+                turnResults={turnResults}
+                advisors={currentAdvisors}
+                courtDebateSession={state.courtDebate}
               />
             </div>
             <div
@@ -470,6 +517,12 @@ export function GamePage() {
           "cabinet",
           () => setMobileTab("cabinet"),
           mobileTab === "cabinet",
+          "top",
+        )}
+        {renderTabButton(
+          "courtDebate",
+          () => setMobileTab("courtDebate"),
+          mobileTab === "courtDebate",
           "top",
         )}
         {renderTabButton(

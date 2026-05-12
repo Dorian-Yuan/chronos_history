@@ -7,6 +7,7 @@ import type {
   AdvisorRole,
   AdvisorData,
   CounselMessage,
+  CourtDebateMessage,
 } from "@/types";
 import type { AIMessage } from "@/types/ai-provider";
 import { createProvider, withRetry } from "@/lib/ai";
@@ -16,6 +17,7 @@ import {
   turnResultSchema,
   analysisSchema,
   counselSchema,
+  courtDebateSchema,
 } from "./schemas";
 import { checkObjectForSensitiveContent } from "./sensitive-content";
 
@@ -932,6 +934,202 @@ ${historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n")}`;
       }
 
       return analysis;
+    },
+    { maxRetries: 3 },
+  );
+}
+
+export interface CourtDebateResponse {
+  speaker_role: AdvisorRole;
+  speaker_name: string;
+  stance: "support" | "oppose" | "supplement";
+  content: string;
+}
+
+const COURT_DEBATE_SYSTEM_PROMPT = `你是Chronos历史推演引擎的廷议辩论系统。你负责模拟内阁成员在朝堂上的公开辩论。
+
+【核心规则】
+1. 每次只有一位内阁成员发言，由你根据议题和当前辩论内容选择最合适的发言人
+2. 选择标准：与当前议题/上一次发言关联度最高的成员，或最有理由驳斥/补充的成员
+3. 发言人不能连续发言（上一位发言者不可立即再次发言）
+4. 回应必须体现该角色的立场、倾向和秘密动机
+5. 秘密动机是每个人内心的真实想法，其他人并不知道——但在公开辩论中，秘密动机会微妙地影响发言倾向，而不会直接暴露
+6. 每次发言必须明确表态：支持、驳斥或补充上一位发言者（首轮对玩家议题表态）
+7. 发言控制在80-150字，言简意赅，像朝堂奏对而非私下闲聊
+8. 必须使用简体中文
+
+【语言与时代约束——极其重要】
+发言的语言风格必须严格符合当前剧本的历史文化时代：
+- 中国古代朝代：使用文言或半文言，如"臣以为""启奏陛下""微臣愚见"等
+- 欧洲/西方文明：使用符合宫廷/议会风格的译法，如"陛下""我认为""据我所知"等，绝对禁止使用"臣以为""微臣"等中国朝堂用语
+- 日本/中东/其他文明：使用符合该文化朝堂风格的用语
+- 核心原则：让玩家感觉身临其境，绝不出戏
+
+【内阁成员信息】
+{advisors_info}
+
+【当前局势】
+国家：{nation_name}
+国君：{leader_title}
+当前纪年：{current_date}
+当前属性：稳定{stability} 经济{economy} 军事{military} 声望{international_standing}
+当前局势：{situation_update}
+近期历史：{recent_history}
+
+【辩论议题】
+{topic}
+
+【辩论历史】
+{debate_history}
+
+【上一位发言者】
+{last_speaker}
+
+【剩余轮数】
+还剩{remaining_rounds}轮辩论
+
+【回应要求】
+- 选择最合适的发言人（不可与上一位相同）
+- 体现角色在公开场合的立场（可能与私下密谈不同，公开场合更谨慎/更官方）
+- 秘密动机应微妙影响发言倾向，但不可直接暴露
+- 驳斥时要有理有据，不可人身攻击
+- 补充时要有新信息或新视角
+- 支持时可以追加论据或举例
+- 语言风格必须符合当前历史文化时代，绝不出戏${JSON_OUTPUT_INSTRUCTION}`;
+
+const COURT_DEBATE_SCHEMA_PROMPT = `
+
+【输出 JSON 结构】你必须严格按以下结构返回JSON：
+{
+  "speaker_role": "General或Diplomat或Intel或Scholar或Merchant",
+  "speaker_name": "发言顾问姓名（必须与内阁成员名单一致）",
+  "stance": "support或oppose或supplement",
+  "content": "廷议发言（简体中文，80-150字，语言风格须符合历史文化时代）"
+}
+注意：
+- speaker_name必须与内阁成员名单中的名字完全一致
+- stance必须三选一
+- content的语言风格必须符合当前剧本的历史文化时代`;
+
+export async function courtDebate(
+  topic: string,
+  scenario: ScenarioData,
+  stats: GameStats,
+  historyLog: string[],
+  currentSituation: string,
+  currentDateDisplay: string,
+  advisors: AdvisorData[],
+  debateHistory: CourtDebateMessage[],
+  remainingRounds: number,
+): Promise<CourtDebateResponse> {
+  const provider = getProvider();
+
+  const advisorsInfo = advisors
+    .map(
+      (a) =>
+        `- ${ROLE_LABELS[a.role]}（${a.role}）：${a.name}，倾向：${a.bias}，秘密动机：${a.hidden_motive || "无"}`,
+    )
+    .join("\n");
+
+  const recentHistory =
+    historyLog.length > 0
+      ? historyLog
+          .slice(-2)
+          .map((h, i) => `回合${historyLog.length - 1 + i}: ${h}`)
+          .join("\n")
+      : "（无）";
+
+  const debateHistoryText =
+    debateHistory.length > 0
+      ? debateHistory
+          .map((msg) => {
+            if (msg.role === "user") {
+              return `【{leader_title}】${msg.content}`;
+            }
+            const stanceLabel =
+              msg.stance === "support"
+                ? "支持"
+                : msg.stance === "oppose"
+                  ? "驳斥"
+                  : "补充";
+            return `【${ROLE_LABELS[msg.advisorRole!] ?? msg.advisorRole} ${msg.advisorName}（${stanceLabel}）】${msg.content}`;
+          })
+          .join("\n")
+      : "（尚无发言）";
+
+  const lastSpeaker =
+    debateHistory.length > 0 &&
+    debateHistory[debateHistory.length - 1].role === "advisor"
+      ? `${debateHistory[debateHistory.length - 1].advisorName}（${ROLE_LABELS[debateHistory[debateHistory.length - 1].advisorRole!] ?? debateHistory[debateHistory.length - 1].advisorRole}）`
+      : "无（首轮发言）";
+
+  const systemPrompt = COURT_DEBATE_SYSTEM_PROMPT.replace(
+    "{advisors_info}",
+    advisorsInfo,
+  )
+    .replace("{nation_name}", scenario.player_context.nation_name)
+    .replace(/{leader_title}/g, scenario.player_context.leader_title)
+    .replace("{current_date}", currentDateDisplay || scenario.start_date)
+    .replace("{stability}", String(stats.stability))
+    .replace("{economy}", String(stats.economy))
+    .replace("{military}", String(stats.military))
+    .replace("{international_standing}", String(stats.international_standing))
+    .replace("{situation_update}", currentSituation || "暂无特别局势变化")
+    .replace("{recent_history}", recentHistory)
+    .replace("{topic}", topic)
+    .replace("{debate_history}", debateHistoryText)
+    .replace("{last_speaker}", lastSpeaker)
+    .replace("{remaining_rounds}", String(remainingRounds));
+
+  const fullSystemPrompt = provider.supportsStructuredOutput()
+    ? systemPrompt
+    : systemPrompt + COURT_DEBATE_SCHEMA_PROMPT;
+
+  const userContent =
+    debateHistory.length === 0
+      ? `{leader_title}提出议题："${topic}"\n\n请选择最合适的内阁成员率先回应。`
+      : `请根据辩论历史，选择下一位最合适的内阁成员回应（不可与上一位发言者相同）。`;
+
+  const messages: AIMessage[] = [
+    { role: "system", content: fullSystemPrompt },
+    {
+      role: "user",
+      content: userContent.replace(
+        /{leader_title}/g,
+        scenario.player_context.leader_title,
+      ),
+    },
+  ];
+
+  return withRetry(
+    async () => {
+      const response = await provider.sendMessage(messages, {
+        responseFormat: "json",
+        responseSchema: courtDebateSchema,
+        temperature: 0.8,
+        maxTokens: 1500,
+      });
+
+      const result = parseResponse<CourtDebateResponse>(
+        response.content,
+        provider,
+      );
+
+      if (!result.content?.trim()) {
+        throw new Error("廷议发言为空");
+      }
+
+      if (!result.speaker_role || !result.speaker_name || !result.stance) {
+        throw new Error("廷议响应缺少必要字段");
+      }
+
+      if (checkObjectForSensitiveContent(result)) {
+        throw new Error(
+          "Generated content contains sensitive keywords, retrying...",
+        );
+      }
+
+      return result;
     },
     { maxRetries: 3 },
   );

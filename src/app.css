@@ -139,6 +139,7 @@
 
   --color-tab-chronicle: #2ece8b;
   --color-tab-cabinet: #e8833a;
+  --color-tab-court-debate: #c9a84c;
   --color-tab-intelligence: #4a9ef5;
 }
 
@@ -193,6 +194,7 @@
   --color-role-merchant: var(--color-role-merchant);
   --color-tab-chronicle: var(--color-tab-chronicle);
   --color-tab-cabinet: var(--color-tab-cabinet);
+  --color-tab-court-debate: var(--color-tab-court-debate);
   --color-tab-intelligence: var(--color-tab-intelligence);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);

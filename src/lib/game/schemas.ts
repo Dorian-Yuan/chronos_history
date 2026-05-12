@@ -435,3 +435,24 @@ export const counselSchema = {
   },
   required: ["response"],
 };
+
+export const courtDebateSchema = {
+  type: "object" as const,
+  additionalProperties: false,
+  properties: {
+    speaker_role: {
+      type: "string" as const,
+      enum: ["General", "Diplomat", "Intel", "Scholar", "Merchant"],
+    },
+    speaker_name: { type: "string" as const },
+    stance: {
+      type: "string" as const,
+      enum: ["support", "oppose", "supplement"],
+    },
+    content: {
+      type: "string" as const,
+      description: "廷议发言（简体中文，80-150字）",
+    },
+  },
+  required: ["speaker_role", "speaker_name", "stance", "content"],
+};

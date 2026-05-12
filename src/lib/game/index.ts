@@ -7,13 +7,16 @@ export {
   evaluateTurn,
   analyzeGame,
   counselAdvisor,
+  courtDebate,
 } from "./ai-calls";
+export type { CourtDebateResponse } from "./ai-calls";
 export {
   scenarioCoreSchema,
   scenarioSchema,
   turnResultSchema,
   analysisSchema,
   counselSchema,
+  courtDebateSchema,
 } from "./schemas";
 export { checkObjectForSensitiveContent } from "./sensitive-content";
 export {
