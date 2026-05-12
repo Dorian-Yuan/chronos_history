@@ -81,7 +81,7 @@ export function DecisionOptionsModal({
           <p className="text-xs text-text-tertiary font-serif">
             选择一项或多项决策方向，确认后将填入输入框
           </p>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {options.map((option, index) => {
               const isSelected = selectedIndices.has(index);
               return (

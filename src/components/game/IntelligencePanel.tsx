@@ -21,7 +21,7 @@ function getAttitudeStyle(attitude: string): string {
 export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   if (!factions.length) {
     return (
-      <section className="flex flex-col gap-4 px-5 py-4" aria-label="情报面板">
+      <section className="flex flex-col gap-4 px-5 py-2" aria-label="情报面板">
         <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
           <p className="text-xs font-serif">暂无情报信息</p>
           <p className="text-xs mt-1 text-text-tertiary/60 font-serif">
@@ -33,7 +33,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
   }
 
   return (
-    <section className="flex flex-col gap-4 px-5 py-4" aria-label="情报面板">
+    <section className="flex flex-col gap-4 px-5 py-2" aria-label="情报面板">
       <ul className="flex flex-col gap-4">
         {factions.map((faction, idx) => (
           <li

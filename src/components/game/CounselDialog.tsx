@@ -166,7 +166,7 @@ export function CounselDialog({
             <h2 className="font-serif text-lg font-semibold text-text-primary">
               {advisor.name} · {config?.label}
             </h2>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-secondary/10 text-accent-secondary font-serif">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-accent-secondary/10 text-accent-secondary font-serif self-center">
               私下密谈
             </span>
           </div>
@@ -196,10 +196,10 @@ export function CounselDialog({
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-3 py-2 text-xs font-serif leading-relaxed ${
+                className={`max-w-[80%] rounded-lg text-xs font-serif leading-relaxed ${
                   msg.role === "user"
-                    ? "bg-accent-primary/15 text-text-primary"
-                    : "bg-bg-tertiary text-text-secondary"
+                    ? "bg-accent-primary/15 text-text-primary px-3 py-2"
+                    : "bg-bg-tertiary text-text-secondary px-3 py-2"
                 }`}
                 style={
                   msg.role === "assistant"
@@ -248,7 +248,8 @@ export function CounselDialog({
               placeholder={`向${advisor.name}提问...`}
               rows={1}
               disabled={isLoading}
-              className="flex-1 resize-none rounded-md border border-border bg-bg-secondary px-3 py-2 text-xs font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent-primary/50 disabled:opacity-40 max-h-20"
+              className="flex-1 resize-none rounded-md border border-border bg-bg-secondary text-xs font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent-primary/50 disabled:opacity-40 max-h-20"
+              style={{ padding: "0.5rem 0.75rem" }}
             />
             <button
               onClick={handleSend}

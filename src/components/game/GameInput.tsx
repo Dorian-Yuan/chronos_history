@@ -68,7 +68,7 @@ export function GameInput({
   const hasDecisionOptions = decisionOptions.length > 0;
 
   return (
-    <div className="px-5">
+    <div className="px-5 py-2">
       <div className="flex items-center gap-2.5">
         {hasDecisionOptions && (
           <button
@@ -81,7 +81,7 @@ export function GameInput({
           </button>
         )}
 
-        <div className="flex-1 flex items-center rounded-[var(--radius-xl)] border border-border bg-bg-card shadow-sm pl-4 pr-2 py-1.5 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all">
+        <div className="flex-1 flex items-center rounded-[var(--radius-md)] border border-border bg-bg-card shadow-sm px-3 focus-within:border-accent-primary/50 focus-within:shadow-glow transition-all h-9">
           <textarea
             ref={textareaRef}
             value={input}
@@ -90,7 +90,7 @@ export function GameInput({
             placeholder={placeholder || "下达指令..."}
             aria-label="决策输入"
             rows={1}
-            className="flex-1 resize-none bg-transparent py-1.5 pl-1 text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none"
+            className="flex-1 resize-none bg-transparent text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none self-center leading-none"
             disabled={disabled}
           />
         </div>

@@ -50,7 +50,7 @@ export function CabinetPanel({
 
   if (!advisors.length) {
     return (
-      <div className="flex flex-col gap-4 px-5 py-4">
+      <div className="flex flex-col gap-4 px-5 py-2">
         <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
           <p className="text-xs font-serif">暂无顾问信息</p>
           <p className="text-xs mt-1 text-text-tertiary/60 font-serif">
@@ -62,7 +62,7 @@ export function CabinetPanel({
   }
 
   return (
-    <div className="flex flex-col gap-4 px-5 py-4">
+    <div className="flex flex-col gap-4 px-5 py-2">
       <div className="flex flex-col gap-4">
         {advisors.map((advisor) => (
           <AdvisorCard
