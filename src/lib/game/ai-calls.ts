@@ -27,6 +27,90 @@ const REQUIRED_ADVISOR_ROLES: AdvisorRole[] = [
   "Merchant",
 ];
 
+function fixInitialStats(
+  stats: ScenarioData["initial_stats"],
+): ScenarioData["initial_stats"] {
+  const min = 200;
+  const max = 320;
+  const sum =
+    stats.stability +
+    stats.economy +
+    stats.military +
+    stats.international_standing;
+
+  if (sum >= min && sum <= max) return stats;
+
+  let delta: number;
+  if (sum < min) {
+    delta = Math.ceil((min - sum + 4) / 4);
+  } else {
+    delta = -Math.ceil((sum - max + 4) / 4);
+  }
+
+  const fixed = {
+    stability: Math.max(0, Math.min(100, stats.stability + delta)),
+    economy: Math.max(0, Math.min(100, stats.economy + delta)),
+    military: Math.max(0, Math.min(100, stats.military + delta)),
+    international_standing: Math.max(
+      0,
+      Math.min(100, stats.international_standing + delta),
+    ),
+  };
+
+  console.log(
+    `[fixInitialStats] 总和${sum}超出[${min},${max}]，每维调整${delta}，修复后总和=${fixed.stability + fixed.economy + fixed.military + fixed.international_standing}`,
+  );
+  return fixed;
+}
+
+function fixInternalFactions(scenario: ScenarioData): ScenarioData {
+  if (scenario.play_style !== "Conquest" || !Array.isArray(scenario.factions)) {
+    return scenario;
+  }
+
+  const internalKeywords = [
+    "主和",
+    "主战",
+    "改革",
+    "保守",
+    "宫廷",
+    "宦官",
+    "外戚",
+    "边军",
+    "禁军",
+    "军阀",
+    "商盟",
+    "行会",
+    "商会",
+    "贵族",
+    "地主",
+    "农民",
+    "百姓",
+    "朝臣",
+  ];
+
+  const internalFactions = scenario.factions.filter((f) => {
+    const text = `${f.name} ${f.description} ${f.attitude}`;
+    return internalKeywords.some((kw) => text.includes(kw));
+  });
+
+  if (internalFactions.length <= 1) return scenario;
+
+  const firstInternalName = internalFactions[0].name;
+  const fixedFactions = scenario.factions.filter((f) => {
+    if (f.name === firstInternalName) return true;
+    const text = `${f.name} ${f.description} ${f.attitude}`;
+    const isInternal = internalKeywords.some((kw) => text.includes(kw));
+    return !isInternal;
+  });
+
+  console.log(
+    `[fixInternalFactions] Conquest模式内部势力${internalFactions.length}个超限，保留首个"${firstInternalName}"，修复后派系数=${fixedFactions.length}`,
+  );
+
+  return { ...scenario, factions: fixedFactions };
+}
+
 function validateScenario(data: ScenarioData): void {
   const errors: string[] = [];
 
@@ -429,7 +513,7 @@ export async function generateScenario(
 
 请生成顾问、派系和初始决策选项。`;
 
-  const detailsResult = await withRetry(
+  const scenario = await withRetry(
     async () => {
       const response = await provider.sendMessage(
         [
@@ -446,50 +530,62 @@ export async function generateScenario(
         },
       );
 
-      return parseResponse<{
+      const detailsResult = parseResponse<{
         initial_advisors: ScenarioData["initial_advisors"];
         factions: ScenarioData["factions"];
         initial_decision_options?: ScenarioData["initial_decision_options"];
       }>(response.content, provider);
+
+      const merged: ScenarioData = {
+        id: coreResult.id || `scenario_${Date.now()}`,
+        title: coreResult.title || "",
+        description: coreResult.description || "",
+        player_context: coreResult.player_context || {
+          nation_name: "",
+          leader_title: "",
+          background_summary: "",
+        },
+        initial_stats: fixInitialStats(
+          coreResult.initial_stats || {
+            stability: 50,
+            economy: 50,
+            military: 50,
+            international_standing: 50,
+          },
+        ),
+        hidden_real_event: coreResult.hidden_real_event || "",
+        play_style: coreResult.play_style || playStyle,
+        start_date: coreResult.start_date || "",
+        initial_advisors: detailsResult.initial_advisors || [],
+        factions: detailsResult.factions || [],
+        initial_decision_options: detailsResult.initial_decision_options,
+      };
+
+      const fixedScenario = fixInternalFactions(merged);
+
+      if (fixedScenario.factions.length < 3) {
+        throw new Error(
+          `修复内部势力后派系仅剩${fixedScenario.factions.length}个，不足3个，需重新生成`,
+        );
+      }
+
+      validateScenario(fixedScenario);
+
+      if (checkObjectForSensitiveContent(fixedScenario)) {
+        throw new Error(
+          "Generated content contains sensitive keywords, retrying...",
+        );
+      }
+
+      return fixedScenario;
     },
     { maxRetries: 3 },
   );
 
   console.log("[generateScenario] Stage 2 details:", {
-    advisors: detailsResult.initial_advisors?.length,
-    factions: detailsResult.factions?.length,
+    advisors: scenario.initial_advisors?.length,
+    factions: scenario.factions?.length,
   });
-
-  const scenario: ScenarioData = {
-    id: coreResult.id || `scenario_${Date.now()}`,
-    title: coreResult.title || "",
-    description: coreResult.description || "",
-    player_context: coreResult.player_context || {
-      nation_name: "",
-      leader_title: "",
-      background_summary: "",
-    },
-    initial_stats: coreResult.initial_stats || {
-      stability: 50,
-      economy: 50,
-      military: 50,
-      international_standing: 50,
-    },
-    hidden_real_event: coreResult.hidden_real_event || "",
-    play_style: coreResult.play_style || playStyle,
-    start_date: coreResult.start_date || "",
-    initial_advisors: detailsResult.initial_advisors || [],
-    factions: detailsResult.factions || [],
-    initial_decision_options: detailsResult.initial_decision_options,
-  };
-
-  validateScenario(scenario);
-
-  if (checkObjectForSensitiveContent(scenario)) {
-    throw new Error(
-      "Generated content contains sensitive keywords, retrying...",
-    );
-  }
 
   return scenario;
 }
