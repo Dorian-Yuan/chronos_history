@@ -1,9 +1,15 @@
-import type { EndGameAnalysis, GameStats, GameOutcome } from "@/types";
+import type {
+  EndGameAnalysis,
+  GameStats,
+  GameOutcome,
+  ConditionalOutcome,
+} from "@/types";
 
 interface EndGameReportProps {
   analysis: EndGameAnalysis;
   stats: GameStats;
   outcome: GameOutcome;
+  conditionalOutcome?: ConditionalOutcome;
   turnCount: number;
 }
 
@@ -43,6 +49,7 @@ export function EndGameReport({
   analysis,
   stats,
   outcome,
+  conditionalOutcome,
   turnCount,
 }: EndGameReportProps) {
   const outcomeConfig = OUTCOME_CONFIG[outcome];
@@ -51,6 +58,9 @@ export function EndGameReport({
     Object.values(stats).reduce((a, b) => a + b, 0) / 4,
   );
 
+  const outcomeTitle = conditionalOutcome?.title || outcomeConfig.label;
+  const outcomeDescription = conditionalOutcome?.description;
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-5 md:p-8">
       <div className="text-center space-y-4 py-4">
@@ -58,8 +68,13 @@ export function EndGameReport({
         <div
           className={`text-3xl font-display font-bold ${outcomeConfig.colorClass}`}
         >
-          {outcomeConfig.label}
+          {outcomeTitle}
         </div>
+        {outcomeDescription && (
+          <div className="font-serif text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
+            {outcomeDescription}
+          </div>
+        )}
         <div className="text-sm text-text-tertiary">
           历经 {turnCount} 回合 · 综合评分 {avgStat}
         </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AdvisorData, AdvisorRole } from "@/types";
+import type { AdvisorData, AdvisorRole, AdvisorStatus } from "@/types";
 import {
   Shield,
   Scroll,
@@ -13,6 +13,13 @@ interface AdvisorCardProps {
   advisor: AdvisorData;
   onCounsel?: (advisor: AdvisorData) => void;
 }
+
+const STATUS_LABELS: Record<AdvisorStatus, string> = {
+  active: "",
+  dead: "已故",
+  exiled: "已流放",
+  retired: "已致仕",
+};
 
 const ROLE_CONFIG: Record<
   AdvisorRole,
@@ -67,6 +74,8 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
   if (!config) return null;
 
   const Icon = config.icon;
+  const isActive = !advisor.status || advisor.status === "active";
+  const statusLabel = advisor.status ? STATUS_LABELS[advisor.status] : "";
 
   const roleColor = `var(${config.colorVar})`;
   const roleBgColor = `var(${config.bgColorVar})`;
@@ -74,7 +83,7 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
 
   return (
     <div
-      className="rounded-lg border bg-bg-card p-5 transition-all hover:border-border-hover"
+      className={`rounded-lg border bg-bg-card p-5 transition-all ${isActive ? "hover:border-border-hover" : "opacity-50"}`}
       style={{ borderColor: roleBorderColor }}
     >
       <div className="flex items-center gap-2.5">
@@ -90,6 +99,11 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
         <span className="text-sm font-serif text-text-secondary">
           // {advisor.name}
         </span>
+        {statusLabel && (
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-danger/10 text-accent-danger font-serif">
+            {statusLabel}
+          </span>
+        )}
       </div>
 
       <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
@@ -101,7 +115,7 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
           倾向：{advisor.bias}
         </div>
         <div className="mt-2 flex items-center justify-between">
-          {onCounsel && (
+          {onCounsel && isActive && (
             <button
               onClick={() => onCounsel(advisor)}
               className="flex items-center gap-1 text-xs font-serif text-accent-secondary/70 hover:text-accent-secondary transition-colors"

@@ -8,6 +8,10 @@ export type AdvisorRole =
   | "Scholar"
   | "Merchant";
 
+export type AdvisorStatus = "active" | "dead" | "exiled" | "retired";
+
+export type FactionLeaderStatus = "active" | "dead" | "exiled" | "overthrown";
+
 export interface PlayerContext {
   nation_name: string;
   leader_title: string;
@@ -20,11 +24,13 @@ export interface AdvisorData {
   advice: string;
   bias: string;
   hidden_motive?: string;
+  status?: AdvisorStatus;
 }
 
 export interface FactionData {
   name: string;
   leader?: string;
+  leader_status?: FactionLeaderStatus;
   description: string;
   strength: string;
   weakness: string;

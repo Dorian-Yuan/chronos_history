@@ -1,4 +1,9 @@
-import type { AdvisorData, FactionData } from "./scenario";
+import type {
+  AdvisorData,
+  FactionData,
+  AdvisorStatus,
+  FactionLeaderStatus,
+} from "./scenario";
 
 export interface DecisionOption {
   title: string;
@@ -16,6 +21,11 @@ export interface StatsDelta {
 export interface FactionUpdate extends FactionData {
   is_new: boolean;
   is_destroyed: boolean;
+  leader_status?: FactionLeaderStatus;
+}
+
+export interface AdvisorUpdate extends AdvisorData {
+  status?: AdvisorStatus;
 }
 
 export interface TurnResult {
@@ -26,7 +36,7 @@ export interface TurnResult {
   rumor: string;
   historian_commentary: string;
   stats_delta: StatsDelta;
-  advisors: AdvisorData[];
+  advisors: AdvisorUpdate[];
   factions_update: FactionUpdate[];
   hidden_consequences: string;
   decision_options: DecisionOption[];

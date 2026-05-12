@@ -17,8 +17,13 @@ import {
   CourtDebatePanel,
   EndGameConfirmModal,
 } from "@/components/game";
-import type { TurnResult, ScenarioData, FactionData } from "@/types";
-import { determineOutcome, checkGameOver, clampStat } from "@/types";
+import type {
+  TurnResult,
+  ScenarioData,
+  FactionData,
+  AdvisorData,
+} from "@/types";
+import { determineConditionalOutcome, checkGameOver, clampStat } from "@/types";
 import {
   Settings,
   Save,
@@ -39,15 +44,19 @@ type SideTab = "cabinet" | "intelligence" | "courtDebate";
 function safeGetAdvisors(
   scenario: ScenarioData | null,
   turnResults: TurnResult[],
+  currentAdvisors: AdvisorData[],
 ) {
-  if (!scenario) return [];
+  const activeAdvisors = currentAdvisors.filter(
+    (a) => !a.status || a.status === "active",
+  );
+  if (activeAdvisors.length > 0) return activeAdvisors;
   if (turnResults.length > 0) {
     const last = turnResults[turnResults.length - 1];
     if (Array.isArray(last?.advisors) && last.advisors.length > 0) {
       return last.advisors;
     }
   }
-  return Array.isArray(scenario.initial_advisors)
+  return Array.isArray(scenario?.initial_advisors)
     ? scenario.initial_advisors
     : [];
 }
@@ -98,7 +107,11 @@ export function GamePage() {
   const scenario = state.scenario;
   const turnResults = state.turnResults;
 
-  const currentAdvisors = safeGetAdvisors(scenario, turnResults);
+  const currentAdvisors = safeGetAdvisors(
+    scenario,
+    turnResults,
+    state.currentAdvisors,
+  );
   const currentFactions = safeGetFactions(scenario);
   const currentDelta = safeGetDelta(turnResults);
 
@@ -141,13 +154,7 @@ export function GamePage() {
 
         if (checkGameOver(state, result)) {
           try {
-            const analysis = await analyzeGame(scenario, [
-              ...state.historyLog,
-              result.hidden_consequences,
-            ]);
-            dispatch({ type: "GAME_OVER", analysis });
-
-            const outcome = determineOutcome({
+            const newStats = {
               stability: clampStat(
                 state.stats.stability + result.stats_delta.stability,
               ),
@@ -161,7 +168,25 @@ export function GamePage() {
                 state.stats.international_standing +
                   result.stats_delta.international_standing,
               ),
+            };
+            const newFactions = state.scenario
+              ? [...state.scenario.factions]
+              : [];
+            const conditionalOutcome = determineConditionalOutcome({
+              stats: newStats,
+              playStyle: scenario.play_style,
+              factions: newFactions,
+              turnCount: state.turnCount + 1,
             });
+
+            const analysis = await analyzeGame(
+              scenario,
+              [...state.historyLog, result.hidden_consequences],
+              conditionalOutcome,
+            );
+            dispatch({ type: "GAME_OVER", analysis });
+
+            const outcome = conditionalOutcome.base;
 
             addHistoryRecord({
               id: `history_${Date.now()}`,
@@ -203,7 +228,7 @@ export function GamePage() {
         setIsLoading(false);
       }
     },
-    [isLoading, scenario, state, dispatch],
+    [isLoading, scenario, state, currentAdvisors, turnResults, dispatch],
   );
 
   const handleEndGame = useCallback(async () => {
@@ -211,10 +236,21 @@ export function GamePage() {
     setIsLoading(true);
     setError(null);
     try {
-      const analysis = await analyzeGame(scenario, state.historyLog);
+      const conditionalOutcome = determineConditionalOutcome({
+        stats: state.stats,
+        playStyle: scenario.play_style,
+        factions: scenario.factions,
+        turnCount: state.turnCount,
+      });
+
+      const analysis = await analyzeGame(
+        scenario,
+        state.historyLog,
+        conditionalOutcome,
+      );
       dispatch({ type: "GAME_OVER", analysis });
 
-      const outcome = determineOutcome(state.stats);
+      const outcome = conditionalOutcome.base;
       addHistoryRecord({
         id: `history_${Date.now()}`,
         scenarioTitle: scenario.title,

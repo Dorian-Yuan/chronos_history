@@ -5,6 +5,7 @@ import type {
   TurnResult,
   EndGameAnalysis,
   FactionData,
+  AdvisorData,
   CounselSession,
   CourtDebateMessage,
   CourtDebateSession,
@@ -37,12 +38,14 @@ function applyStatsDelta(
   turnCount: number,
 ): GameStats {
   const config = getAppConfig();
-  const isEarlyGame = turnCount <= config.earlyGameProtectionTurns;
+  const protectionTurns = config.earlyGameProtectionTurns;
 
   const applyDelta = (current: number, change: number): number => {
     let result = current + change;
-    if (isEarlyGame && result < 10) {
-      result = Math.max(10, current);
+    if (turnCount <= Math.max(1, protectionTurns - 2)) {
+      if (result < 15) result = Math.max(15, result);
+    } else if (turnCount <= protectionTurns) {
+      if (result < 10) result = Math.max(10, result);
     }
     return clampStat(result);
   };
@@ -92,6 +95,49 @@ function normalizeAttitude(attitude: string): string {
   return "中立";
 }
 
+function updateAdvisors(
+  currentAdvisors: AdvisorData[],
+  newAdvisors: AdvisorData[],
+): AdvisorData[] {
+  const result: AdvisorData[] = [];
+  const processedRoles = new Set<string>();
+
+  for (const newAdvisor of newAdvisors) {
+    const existing = currentAdvisors.find(
+      (a) =>
+        a.role === newAdvisor.role &&
+        a.status !== "dead" &&
+        a.status !== "exiled" &&
+        a.status !== "retired",
+    );
+    if (existing && existing.name !== newAdvisor.name) {
+      result.push({
+        ...existing,
+        status: newAdvisor.status || "retired",
+      });
+    }
+    result.push({
+      ...newAdvisor,
+      status: "active",
+    });
+    processedRoles.add(newAdvisor.role);
+  }
+
+  for (const oldAdvisor of currentAdvisors) {
+    if (
+      !processedRoles.has(oldAdvisor.role) &&
+      oldAdvisor.status === "active"
+    ) {
+      result.push({
+        ...oldAdvisor,
+        status: "retired",
+      });
+    }
+  }
+
+  return result;
+}
+
 function updateFactions(
   currentFactions: FactionData[],
   updates: TurnResult["factions_update"],
@@ -106,6 +152,7 @@ function updateFactions(
           ...result[idx],
           is_destroyed: true,
           attitude: "已灭亡",
+          leader_status: update.leader_status || result[idx].leader_status,
         };
       }
       continue;
@@ -121,6 +168,7 @@ function updateFactions(
         needs: update.needs ?? result[idx].needs,
         attitude: normalizeAttitude(update.attitude ?? result[idx].attitude),
         leader: update.leader ?? result[idx].leader,
+        leader_status: update.leader_status || result[idx].leader_status,
         is_new: false,
       };
     } else if (update.is_new) {
@@ -132,6 +180,7 @@ function updateFactions(
         needs: update.needs,
         attitude: normalizeAttitude(update.attitude),
         leader: update.leader,
+        leader_status: update.leader_status,
         is_new: true,
       });
     }
@@ -147,6 +196,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "SET_SCENARIO": {
       const scenario = action.scenario;
+      const initialAdvisors = (scenario.initial_advisors || []).map((a) => ({
+        ...a,
+        status: "active" as const,
+      }));
       return {
         ...state,
         phase: "playing",
@@ -159,6 +212,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         turnResults: [],
         counselSessions: [],
         playerActions: [],
+        currentAdvisors: initialAdvisors,
       };
     }
 
@@ -179,6 +233,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           }
         : null;
 
+      const updatedAdvisors = updateAdvisors(
+        state.currentAdvisors,
+        result.advisors,
+      );
+
       return {
         ...state,
         stats: newStats,
@@ -189,6 +248,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         turnResults: [...state.turnResults, result],
         counselSessions: [],
         playerActions: [...state.playerActions, action.playerAction],
+        currentAdvisors: updatedAdvisors,
       };
     }
 
@@ -209,12 +269,22 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
                 .courtDebate as CourtDebateSession,
             ]
           : []);
+      const loadedAdvisors = loaded.currentAdvisors ?? [];
+      const hasActiveAdvisors = loadedAdvisors.some(
+        (a) => a.status === "active" || !a.status,
+      );
       return {
         ...loaded,
         turnResults: loaded.turnResults ?? [],
         counselSessions: loaded.counselSessions ?? [],
         courtDebateSessions,
         playerActions: loaded.playerActions ?? [],
+        currentAdvisors: hasActiveAdvisors
+          ? loadedAdvisors
+          : (loaded.turnResults?.length > 0
+              ? loaded.turnResults[loaded.turnResults.length - 1].advisors
+              : (loaded.scenario?.initial_advisors ?? [])
+            ).map((a) => ({ ...a, status: "active" as const })),
       };
     }
 

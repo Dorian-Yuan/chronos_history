@@ -64,13 +64,23 @@ export function CabinetPanel({
   return (
     <div className="flex flex-col gap-4 px-5 py-2">
       <div className="flex flex-col gap-4">
-        {advisors.map((advisor) => (
-          <AdvisorCard
-            key={advisor.role}
-            advisor={advisor}
-            onCounsel={scenario ? (a) => setCounselAdvisor(a) : undefined}
-          />
-        ))}
+        {advisors
+          .filter((a) => !a.status || a.status === "active")
+          .map((advisor) => (
+            <AdvisorCard
+              key={advisor.role}
+              advisor={advisor}
+              onCounsel={scenario ? (a) => setCounselAdvisor(a) : undefined}
+            />
+          ))}
+        {advisors
+          .filter((a) => a.status && a.status !== "active")
+          .map((advisor) => (
+            <AdvisorCard
+              key={`${advisor.role}-${advisor.name}`}
+              advisor={advisor}
+            />
+          ))}
       </div>
 
       {counselAdvisor && scenario && (

@@ -1,9 +1,16 @@
-import type { FactionData } from "@/types";
+import type { FactionData, FactionLeaderStatus } from "@/types";
 import { Swords, Skull, TrendingUp, AlertTriangle, Target } from "lucide-react";
 
 interface IntelligencePanelProps {
   factions: FactionData[];
 }
+
+const LEADER_STATUS_LABELS: Record<FactionLeaderStatus, string> = {
+  active: "",
+  dead: "已故",
+  exiled: "已流放",
+  overthrown: "已推翻",
+};
 
 const ATTITUDE_STYLES: Record<string, string> = {
   敌对: "bg-status-error-bg text-status-error-text border border-status-error-border",
@@ -93,6 +100,12 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                 {faction.leader && (
                   <span className="text-sm font-serif text-text-secondary">
                     // {faction.leader}
+                    {faction.leader_status &&
+                      faction.leader_status !== "active" && (
+                        <span className="text-[10px] ml-1 px-1.5 py-0.5 rounded bg-accent-danger/10 text-accent-danger font-serif">
+                          {LEADER_STATUS_LABELS[faction.leader_status]}
+                        </span>
+                      )}
                   </span>
                 )}
               </div>

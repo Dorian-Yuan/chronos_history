@@ -1,6 +1,6 @@
 import { useGameState, useGameDispatch } from "@/lib/game";
 import { EndGameReport } from "@/components/game";
-import { determineOutcome } from "@/types";
+import { determineConditionalOutcome } from "@/types";
 
 export function EndPage() {
   const state = useGameState();
@@ -8,18 +8,29 @@ export function EndPage() {
 
   if (!state.endGameAnalysis || !state.scenario) return null;
 
-  const outcome = determineOutcome(state.stats);
+  const conditionalOutcome = determineConditionalOutcome({
+    stats: state.stats,
+    playStyle: state.scenario.play_style,
+    factions: state.scenario.factions,
+    turnCount: state.turnCount,
+  });
 
   return (
     <main className="h-full overflow-y-auto">
       <EndGameReport
         analysis={state.endGameAnalysis}
         stats={state.stats}
-        outcome={outcome}
+        outcome={conditionalOutcome.base}
+        conditionalOutcome={conditionalOutcome}
         turnCount={state.turnCount}
       />
 
-      <div className="flex justify-center gap-4 px-6 pt-4" style={{ paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom, 0px))' }}>
+      <div
+        className="flex justify-center gap-4 px-6 pt-4"
+        style={{
+          paddingBottom: "max(2.5rem, env(safe-area-inset-bottom, 0px))",
+        }}
+      >
         <button
           onClick={() => {
             dispatch({ type: "ENTER_SELECTION" });

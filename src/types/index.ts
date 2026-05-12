@@ -10,4 +10,8 @@ export type {
   CounselSession,
   CourtDebateMessage,
   CourtDebateSession,
+  BaseOutcome,
+  ConditionalOutcome,
+  OutcomeContext,
 } from "./game-state";
+export type { AdvisorStatus, FactionLeaderStatus } from "./scenario";
