@@ -17,7 +17,18 @@ import {
 } from "@/components/game";
 import type { TurnResult, ScenarioData, FactionData } from "@/types";
 import { determineOutcome, checkGameOver, clampStat } from "@/types";
-import { Settings, Save, BookOpen, Users, Radar, Home } from "lucide-react";
+import {
+  Settings,
+  Save,
+  BookOpen,
+  Users,
+  Radar,
+  Home,
+  Scale,
+  Coins,
+  Swords,
+  Globe,
+} from "lucide-react";
 import { useUIStore } from "@/stores";
 
 type SideTab = "cabinet" | "intelligence";
@@ -232,108 +243,111 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col gap-2">
-      {/* Merged identity + stat bar card */}
-      <div className="mx-5 mt-4 rounded-lg border border-border bg-bg-card shadow-sm">
-        {/* Identity row */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex flex-col gap-0.5 min-w-0 overflow-hidden">
-            <span className="text-base font-serif font-bold text-text-primary truncate">
-              {nationName}
-            </span>
-            <span className="text-xs font-serif text-accent-primary opacity-80 truncate">
-              // {leaderTitle}
-            </span>
+      {/* Merged identity + stat bar card - use px-5 wrapper to match ChroniclePanel/GameInput alignment */}
+      <div className="px-5 mt-4">
+        <div className="rounded-lg border border-border bg-bg-card shadow-sm">
+          {/* Identity row */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex flex-col gap-0.5 min-w-0 overflow-hidden">
+              <span className="text-base font-serif font-bold text-text-primary truncate">
+                {nationName}
+              </span>
+              <span className="text-xs font-serif text-accent-primary opacity-80 truncate">
+                // {leaderTitle}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 ml-2 shrink-0 pl-3 border-l border-border/50">
+              <button
+                onClick={() => dispatch({ type: "RESET" })}
+                className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
+                aria-label="返回主页"
+              >
+                <Home size={16} strokeWidth={1.5} />
+              </button>
+              <button
+                onClick={() => setShowSaveManager(true)}
+                className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
+                aria-label="存档管理"
+              >
+                <Save size={16} strokeWidth={1.5} />
+              </button>
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
+                aria-label="设置"
+              >
+                <Settings size={16} strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-1 ml-2 shrink-0 pl-3 border-l border-border/50">
-            <button
-              onClick={() => dispatch({ type: "RESET" })}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
-              aria-label="返回主页"
-            >
-              <Home size={16} strokeWidth={1.5} />
-            </button>
-            <button
-              onClick={() => setShowSaveManager(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
-              aria-label="存档管理"
-            >
-              <Save size={16} strokeWidth={1.5} />
-            </button>
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
-              aria-label="设置"
-            >
-              <Settings size={16} strokeWidth={1.5} />
-            </button>
-          </div>
-        </div>
-        {/* Divider */}
-        <div className="h-px bg-border mx-4" />
-        {/* Stat bars */}
-        <div
-          className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 py-3"
-          role="group"
-          aria-label="国家属性"
-        >
-          {[
-            { key: "stability" as const, label: "稳定性", icon: "Scale" },
-            { key: "economy" as const, label: "经济", icon: "Coins" },
-            { key: "military" as const, label: "军事", icon: "Swords" },
-            {
-              key: "international_standing" as const,
-              label: "国际声望",
-              icon: "Globe",
-            },
-          ].map(({ key, label }) => {
-            const value = state.stats[key];
-            const deltaValue = currentDelta?.[key] ?? 0;
-            const barColor =
-              value >= 70
-                ? "var(--color-accent-primary)"
-                : "var(--color-accent-secondary)";
-            return (
-              <div key={key}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-text-secondary">
-                    {label}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <span className="font-mono text-xs font-semibold text-text-primary">
-                      {value}
+          {/* Divider */}
+          <div className="h-px bg-border mx-4" />
+          {/* Stat bars */}
+          <div
+            className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 py-3"
+            role="group"
+            aria-label="国家属性"
+          >
+            {[
+              { key: "stability" as const, label: "稳定性", Icon: Scale },
+              { key: "economy" as const, label: "经济", Icon: Coins },
+              { key: "military" as const, label: "军事", Icon: Swords },
+              {
+                key: "international_standing" as const,
+                label: "国际声望",
+                Icon: Globe,
+              },
+            ].map(({ key, label, Icon }) => {
+              const value = state.stats[key];
+              const deltaValue = currentDelta?.[key] ?? 0;
+              const barColor =
+                value >= 70
+                  ? "var(--color-accent-primary)"
+                  : "var(--color-accent-secondary)";
+              return (
+                <div key={key}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-text-secondary flex items-center gap-1">
+                      <Icon size={10} className="text-text-tertiary" />
+                      {label}
                     </span>
-                    {deltaValue !== 0 && (
-                      <span
-                        className={`font-mono text-xs font-medium ${deltaValue > 0 ? "text-accent-primary" : "text-accent-danger"}`}
-                      >
-                        {deltaValue > 0 ? `+${deltaValue}` : deltaValue}
+                    <div className="flex items-center gap-1">
+                      <span className="font-mono text-xs font-semibold text-text-primary">
+                        {value}
                       </span>
-                    )}
+                      {deltaValue !== 0 && (
+                        <span
+                          className={`font-mono text-xs font-medium ${deltaValue > 0 ? "text-accent-primary" : "text-accent-danger"}`}
+                        >
+                          {deltaValue > 0 ? `+${deltaValue}` : deltaValue}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    className="h-1 w-full overflow-hidden rounded-sm bg-bg-tertiary"
+                    role="progressbar"
+                    aria-valuenow={value}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${label}: ${value}`}
+                  >
+                    <div
+                      className="h-full rounded-sm transition-all duration-700"
+                      style={{ width: `${value}%`, backgroundColor: barColor }}
+                    />
                   </div>
                 </div>
-                <div
-                  className="h-1 w-full overflow-hidden rounded-sm bg-bg-tertiary"
-                  role="progressbar"
-                  aria-valuenow={value}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`${label}: ${value}`}
-                >
-                  <div
-                    className="h-full rounded-sm transition-all duration-700"
-                    style={{ width: `${value}%`, backgroundColor: barColor }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 flex flex-col overflow-hidden">
           <div
-            className={`flex-1 flex-col overflow-hidden md:flex gap-3 ${mobileTab !== "chronicle" ? "hidden" : "flex"}`}
+            className={`flex-1 flex-col overflow-hidden md:flex gap-2 ${mobileTab !== "chronicle" ? "hidden" : "flex"}`}
           >
             {error && (
               <div className="mx-5 mt-3 rounded-lg border border-status-error-border bg-status-error-bg px-4 py-2.5 text-xs text-status-error-text flex items-center justify-between">

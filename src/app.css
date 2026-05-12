@@ -758,7 +758,7 @@ select,
 .divider {
   height: 1px;
   background: var(--color-border);
-  margin: 1.5rem 0;
+  margin: 0.75rem 0;
 }
 
 .badge {
@@ -1012,4 +1012,62 @@ select,
 }
 .safe-right {
   padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Margin - horizontal (mx-) */
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.mx-3 {
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+}
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+.mx-5 {
+  margin-left: 1.25rem;
+  margin-right: 1.25rem;
+}
+.mx-6 {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Margin - top (mt-) more values */
+.mt-0\.5 {
+  margin-top: 0.125rem;
+}
+.mt-0 {
+  margin-top: 0;
+}
+
+/* Width utilities */
+.w-7 {
+  width: 1.75rem;
+}
+.h-7 {
+  height: 1.75rem;
+}
+.w-8 {
+  width: 2rem;
+}
+.h-8 {
+  height: 2rem;
+}
+.w-9 {
+  width: 2.25rem;
+}
+.h-9 {
+  height: 2.25rem;
 }

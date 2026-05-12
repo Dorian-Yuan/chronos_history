@@ -84,11 +84,11 @@ export function AIProviderConfig() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
       <div className="section-label">{t("settings.apiConfig")}</div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
+        <label className="mb-1.5 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.aiProvider")}
         </label>
         <select
@@ -105,7 +105,7 @@ export function AIProviderConfig() {
       </div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
+        <label className="mb-1.5 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.apiKey")}
           <span className="text-accent-danger ml-1">*</span>
         </label>
@@ -124,7 +124,7 @@ export function AIProviderConfig() {
       </div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
+        <label className="mb-1.5 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.baseUrl")}
         </label>
         <input
@@ -145,7 +145,7 @@ export function AIProviderConfig() {
       </div>
 
       <div>
-        <label className="mb-3 block text-sm font-medium font-serif text-text-secondary">
+        <label className="mb-1.5 block text-sm font-medium font-serif text-text-secondary">
           {t("settings.model")}
         </label>
         <input
@@ -160,7 +160,7 @@ export function AIProviderConfig() {
         />
       </div>
 
-      <div className="pt-6">
+      <div className="pt-2">
         <button
           onClick={handleSaveAndTest}
           disabled={!apiKey.trim() || testStatus === "testing"}
