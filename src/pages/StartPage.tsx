@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useGameDispatch, useGameState } from "@/lib/game";
 import { hasAutoSave, loadAutoSave } from "@/lib/game";
 import {
@@ -11,14 +11,53 @@ import {
   Settings,
   Archive,
   Save,
-  Globe,
   BookOpen,
   FolderOpen,
   Trophy,
   Compass,
+  Crown,
+  Sword,
+  Shield,
+  Scroll,
+  Castle,
+  Flame,
+  Skull,
+  Star,
+  Moon,
+  Sun,
+  Map,
+  Clock,
+  Landmark,
+  Sparkles,
+  Feather,
+  Gem,
+  TreePine,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
 import { useSettingsStore } from "@/stores";
+
+const START_ICONS = [
+  Crown,
+  Sword,
+  Shield,
+  Scroll,
+  Castle,
+  Flame,
+  Skull,
+  Star,
+  Moon,
+  Sun,
+  Map,
+  Clock,
+  Landmark,
+  Sparkles,
+  Feather,
+  Gem,
+  TreePine,
+  Trophy,
+  Compass,
+  BookOpen,
+] as const;
 
 export function StartPage() {
   const dispatch = useGameDispatch();
@@ -28,6 +67,11 @@ export function StartPage() {
   const [showCompendium, setShowCompendium] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
   const experimentalMode = useSettingsStore((s) => s.experimentalMode);
+
+  const RandomIcon = useMemo(
+    () => START_ICONS[Math.floor(Math.random() * START_ICONS.length)],
+    [],
+  );
 
   const canContinue = hasAutoSave();
 
@@ -50,16 +94,20 @@ export function StartPage() {
     <main className="relative h-full flex flex-col items-center px-6 stripe-texture overflow-hidden">
       <DisclaimerModal />
 
-      <div className="absolute top-[28%] left-0 right-0 z-10 flex flex-col items-center gap-6 animate-fade-in">
+      <div className="absolute top-[18%] left-0 right-0 z-10 flex flex-col items-center gap-6 animate-fade-in">
         <div className="inline-flex items-center justify-center w-[72px] h-[72px] rounded-xl bg-bg-tertiary/60 border border-border">
-          <Globe size={32} className="text-text-primary" strokeWidth={1.5} />
+          <RandomIcon
+            size={32}
+            className="text-text-primary"
+            strokeWidth={1.5}
+          />
         </div>
         <h1 className="font-display text-5xl font-bold tracking-[0.15em] text-text-primary">
           CHRONOS
         </h1>
       </div>
 
-      <div className="absolute top-[60%] left-1/2 -translate-x-1/2 z-10 flex flex-col gap-4 w-full max-w-[240px] animate-slide-up">
+      <div className="absolute top-[50%] left-1/2 -translate-x-1/2 z-10 flex flex-col gap-4 w-full max-w-[240px] animate-slide-up">
         <button
           onClick={handleEnterHistory}
           className="btn-primary w-full h-14 text-base"
@@ -71,9 +119,9 @@ export function StartPage() {
         {experimentalMode && (
           <button
             onClick={handleEnterLife}
-            className="btn-secondary w-full h-14 text-base"
+            className="btn-primary w-full h-14 text-base"
           >
-            <Compass size={18} />
+            <Compass size={18} className="text-btn-primary-text" />
             进入人生
           </button>
         )}
