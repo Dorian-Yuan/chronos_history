@@ -3,8 +3,13 @@ import type {
   SaveData,
   HistoryRecord,
   CompendiumEntry,
+  FullExportData,
 } from "@/types";
-import { SAVE_VERSION, MAX_HISTORY_RECORDS } from "@/types";
+import {
+  SAVE_VERSION,
+  MAX_HISTORY_RECORDS,
+  FULL_EXPORT_VERSION,
+} from "@/types";
 
 const AUTOSAVE_KEY = "chronos_autosave";
 const SAVE_KEY_PREFIX = "chronos_save_";
@@ -119,13 +124,92 @@ export function exportSave(state: GameState): string {
   return JSON.stringify(data, null, 2);
 }
 
+export function exportAllData(): string {
+  const data: FullExportData = {
+    version: FULL_EXPORT_VERSION,
+    exportTimestamp: Date.now(),
+    saves: {
+      autosave: loadAutoSave(),
+      slots: Array.from({ length: 5 }, (_, i) => loadFromSlot(i)),
+    },
+    historyRecords: getHistoryRecords(),
+    compendium: {
+      persona: getPersonaCompendium(),
+      history: getHistoryCompendium(),
+    },
+  };
+  return JSON.stringify(data, null, 2);
+}
+
 export function importSave(jsonString: string): SaveData | null {
   try {
-    const data = JSON.parse(jsonString) as SaveData;
-    if (!data.state || !data.state.scenario || !data.state.stats) return null;
-    return data;
+    const data = JSON.parse(jsonString);
+
+    if (data.saves !== undefined) {
+      const autosave = data.saves?.autosave;
+      if (autosave?.state?.scenario && autosave?.state?.stats) {
+        return autosave as SaveData;
+      }
+      const firstSlot = (
+        data.saves?.slots as (SaveData | null)[] | undefined
+      )?.find((s) => s?.state?.scenario && s?.state?.stats);
+      return firstSlot || null;
+    }
+
+    if (data.state && data.state.scenario && data.state.stats) {
+      return data as SaveData;
+    }
+
+    return null;
   } catch {
     return null;
+  }
+}
+
+export function importAllData(jsonString: string): boolean {
+  try {
+    const data = JSON.parse(jsonString) as FullExportData;
+    if (!data.version || !data.saves) return false;
+
+    if (data.saves.autosave) {
+      saveToLocalStorage(AUTOSAVE_KEY, data.saves.autosave);
+    }
+    data.saves.slots.forEach((slotData, i) => {
+      if (slotData) {
+        saveToLocalStorage(`${SAVE_KEY_PREFIX}${i}`, slotData);
+      }
+    });
+
+    const existingHistory = getHistoryRecords();
+    const newHistory = (data.historyRecords || []).filter(
+      (nr) => !existingHistory.some((er) => er.id === nr.id),
+    );
+    const mergedHistory = [...newHistory, ...existingHistory]
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, MAX_HISTORY_RECORDS);
+    saveToLocalStorage(HISTORY_KEY, mergedHistory);
+
+    const existingPersona = getPersonaCompendium();
+    const newPersona = (data.compendium?.persona || []).filter(
+      (ne) => !existingPersona.some((ee) => ee.title === ne.title),
+    );
+    saveToLocalStorage(COMPENDIUM_PERSONA_KEY, [
+      ...existingPersona,
+      ...newPersona,
+    ]);
+
+    const existingHistoryComp = getHistoryCompendium();
+    const newHistoryComp = (data.compendium?.history || []).filter(
+      (ne) => !existingHistoryComp.some((ee) => ee.title === ne.title),
+    );
+    saveToLocalStorage(COMPENDIUM_HISTORY_KEY, [
+      ...existingHistoryComp,
+      ...newHistoryComp,
+    ]);
+
+    return true;
+  } catch {
+    return false;
   }
 }
 

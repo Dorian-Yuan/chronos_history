@@ -5,8 +5,9 @@ import {
   loadFromSlot,
   saveToSlot,
   deleteSlot,
-  exportSave,
+  exportAllData,
   importSave,
+  importAllData,
 } from "@/lib/game";
 import type { GameState } from "@/types";
 import { Download, Upload, Trash2, Save, X } from "lucide-react";
@@ -61,12 +62,12 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
   };
 
   const handleExport = () => {
-    const json = exportSave(gameState);
+    const json = exportAllData();
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `chronos_save_${Date.now()}.json`;
+    a.download = `chronos_full_backup_${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -80,6 +81,18 @@ export function SaveManager({ gameState, onLoad, onClose }: SaveManagerProps) {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       const text = await file.text();
+
+      if (importAllData(text)) {
+        refreshSaves();
+        setImportError(null);
+        const data = importSave(text);
+        if (data) {
+          onLoad(data.state);
+          onClose();
+        }
+        return;
+      }
+
       const data = importSave(text);
       if (data) {
         onLoad(data.state);

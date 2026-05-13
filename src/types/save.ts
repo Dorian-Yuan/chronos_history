@@ -35,3 +35,18 @@ export interface CompendiumEntry {
 
 export const MAX_HISTORY_RECORDS = 50;
 export const SAVE_VERSION = 1;
+export const FULL_EXPORT_VERSION = 1;
+
+export interface FullExportData {
+  version: number;
+  exportTimestamp: number;
+  saves: {
+    autosave: SaveData | null;
+    slots: (SaveData | null)[];
+  };
+  historyRecords: HistoryRecord[];
+  compendium: {
+    persona: CompendiumEntry[];
+    history: CompendiumEntry[];
+  };
+}
