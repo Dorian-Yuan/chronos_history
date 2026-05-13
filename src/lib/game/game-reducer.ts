@@ -67,8 +67,9 @@ function applyStatsDelta(
 function updateAdvisors(
   currentAdvisors: AdvisorData[],
   newAdvisors: AdvisorData[],
-): AdvisorData[] {
+): { advisors: AdvisorData[]; pendingAdvisors: AdvisorData[] } {
   const result: AdvisorData[] = [];
+  const pending: AdvisorData[] = [];
   const processedRoles = new Set<string>();
 
   for (const newAdvisor of newAdvisors) {
@@ -84,11 +85,16 @@ function updateAdvisors(
         ...existing,
         status: newAdvisor.status || "retired",
       });
+      pending.push({
+        ...newAdvisor,
+        status: "active",
+      });
+    } else {
+      result.push({
+        ...newAdvisor,
+        status: "active",
+      });
     }
-    result.push({
-      ...newAdvisor,
-      status: "active",
-    });
     processedRoles.add(newAdvisor.role);
   }
 
@@ -104,7 +110,7 @@ function updateAdvisors(
     }
   }
 
-  return result;
+  return { advisors: result, pendingAdvisors: pending };
 }
 
 function updateFactions(
@@ -194,12 +200,24 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         courtDebateSessions: [],
         playerActions: [],
         currentAdvisors: initialAdvisors,
+        pendingAdvisors: [],
         identityChangeCount: { nation_name: 0, leader_title: 0 },
       };
     }
 
     case "PROCESS_TURN": {
       const result = action.result;
+
+      let baseAdvisors = [...state.currentAdvisors];
+      if (state.pendingAdvisors.length > 0) {
+        for (const pending of state.pendingAdvisors) {
+          baseAdvisors = baseAdvisors.filter(
+            (a) => !(a.role === pending.role && a.status !== "active"),
+          );
+          baseAdvisors.push(pending);
+        }
+      }
+
       const newStats = applyStatsDelta(
         state.stats,
         result.stats_delta,
@@ -215,8 +233,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           }
         : null;
 
-      const updatedAdvisors = updateAdvisors(
-        state.currentAdvisors,
+      const { advisors: updatedAdvisors, pendingAdvisors } = updateAdvisors(
+        baseAdvisors,
         result.advisors,
       );
 
@@ -301,6 +319,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         counselSessions: [],
         playerActions: [...state.playerActions, action.playerAction],
         currentAdvisors: updatedAdvisors,
+        pendingAdvisors,
         identityChangeCount: newIdentityChangeCount,
       };
     }
@@ -338,6 +357,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
               ? loaded.turnResults[loaded.turnResults.length - 1].advisors
               : (loaded.scenario?.initial_advisors ?? [])
             ).map((a) => ({ ...a, status: "active" as const })),
+        pendingAdvisors: (loaded as GameState).pendingAdvisors ?? [],
       };
     }
 

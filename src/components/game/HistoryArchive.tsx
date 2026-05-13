@@ -1,15 +1,21 @@
-import { useState, useEffect, useRef } from "react";
-import type { HistoryRecord } from "@/types";
+import { useState, useEffect, useRef, useMemo } from "react";
+import type { HistoryRecord, GameUniverse } from "@/types";
 import { getHistoryRecords } from "@/lib/game";
 import { X } from "lucide-react";
+import { getTerminology } from "@/config/terminology";
 
 interface HistoryArchiveProps {
   onClose: () => void;
+  universe?: GameUniverse;
 }
 
-export function HistoryArchive({ onClose }: HistoryArchiveProps) {
+export function HistoryArchive({
+  onClose,
+  universe = "history",
+}: HistoryArchiveProps) {
   const [records] = useState<HistoryRecord[]>(() => getHistoryRecords());
   const modalRef = useRef<HTMLDivElement>(null);
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -76,16 +82,15 @@ export function HistoryArchive({ onClose }: HistoryArchiveProps) {
                     <span
                       className={`badge ${OUTCOME_STYLES[record.outcome] || "bg-bg-tertiary text-text-tertiary"}`}
                     >
-                      {record.outcome === "victory"
-                        ? "胜利"
-                        : record.outcome === "defeat"
-                          ? "失败"
-                          : "存续"}
+                      {term.outcomeLabels[
+                        record.outcome as keyof typeof term.outcomeLabels
+                      ] || record.outcome}
                     </span>
                   </div>
                   <div className="text-xs text-text-tertiary font-serif leading-relaxed">
                     {record.nationName} · {record.leaderTitle} ·{" "}
-                    {record.turnCount}回合
+                    {record.turnCount}
+                    {term.turnLabel}
                   </div>
                   <div className="text-xs text-text-tertiary font-serif mt-1.5">
                     {record.personaTitle} · 历史原型：{record.realEventTitle}

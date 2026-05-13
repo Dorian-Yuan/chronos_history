@@ -131,44 +131,57 @@ export function AdvisorCard({
         )}
       </div>
 
-      <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
-        &ldquo;{advisor.advice}&rdquo;
-      </p>
-
-      <div className="mt-3">
-        <div className="text-xs font-serif text-text-tertiary">
-          倾向：{advisor.bias}
-        </div>
-        <div className="mt-2 flex items-center justify-between">
-          {onCounsel && isActive && (
-            <button
-              onClick={() => onCounsel(advisor)}
-              className="flex items-center gap-1 text-xs font-serif text-accent-secondary/70 hover:text-accent-secondary transition-colors"
-              aria-label={`与${advisor.name}${term.counselLabel}`}
-            >
-              <MessageCircle size={11} />
-              {term.counselLabel}
-            </button>
-          )}
-
-          {advisor.hidden_motive && (
-            <button
-              onClick={() => setShowMotive(!showMotive)}
-              className="flex items-center gap-1 text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
-              aria-label={showMotive ? "隐藏秘密动机" : "查看秘密动机"}
-            >
-              {showMotive ? "▲ 隐藏动机" : "▼ 秘密动机"}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {advisor.hidden_motive && showMotive && (
-        <div className="mt-2 rounded-md border border-border bg-bg-card py-1.5 px-4">
-          <p className="text-xs font-serif italic leading-tight text-accent-secondary">
-            {advisor.hidden_motive}
+      {isActive ? (
+        <>
+          <p className="mt-3 text-sm font-serif text-text-primary font-medium leading-relaxed">
+            &ldquo;{advisor.advice}&rdquo;
           </p>
-        </div>
+
+          <div className="mt-3">
+            <div className="text-xs font-serif text-text-tertiary">
+              {term.tendencyLabel}
+              {advisor.bias}
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              {onCounsel && isActive && (
+                <button
+                  onClick={() => onCounsel(advisor)}
+                  className="flex items-center gap-1 text-xs font-serif text-accent-secondary/70 hover:text-accent-secondary transition-colors"
+                  aria-label={`与${advisor.name}${term.counselLabel}`}
+                >
+                  <MessageCircle size={11} />
+                  {term.counselLabel}
+                </button>
+              )}
+
+              {advisor.hidden_motive && (
+                <button
+                  onClick={() => setShowMotive(!showMotive)}
+                  className="flex items-center gap-1 text-xs font-serif text-text-tertiary hover:text-text-secondary transition-colors"
+                  aria-label={
+                    showMotive ? term.hiddenMotiveHide : term.hiddenMotiveShow
+                  }
+                >
+                  {showMotive
+                    ? `▲ ${term.hiddenMotiveHide}`
+                    : `▼ ${term.hiddenMotiveShow}`}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {advisor.hidden_motive && showMotive && (
+            <div className="mt-2 rounded-md border border-border bg-bg-card py-1.5 px-4">
+              <p className="text-xs font-serif italic leading-tight text-accent-secondary">
+                {advisor.hidden_motive}
+              </p>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="mt-3 text-xs font-serif text-text-tertiary italic">
+          {term.advisorVacantHint}
+        </p>
       )}
     </div>
   );

@@ -17,24 +17,21 @@ interface EndGameReportProps {
   universe?: GameUniverse;
 }
 
-const OUTCOME_CONFIG: Record<
+const OUTCOME_STYLE: Record<
   GameOutcome,
-  { label: string; colorClass: string; emoji: string; bgClass: string }
+  { colorClass: string; emoji: string; bgClass: string }
 > = {
   victory: {
-    label: "胜利",
     colorClass: "text-status-success-text",
     emoji: "\uD83D\uDC51",
     bgClass: "bg-status-success-bg border border-status-success-border",
   },
   neutral: {
-    label: "存续",
     colorClass: "text-status-warning-text",
     emoji: "\u2696\uFE0F",
     bgClass: "bg-status-warning-bg border border-status-warning-border",
   },
   defeat: {
-    label: "失败",
     colorClass: "text-status-error-text",
     emoji: "\uD83D\uDC80",
     bgClass: "bg-status-error-bg border border-status-error-border",
@@ -51,21 +48,21 @@ export function EndGameReport({
 }: EndGameReportProps) {
   const term = useMemo(() => getTerminology(universe), [universe]);
 
-  const outcomeConfig = OUTCOME_CONFIG[outcome];
+  const outcomeStyle = OUTCOME_STYLE[outcome];
 
   const avgStat = Math.round(
     Object.values(stats).reduce((a, b) => a + b, 0) / 4,
   );
 
-  const outcomeTitle = conditionalOutcome?.title || outcomeConfig.label;
+  const outcomeTitle = conditionalOutcome?.title || term.outcomeLabels[outcome];
   const outcomeDescription = conditionalOutcome?.description;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-5 md:p-8">
       <div className="text-center space-y-4 py-4">
-        <div className="text-5xl mb-2">{outcomeConfig.emoji}</div>
+        <div className="text-5xl mb-2">{outcomeStyle.emoji}</div>
         <div
-          className={`text-3xl font-display font-bold ${outcomeConfig.colorClass}`}
+          className={`text-3xl font-display font-bold ${outcomeStyle.colorClass}`}
         >
           {outcomeTitle}
         </div>
@@ -90,7 +87,7 @@ export function EndGameReport({
         </div>
       </div>
 
-      <div className={`rounded-lg p-5 ${outcomeConfig.bgClass}`}>
+      <div className={`rounded-lg p-5 ${outcomeStyle.bgClass}`}>
         <div className="font-serif text-sm font-semibold text-accent-primary mb-3">
           {term.realHistoryLabel}
           {analysis.real_event_title}

@@ -181,7 +181,7 @@ export function ChroniclePanel({
                             result.player_context_update.official_rank
                               .level) && (
                           <div className="text-xs font-serif text-text-secondary">
-                            品级：
+                            {term.rankLabel}
                             {result.player_context_update.previous_official_rank
                               ? result.player_context_update
                                   .previous_official_rank.level === 0
@@ -199,7 +199,7 @@ export function ChroniclePanel({
                         )}
                       {result.player_context_update.superior_name && (
                         <div className="text-xs font-serif text-text-secondary">
-                          上位者：
+                          {term.superiorLabel}
                           {result.player_context_update
                             .previous_superior_title &&
                           result.player_context_update.previous_superior_name

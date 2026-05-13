@@ -121,7 +121,7 @@ const SCENARIO_DETAILS_SCHEMA_PROMPT = `
     }
   ],
   "initial_decision_options": [
-    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐同僚角色名（如'武官'）" }
+    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐同僚姓名（必须是当前同僚名单中的人名，如'沈清臣'）" }
   ]
 }`;
 
@@ -190,7 +190,7 @@ const TURN_SYSTEM_PROMPT = `你是Chronos人生推演引擎的回合评估器。
 - headline：简洁有力
 - rumor：坊间传闻，暗示潜在危机
 - historian_commentary：同僚评语，50-100字，暗含褒贬
-- decision_options：2-3个，涵盖不同方向
+- decision_options：2-3个，涵盖不同方向，recommended_advisor须是5位同僚之一的姓名（禁止使用角色名或英文）
 - hidden_consequences：AI长期记忆
 
 【稳定性总则——极其重要】
@@ -226,10 +226,11 @@ const TURN_SYSTEM_PROMPT = `你是Chronos人生推演引擎的回合评估器。
 1. 同僚name是否与"当前同僚名单"一致？
 2. 派系leader是否与"当前派系"一致？
 3. decision_options是否有2-3个且各不相同？
-4. stats_delta每项是否在合理范围？
-5. historian_commentary是否50-100字？
-6. 所有文本字段是否为简体中文？
-7. factions_update中每个派系的attitude是否为5个合法值之一？
+4. decision_options中recommended_advisor是否为同僚姓名（非角色名、非英文）？
+5. stats_delta每项是否在合理范围？
+6. historian_commentary是否50-100字？
+7. 所有文本字段是否为简体中文？
+8. factions_update中每个派系的attitude是否为5个合法值之一？
 不通过则修正后再输出${JSON_OUTPUT_INSTRUCTION}`;
 
 const TURN_SCHEMA_PROMPT = `
@@ -274,7 +275,7 @@ const TURN_SCHEMA_PROMPT = `
   ],
   "hidden_consequences": "回合总结（AI长期记忆）",
   "decision_options": [
-    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐同僚角色名" }
+    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐同僚姓名（必须是当前同僚名单中的人名，如'沈清臣'）" }
   ],
   "player_context_update": {
     "nation_name": "新的衙门/派系名称（仅在调任时提供）",

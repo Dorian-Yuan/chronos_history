@@ -44,22 +44,19 @@ const ROLE_STATIC: Record<
   Merchant: { icon: Coins, colorVar: "--color-role-merchant" },
 };
 
-const STANCE_CONFIG: Record<
+const STANCE_STYLE: Record<
   string,
-  { label: string; colorClass: string; bgColorClass: string }
+  { colorClass: string; bgColorClass: string }
 > = {
   support: {
-    label: "支持",
     colorClass: "text-accent-primary",
     bgColorClass: "bg-accent-primary/10",
   },
   oppose: {
-    label: "驳斥",
     colorClass: "text-accent-danger",
     bgColorClass: "bg-accent-danger/10",
   },
   supplement: {
-    label: "补充",
     colorClass: "text-accent-info",
     bgColorClass: "bg-accent-info/10",
   },
@@ -250,7 +247,7 @@ export function CourtDebatePanel({
 
       const roleColor = getRoleColor(msg.advisorRole);
       const roleLabel = getRoleLabel(msg.advisorRole);
-      const stanceConfig = msg.stance ? STANCE_CONFIG[msg.stance] : null;
+      const stanceStyle = msg.stance ? STANCE_STYLE[msg.stance] : null;
 
       return (
         <div key={index} className="flex justify-start mb-3">
@@ -268,11 +265,15 @@ export function CourtDebatePanel({
               >
                 {msg.advisorName}
               </span>
-              {stanceConfig && (
+              {stanceStyle && (
                 <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded font-serif ${stanceConfig.bgColorClass} ${stanceConfig.colorClass}`}
+                  className={`text-[9px] px-1.5 py-0.5 rounded font-serif ${stanceStyle.bgColorClass} ${stanceStyle.colorClass}`}
                 >
-                  {stanceConfig.label}
+                  {
+                    term.stanceLabels[
+                      msg.stance as keyof typeof term.stanceLabels
+                    ]
+                  }
                 </span>
               )}
             </div>

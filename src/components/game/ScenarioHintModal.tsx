@@ -55,7 +55,8 @@ export function ScenarioHintModal({
       <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
-            {styleInfo?.name || "自定义剧本"} · {term.scenarioHintTitle}
+            {styleInfo?.name || term.defaultStyleName} ·{" "}
+            {term.scenarioHintTitle}
           </h2>
         </div>
 

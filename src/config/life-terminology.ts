@@ -50,6 +50,7 @@ export const LIFE_TERMINOLOGY = {
   loadingText: "演绎中...",
 
   endGameTitle: "致仕",
+  endGameLockedHint: "第8回合后方可致仕",
   endGameConfirm: "确定要结束本次仕途吗？",
   endGameEarlyHint: "仕途方才起步，建议继续为官以获得更完整的结局。",
   endGameEarlyConfirm: "当前第{turn}回合，仕途仍在继续。确定要提前致仕吗？",
@@ -115,7 +116,7 @@ export const LIFE_TERMINOLOGY = {
   factionWeaknessLabel: "软肋：",
   factionNeedsLabel: "所求：",
 
-  superiorLabel: "上位者",
+  superiorLabel: "上位者：",
   superiorAttitudeLabels: {
     trust: "信任重用",
     normal: "正常看待",
@@ -170,4 +171,20 @@ export const LIFE_TERMINOLOGY = {
   evaluateError: "演绎失败",
   jsonParseError: "AI 返回格式异常，请检查 API 配置或更换模型",
   endGameError: "致仕失败",
+
+  tendencyLabel: "倾向：",
+  hiddenMotiveShow: "查看隐情",
+  hiddenMotiveHide: "隐藏隐情",
+  settingsLabel: "设置",
+  turnLabel: "任期",
+  loadingLabel: "加载中...",
+  confirmSelectButton: "确认选择",
+  decisionSelectTitle: "奏请选择",
+  decisionSelectHint: "选择一项或多项奏请方向，确认后将填入输入框",
+  recommendSuffix: "荐",
+  inputAriaLabel: "奏请输入",
+  sendAriaLabel: "发送奏请",
+  advisorVacantHint: "此位置将在下回合由新人接替",
+  rankLabel: "品级：",
+  favorAriaLabel: "圣眷",
 } as const;

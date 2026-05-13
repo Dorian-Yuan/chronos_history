@@ -203,7 +203,8 @@ export const scenarioSchema = {
           },
           recommended_advisor: {
             type: "string" as const,
-            description: "推荐此选择的顾问角色名（如'将军''外交官'）",
+            description:
+              "推荐此选择的顾问姓名（必须是当前顾问名单中的人名，禁止角色名或英文）",
           },
         },
         required: ["title", "description", "recommended_advisor"],
@@ -338,7 +339,8 @@ export const turnResultSchema = {
           },
           recommended_advisor: {
             type: "string" as const,
-            description: "推荐此选择的顾问角色名（如'将军''外交官'）",
+            description:
+              "推荐此选择的顾问姓名（必须是当前顾问名单中的人名，禁止角色名或英文）",
           },
         },
         required: ["title", "description", "recommended_advisor"],
@@ -670,7 +672,8 @@ export const lifeTurnResultSchema = {
           },
           recommended_advisor: {
             type: "string" as const,
-            description: "推荐此选择的同僚角色名",
+            description:
+              "推荐此选择的同僚姓名（必须是当前同僚名单中的人名，禁止角色名或英文）",
           },
         },
         required: ["title", "description", "recommended_advisor"],

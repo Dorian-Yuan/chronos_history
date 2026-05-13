@@ -1,22 +1,26 @@
-import { useState, useEffect, useRef } from "react";
-import type { DecisionOption } from "@/types";
+import { useState, useEffect, useRef, useMemo } from "react";
+import type { DecisionOption, GameUniverse } from "@/types";
 import { X, Check } from "lucide-react";
+import { getTerminology } from "@/config/terminology";
 
 interface DecisionOptionsModalProps {
   options: DecisionOption[];
   onConfirm: (selectedItems: { title: string; description: string }[]) => void;
   onCancel: () => void;
+  universe?: GameUniverse;
 }
 
 export function DecisionOptionsModal({
   options,
   onConfirm,
   onCancel,
+  universe = "history",
 }: DecisionOptionsModalProps) {
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(
     new Set(),
   );
   const modalRef = useRef<HTMLDivElement>(null);
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,7 +70,7 @@ export function DecisionOptionsModal({
       <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
-            决策选择
+            {term.decisionSelectTitle}
           </h2>
           <button
             onClick={onCancel}
@@ -79,7 +83,7 @@ export function DecisionOptionsModal({
 
         <div className="modal-body space-y-3">
           <p className="text-xs text-text-tertiary font-serif">
-            选择一项或多项决策方向，确认后将填入输入框
+            {term.decisionSelectHint}
           </p>
           <div className="flex flex-col gap-3">
             {options.map((option, index) => {
@@ -101,7 +105,8 @@ export function DecisionOptionsModal({
                           {option.title}
                         </span>
                         <span className="badge bg-accent-secondary/10 text-accent-secondary border border-accent-secondary/20">
-                          {option.recommended_advisor}荐
+                          {option.recommended_advisor}
+                          {term.recommendSuffix}
                         </span>
                       </div>
                       <p className="text-xs font-serif text-text-secondary leading-relaxed">
@@ -125,14 +130,14 @@ export function DecisionOptionsModal({
             onClick={onCancel}
             className="btn-ghost flex-1 max-w-[10rem] mx-0"
           >
-            取消
+            {term.cancelButton}
           </button>
           <button
             onClick={handleConfirm}
             disabled={selectedIndices.size === 0}
             className="btn-primary flex-1 max-w-[10rem] mx-0 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            确认选择
+            {term.confirmSelectButton}
           </button>
         </div>
       </div>

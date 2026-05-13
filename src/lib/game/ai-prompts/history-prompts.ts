@@ -102,7 +102,7 @@ const SCENARIO_DETAILS_SCHEMA_PROMPT = `
     }
   ],
   "initial_decision_options": [
-    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐顾问角色名（如'将军'）" }
+    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐顾问姓名（必须是当前顾问名单中的人名，如'陈伯年'）" }
   ]
 }`;
 
@@ -172,7 +172,7 @@ is_game_over设置规则：
 - headline：简洁有力
 - rumor：民间流言，暗示潜在危机
 - historian_commentary：史官注疏，文言/半文言，50-100字，春秋笔法，偶尔暗示未来，禁止剧透
-- decision_options：2-3个，涵盖不同方向，含陷阱选项，recommended_advisor须是5位顾问之一
+- decision_options：2-3个，涵盖不同方向，含陷阱选项，recommended_advisor须是5位顾问之一的姓名（禁止使用角色名或英文）
 - hidden_consequences：AI长期记忆，必须记录派系镇压累积次数、态度变化节点、玩家持续政策、未解决隐患、玩家政策的取消/变更
 
 【稳定性总则——极其重要】
@@ -224,10 +224,11 @@ is_game_over设置规则：
 1. 顾问name是否与"当前顾问名单"一致（除非满足极端更换条件）？
 2. 派系leader是否与"当前派系"一致（除非满足更换条件）？
 3. decision_options是否有2-3个且各不相同？
-4. stats_delta每项是否在-10到10之间？
-5. historian_commentary是否为文言/半文言风格，50-100字？
-6. 所有文本字段是否为简体中文？
-7. factions_update中每个派系的attitude是否为5个合法值之一（敌对、求和、中立、友好、臣服）？
+4. decision_options中recommended_advisor是否为顾问姓名（非角色名、非英文）？
+5. stats_delta每项是否在-10到10之间？
+6. historian_commentary是否为文言/半文言风格，50-100字？
+7. 所有文本字段是否为简体中文？
+8. factions_update中每个派系的attitude是否为5个合法值之一（敌对、求和、中立、友好、臣服）？
 不通过则修正后再输出${JSON_OUTPUT_INSTRUCTION}`;
 
 const TURN_SCHEMA_PROMPT = `
@@ -272,7 +273,7 @@ const TURN_SCHEMA_PROMPT = `
   ],
   "hidden_consequences": "回合总结（AI长期记忆）",
   "decision_options": [
-    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐顾问角色名（如'将军'）" }
+    { "title": "选项标题（2-6字）", "description": "选项简述（30-60字）", "recommended_advisor": "推荐顾问姓名（必须是当前顾问名单中的人名，如'陈伯年'）" }
   ],
   "player_context_update": {
     "nation_name": "新的国家/派系名称（仅在重大变更时提供，大部分回合不提供此字段）",

@@ -1,13 +1,15 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { Send, Lightbulb } from "lucide-react";
-import type { DecisionOption } from "@/types";
+import type { DecisionOption, GameUniverse } from "@/types";
 import { DecisionOptionsModal } from "./DecisionOptionsModal";
+import { getTerminology } from "@/config/terminology";
 
 interface GameInputProps {
   onSubmit: (action: string) => void;
   disabled: boolean;
   placeholder?: string;
   decisionOptions: DecisionOption[];
+  universe?: GameUniverse;
 }
 
 export function GameInput({
@@ -15,10 +17,12 @@ export function GameInput({
   disabled,
   placeholder,
   decisionOptions,
+  universe = "history",
 }: GameInputProps) {
   const [input, setInput] = useState("");
   const [showDecisionModal, setShowDecisionModal] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   const adjustHeight = useCallback(() => {
     const textarea = textareaRef.current;
@@ -92,7 +96,7 @@ export function GameInput({
             onClick={() => setShowDecisionModal(true)}
             disabled={disabled}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-secondary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-secondary/90"
-            aria-label="决策选择"
+            aria-label={term.decisionSelectTitle}
             style={{ width: "2.25rem", height: "2.25rem", flexShrink: 0 }}
           >
             <Lightbulb size={15} />
@@ -115,7 +119,7 @@ export function GameInput({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder || "下达指令..."}
-            aria-label="决策输入"
+            aria-label={term.inputAriaLabel}
             rows={1}
             className="flex-1 resize-none bg-transparent text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none leading-relaxed"
             style={{ maxHeight: "120px", overflowY: "auto" }}
@@ -127,7 +131,7 @@ export function GameInput({
           onClick={handleSubmit}
           disabled={!input.trim() || disabled}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90 self-end"
-          aria-label="发送决策"
+          aria-label={term.sendAriaLabel}
           style={{ width: "2.25rem", height: "2.25rem", flexShrink: 0 }}
         >
           <Send size={15} />
@@ -139,6 +143,7 @@ export function GameInput({
           options={decisionOptions}
           onConfirm={handleDecisionConfirm}
           onCancel={() => setShowDecisionModal(false)}
+          universe={universe}
         />
       )}
     </div>

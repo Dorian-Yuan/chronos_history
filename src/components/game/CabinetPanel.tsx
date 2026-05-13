@@ -1,16 +1,24 @@
 import { useState, useMemo } from "react";
 import type {
   AdvisorData,
+  AdvisorRole,
   ScenarioData,
   GameStats,
   CounselMessage,
-  AdvisorRole,
   GameUniverse,
 } from "@/types";
 import { useGameState, useGameDispatch } from "@/lib/game";
 import { AdvisorCard } from "./AdvisorCard";
 import { CounselDialog } from "./CounselDialog";
 import { getTerminology } from "@/config/terminology";
+
+const REQUIRED_ROLES: AdvisorRole[] = [
+  "General",
+  "Diplomat",
+  "Intel",
+  "Scholar",
+  "Merchant",
+];
 
 interface CabinetPanelProps {
   advisors: AdvisorData[];
@@ -69,25 +77,37 @@ export function CabinetPanel({
   return (
     <div className="flex flex-col gap-4 px-5 py-2">
       <div className="flex flex-col gap-4">
-        {advisors
-          .filter((a) => !a.status || a.status === "active")
-          .map((advisor) => (
+        {REQUIRED_ROLES.map((role) => {
+          const advisor = advisors.find((a) => a.role === role);
+          if (!advisor) {
+            return (
+              <div
+                key={role}
+                className="rounded-lg border border-border bg-bg-card p-5 opacity-40"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-sm text-text-tertiary">
+                    {term.advisorRoles[role]}
+                  </span>
+                </div>
+                <p className="mt-3 text-xs font-serif text-text-tertiary">
+                  {term.advisorVacantHint}
+                </p>
+              </div>
+            );
+          }
+          const isActive = !advisor.status || advisor.status === "active";
+          return (
             <AdvisorCard
-              key={advisor.role}
+              key={role}
               advisor={advisor}
-              onCounsel={scenario ? (a) => setCounselAdvisor(a) : undefined}
+              onCounsel={
+                scenario && isActive ? (a) => setCounselAdvisor(a) : undefined
+              }
               universe={universe}
             />
-          ))}
-        {advisors
-          .filter((a) => a.status && a.status !== "active")
-          .map((advisor) => (
-            <AdvisorCard
-              key={`${advisor.role}-${advisor.name}`}
-              advisor={advisor}
-              universe={universe}
-            />
-          ))}
+          );
+        })}
       </div>
 
       {counselAdvisor && scenario && (

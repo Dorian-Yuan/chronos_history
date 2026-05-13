@@ -158,7 +158,7 @@ export function IntelligencePanel({
                 aria-valuenow={favor}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label={`圣眷: ${favor}`}
+                aria-label={`${term.favorAriaLabel}: ${favor}`}
               >
                 <div
                   className="h-full rounded-sm transition-all duration-700"

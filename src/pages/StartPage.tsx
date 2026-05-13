@@ -133,10 +133,18 @@ export function StartPage() {
         />
       )}
 
-      {showHistory && <HistoryArchive onClose={() => setShowHistory(false)} />}
+      {showHistory && (
+        <HistoryArchive
+          onClose={() => setShowHistory(false)}
+          universe={state.universe}
+        />
+      )}
 
       {showCompendium && (
-        <EndingCompendium onClose={() => setShowCompendium(false)} />
+        <EndingCompendium
+          onClose={() => setShowCompendium(false)}
+          universe={state.universe}
+        />
       )}
     </main>
   );

@@ -83,6 +83,7 @@ export interface GameState {
   courtDebateSessions: CourtDebateSession[];
   playerActions: string[];
   currentAdvisors: AdvisorData[];
+  pendingAdvisors: AdvisorData[];
   identityChangeCount: IdentityChangeCount;
   universe: GameUniverse;
 }
@@ -107,6 +108,7 @@ export const INITIAL_GAME_STATE: GameState = {
   courtDebateSessions: [],
   playerActions: [],
   currentAdvisors: [],
+  pendingAdvisors: [],
   identityChangeCount: { nation_name: 0, leader_title: 0 },
   universe: "history" as GameUniverse,
 };

@@ -47,11 +47,20 @@ function safeGetAdvisors(
   scenario: ScenarioData | null,
   turnResults: TurnResult[],
   currentAdvisors: AdvisorData[],
-) {
-  const activeAdvisors = currentAdvisors.filter(
-    (a) => !a.status || a.status === "active",
-  );
-  if (activeAdvisors.length > 0) return activeAdvisors;
+): AdvisorData[] {
+  if (currentAdvisors.length > 0) {
+    const roleMap = new Map<string, AdvisorData>();
+    for (const a of currentAdvisors) {
+      const existing = roleMap.get(a.role);
+      if (!existing) {
+        roleMap.set(a.role, a);
+      } else if (a.status === "active" && existing.status !== "active") {
+        roleMap.set(a.role, a);
+      }
+    }
+    const result = Array.from(roleMap.values());
+    if (result.length > 0) return result;
+  }
   if (turnResults.length > 0) {
     const last = turnResults[turnResults.length - 1];
     if (Array.isArray(last?.advisors) && last.advisors.length > 0) {
@@ -350,7 +359,7 @@ export function GamePage() {
     return (
       <main className="flex h-full items-center justify-center">
         <p className="text-text-tertiary" role="status">
-          加载中...
+          {term.loadingLabel}
         </p>
       </main>
     );
@@ -417,10 +426,13 @@ export function GamePage() {
               >
                 <Home size={16} strokeWidth={1.5} />
               </button>
-              {state.turnCount >= 8 && state.phase === "playing" && (
+              {state.phase === "playing" && (
                 <button
                   onClick={() => setShowEndGameConfirm(true)}
-                  disabled={isLoading}
+                  disabled={isLoading || state.turnCount < 8}
+                  title={
+                    state.turnCount < 8 ? term.endGameLockedHint : undefined
+                  }
                   className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-accent-primary transition-all w-7 h-7 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label={term.endGameTitle}
                 >
@@ -437,7 +449,7 @@ export function GamePage() {
               <button
                 onClick={() => setSettingsOpen(true)}
                 className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
-                aria-label="设置"
+                aria-label={term.settingsLabel}
               >
                 <Settings size={16} strokeWidth={1.5} />
               </button>
@@ -529,6 +541,7 @@ export function GamePage() {
                       .decision_options || []
                   : scenario?.initial_decision_options || []
               }
+              universe={universe}
             />
           </div>
 
@@ -692,7 +705,9 @@ export function GamePage() {
       </nav>
 
       <footer className="hidden md:flex items-center justify-between h-10 px-6 border-t border-border bg-bg-secondary text-xs text-text-tertiary">
-        <span className="font-mono">TURN: {state.turnCount}</span>
+        <span className="font-mono">
+          {term.turnLabel}: {state.turnCount}
+        </span>
         <span className="font-serif">{scenarioTitle}</span>
         <button
           onClick={() => setShowSaveManager(true)}

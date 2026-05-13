@@ -1,32 +1,19 @@
-import type { GameStats, StatsDelta } from "@/types";
+import { useMemo } from "react";
+import type { GameStats, StatsDelta, GameUniverse } from "@/types";
 import { Scale, Coins, Swords, Globe } from "lucide-react";
+import { getTerminology } from "@/config/terminology";
 
 interface StatBarsProps {
   stats: GameStats;
   delta?: StatsDelta;
+  universe?: GameUniverse;
 }
 
-const STAT_CONFIG = [
-  {
-    key: "stability" as const,
-    label: "稳定性",
-    icon: Scale,
-  },
-  {
-    key: "economy" as const,
-    label: "经济",
-    icon: Coins,
-  },
-  {
-    key: "military" as const,
-    label: "军事",
-    icon: Swords,
-  },
-  {
-    key: "international_standing" as const,
-    label: "国际声望",
-    icon: Globe,
-  },
+const STAT_KEYS = [
+  { key: "stability" as const, icon: Scale },
+  { key: "economy" as const, icon: Coins },
+  { key: "military" as const, icon: Swords },
+  { key: "international_standing" as const, icon: Globe },
 ];
 
 function getBarColorVar(value: number): string {
@@ -34,17 +21,24 @@ function getBarColorVar(value: number): string {
   return "var(--color-accent-secondary)";
 }
 
-export function StatBars({ stats, delta }: StatBarsProps) {
+export function StatBars({
+  stats,
+  delta,
+  universe = "history",
+}: StatBarsProps) {
+  const term = useMemo(() => getTerminology(universe), [universe]);
+
   return (
     <div className="px-5">
       <div
         className="grid grid-cols-2 gap-x-5 gap-y-3 rounded-lg border border-border bg-bg-card p-4"
         role="group"
-        aria-label="国家属性"
+        aria-label={term.statAriaLabel}
       >
-        {STAT_CONFIG.map(({ key, label, icon: Icon }) => {
+        {STAT_KEYS.map(({ key, icon: Icon }) => {
           const value = stats[key];
           const deltaValue = delta?.[key] ?? 0;
+          const label = term.statLabels[key];
 
           return (
             <div key={key} className="space-y-3">

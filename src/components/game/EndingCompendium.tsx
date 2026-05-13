@@ -1,15 +1,20 @@
-import { useState, useEffect, useRef } from "react";
-import type { CompendiumEntry } from "@/types";
+import { useState, useEffect, useRef, useMemo } from "react";
+import type { CompendiumEntry, GameUniverse } from "@/types";
 import { getPersonaCompendium, getHistoryCompendium } from "@/lib/game";
 import { X, Crown, ScrollText } from "lucide-react";
+import { getTerminology } from "@/config/terminology";
 
 interface EndingCompendiumProps {
   onClose: () => void;
+  universe?: GameUniverse;
 }
 
 type CompendiumTab = "persona" | "history";
 
-export function EndingCompendium({ onClose }: EndingCompendiumProps) {
+export function EndingCompendium({
+  onClose,
+  universe = "history",
+}: EndingCompendiumProps) {
   const [tab, setTab] = useState<CompendiumTab>("persona");
   const [personaEntries] = useState<CompendiumEntry[]>(() =>
     getPersonaCompendium(),
@@ -18,6 +23,7 @@ export function EndingCompendium({ onClose }: EndingCompendiumProps) {
     getHistoryCompendium(),
   );
   const modalRef = useRef<HTMLDivElement>(null);
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,7 +46,7 @@ export function EndingCompendium({ onClose }: EndingCompendiumProps) {
     { label: string; icon: typeof Crown; colorVar: string }
   > = {
     persona: {
-      label: "统治者画像",
+      label: term.rulerPortraitLabel,
       icon: Crown,
       colorVar: "--color-accent-secondary",
     },
@@ -114,7 +120,7 @@ export function EndingCompendium({ onClose }: EndingCompendiumProps) {
           {currentEntries.length === 0 ? (
             <div className="text-center py-12 text-sm text-text-tertiary font-serif">
               {tab === "persona"
-                ? "尚未收集任何统治者画像"
+                ? `尚未收集任何${term.rulerPortraitLabel}`
                 : "尚未收集任何历史事件"}
               <p className="text-xs mt-2 text-text-tertiary/60">
                 完成游戏后自动收录
