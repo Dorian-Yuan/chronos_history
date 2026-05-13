@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { GameProvider, useGameState } from "@/lib/game";
 import { StartPage } from "@/pages/StartPage";
 import { SelectionPage } from "@/pages/SelectionPage";
+import { LifeSelectionPage } from "@/pages/LifeSelectionPage";
 import { GamePage } from "@/pages/GamePage";
 import { EndPage } from "@/pages/EndPage";
 import { SettingsPanel, WelcomeSetup } from "@/components/settings";
@@ -73,6 +74,9 @@ function GameRouter() {
       case "selection":
         navigate("/selection");
         break;
+      case "life_selection":
+        navigate("/life-selection");
+        break;
       case "playing":
         navigate("/game");
         break;
@@ -86,6 +90,7 @@ function GameRouter() {
     <Routes>
       <Route path="/" element={<StartPage />} />
       <Route path="/selection" element={<SelectionPage />} />
+      <Route path="/life-selection" element={<LifeSelectionPage />} />
       <Route path="/game" element={<GamePage />} />
       <Route path="/end" element={<EndPage />} />
     </Routes>

@@ -1,23 +1,29 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import type { PlayStyle } from "@/types";
-import { PLAY_STYLES } from "@/types";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import type { PlayStyle, LifeMode, GameUniverse } from "@/types";
+import { PLAY_STYLES, LIFE_MODES } from "@/types";
+import { getTerminology } from "@/config/terminology";
 
 interface ScenarioHintModalProps {
-  playStyle: PlayStyle;
+  playStyle: PlayStyle | LifeMode;
   onConfirm: (hint: string) => void;
   onCancel: () => void;
+  universe?: GameUniverse;
 }
 
 export function ScenarioHintModal({
   playStyle,
   onConfirm,
   onCancel,
+  universe = "history",
 }: ScenarioHintModalProps) {
   const [hint, setHint] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
-  const styleInfo = PLAY_STYLES.find((s) => s.id === playStyle);
+  const styleInfo =
+    PLAY_STYLES.find((s) => s.id === playStyle) ||
+    LIFE_MODES.find((s) => s.id === playStyle);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -49,20 +55,20 @@ export function ScenarioHintModal({
       <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
-            {styleInfo?.name || "自定义剧本"} · 设定愿景
+            {styleInfo?.name || "自定义剧本"} · {term.scenarioHintTitle}
           </h2>
         </div>
 
         <div className="modal-body space-y-4">
           <p className="text-sm text-text-secondary leading-relaxed">
-            您可以描述期望的文明、年代、身份和大致剧情，AI将重点参考您的愿景生成剧本。留空则由AI随机生成。
+            {term.scenarioHintDescription}
           </p>
           <textarea
             ref={textareaRef}
             value={hint}
             onChange={(e) => setHint(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="例如：战国末期秦国、大航海时代的葡萄牙、文艺复兴威尼斯商人..."
+            placeholder={term.scenarioHintPlaceholder}
             rows={4}
             className="w-full resize-none rounded-lg border border-border bg-bg-secondary px-4 py-3 text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent-primary/50"
           />
@@ -73,13 +79,13 @@ export function ScenarioHintModal({
             onClick={onCancel}
             className="btn-ghost flex-1 max-w-[10rem] mx-0"
           >
-            取消
+            {term.cancelButton}
           </button>
           <button
             onClick={handleSubmit}
             className="btn-primary flex-1 max-w-[10rem] mx-0"
           >
-            开始推演
+            {term.startButton}
           </button>
         </div>
       </div>

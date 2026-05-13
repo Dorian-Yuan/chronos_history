@@ -1,76 +1,184 @@
-import type { FactionData, FactionLeaderStatus } from "@/types";
-import { Swords, Skull, TrendingUp, AlertTriangle, Target } from "lucide-react";
+import { useMemo } from "react";
+import type { FactionData, GameUniverse } from "@/types";
+import { getTerminology } from "@/config/terminology";
+import {
+  Swords,
+  Skull,
+  TrendingUp,
+  AlertTriangle,
+  Target,
+  Crown,
+} from "lucide-react";
+
+interface SuperiorInfo {
+  title: string;
+  name: string;
+}
 
 interface IntelligencePanelProps {
   factions: FactionData[];
+  universe?: GameUniverse;
+  superior?: SuperiorInfo;
+  favor?: number;
 }
 
-const LEADER_STATUS_LABELS: Record<FactionLeaderStatus, string> = {
-  active: "",
-  dead: "已故",
-  exiled: "已流放",
-  overthrown: "已推翻",
+const ATTITUDE_STYLE_MAP: Record<string, string> = {
+  hostile:
+    "bg-status-error-bg text-status-error-text border border-status-error-border",
+  peace:
+    "bg-status-info-bg text-status-info-text border border-status-info-border",
+  neutral: "bg-bg-tertiary text-text-secondary border border-border",
+  friendly:
+    "bg-status-success-bg text-status-success-text border border-status-success-border",
+  vassal:
+    "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
+  destroyed:
+    "bg-bg-tertiary text-text-tertiary line-through border border-border",
 };
 
-const ATTITUDE_STYLES: Record<string, string> = {
-  敌对: "bg-status-error-bg text-status-error-text border border-status-error-border",
-  求和: "bg-status-info-bg text-status-info-text border border-status-info-border",
-  中立: "bg-bg-tertiary text-text-secondary border border-border",
-  友好: "bg-status-success-bg text-status-success-text border border-status-success-border",
-  臣服: "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
-  已灭亡: "bg-bg-tertiary text-text-tertiary line-through border border-border",
+const SUPERIOR_ATTITUDE_STYLES: Record<string, string> = {
+  trust:
+    "bg-status-success-bg text-status-success-text border border-status-success-border",
+  normal:
+    "bg-status-info-bg text-status-info-text border border-status-info-border",
+  wary: "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
+  danger:
+    "bg-status-error-bg text-status-error-text border border-status-error-border",
+  fatal:
+    "bg-accent-danger/20 text-accent-danger border border-accent-danger/40",
 };
 
-const ATTITUDE_FALLBACK_MAP: Record<string, string> = {
-  即将归附: "友好",
-  倾向臣服: "友好",
-  即将臣服: "友好",
-  表面臣服: "臣服",
-  归附: "臣服",
-  归顺: "臣服",
-  降服: "臣服",
-  倾向敌对: "敌对",
-  敌视: "敌对",
-  仇恨: "敌对",
-  敌意: "敌对",
-  亲近: "友好",
-  友善: "友好",
-  亲善: "友好",
-  和平: "求和",
-  议和: "求和",
-  示好: "求和",
-  冷淡: "中立",
-  疏远: "中立",
-  观望: "中立",
-};
-
-function getAttitudeStyle(attitude: string): string {
-  if (ATTITUDE_STYLES[attitude]) return ATTITUDE_STYLES[attitude];
-  const normalized = ATTITUDE_FALLBACK_MAP[attitude];
-  if (normalized && ATTITUDE_STYLES[normalized])
-    return ATTITUDE_STYLES[normalized];
-  for (const key of Object.keys(ATTITUDE_STYLES)) {
-    if (attitude.includes(key)) return ATTITUDE_STYLES[key];
+function getAttitudeStyle(
+  attitude: string,
+  fallbackMap: Record<string, string>,
+  attitudeLabels: Record<string, string>,
+): string {
+  for (const [engKey, cnLabel] of Object.entries(attitudeLabels)) {
+    if (attitude === cnLabel && ATTITUDE_STYLE_MAP[engKey]) {
+      return ATTITUDE_STYLE_MAP[engKey];
+    }
+  }
+  const fallbackKey = fallbackMap[attitude];
+  if (fallbackKey && ATTITUDE_STYLE_MAP[fallbackKey]) {
+    return ATTITUDE_STYLE_MAP[fallbackKey];
+  }
+  for (const [engKey, cnLabel] of Object.entries(attitudeLabels)) {
+    if (attitude.includes(cnLabel) && ATTITUDE_STYLE_MAP[engKey]) {
+      return ATTITUDE_STYLE_MAP[engKey];
+    }
   }
   return "bg-bg-tertiary text-text-secondary";
 }
 
-export function IntelligencePanel({ factions }: IntelligencePanelProps) {
-  if (!factions.length) {
+function getSuperiorAttitudeKey(favor: number): string {
+  if (favor > 70) return "trust";
+  if (favor > 50) return "normal";
+  if (favor > 30) return "wary";
+  if (favor > 15) return "danger";
+  return "fatal";
+}
+
+export function IntelligencePanel({
+  factions,
+  universe = "history",
+  superior,
+  favor,
+}: IntelligencePanelProps) {
+  const term = useMemo(() => getTerminology(universe), [universe]);
+
+  const showSuperior = universe === "life" && superior;
+
+  if (!factions.length && !showSuperior) {
     return (
-      <section className="flex flex-col gap-4 px-5 py-2" aria-label="情报面板">
+      <section
+        className="flex flex-col gap-4 px-5 py-2"
+        aria-label={`${term.intelligenceLabel}面板`}
+      >
         <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
-          <p className="text-xs font-serif">暂无情报信息</p>
+          <p className="text-xs font-serif">暂无{term.intelligenceLabel}信息</p>
           <p className="text-xs mt-1 text-text-tertiary/60 font-serif">
-            完成第一回合后将显示派系情报
+            完成第一回合后将显示派系{term.intelligenceLabel}
           </p>
         </div>
       </section>
     );
   }
 
+  const superiorAttitudeKey =
+    showSuperior && favor !== undefined
+      ? getSuperiorAttitudeKey(favor)
+      : "normal";
+  const superiorAttitudeLabels = (term as Record<string, unknown>)
+    .superiorAttitudeLabels as Record<string, string> | undefined;
+  const superiorAttitudeText =
+    superiorAttitudeLabels?.[superiorAttitudeKey] || "正常看待";
+  const superiorAttitudeStyle =
+    SUPERIOR_ATTITUDE_STYLES[superiorAttitudeKey] ||
+    SUPERIOR_ATTITUDE_STYLES.normal;
+
   return (
-    <section className="flex flex-col gap-4 px-5 py-2" aria-label="情报面板">
+    <section
+      className="flex flex-col gap-4 px-5 py-2"
+      aria-label={`${term.intelligenceLabel}面板`}
+    >
+      {showSuperior && (
+        <div className="rounded-lg border border-accent-secondary/30 bg-accent-secondary/5 p-5 ring-1 ring-accent-secondary/10">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Crown
+                size={14}
+                className="text-accent-secondary"
+                aria-hidden="true"
+              />
+              <span className="text-base font-serif font-bold text-text-primary">
+                {((term as Record<string, unknown>).superiorLabel as string) ||
+                  "上位者"}
+              </span>
+              <span className="text-sm font-serif text-accent-secondary font-semibold">
+                {superior.title} {superior.name}
+              </span>
+            </div>
+            <span className={`badge ${superiorAttitudeStyle}`}>
+              {superiorAttitudeText}
+            </span>
+          </div>
+          {favor !== undefined && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-text-secondary">
+                  {term.statLabels.international_standing}
+                </span>
+                <span className="font-mono text-xs font-semibold text-text-primary">
+                  {favor}
+                </span>
+              </div>
+              <div
+                className="h-1.5 w-full overflow-hidden rounded-sm bg-bg-tertiary"
+                role="progressbar"
+                aria-valuenow={favor}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`圣眷: ${favor}`}
+              >
+                <div
+                  className="h-full rounded-sm transition-all duration-700"
+                  style={{
+                    width: `${favor}%`,
+                    backgroundColor:
+                      favor > 70
+                        ? "var(--color-accent-primary)"
+                        : favor > 50
+                          ? "var(--color-accent-secondary)"
+                          : favor > 30
+                            ? "var(--color-accent-secondary)"
+                            : "var(--color-accent-danger)",
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       <ul className="flex flex-col gap-4">
         {factions.map((faction, idx) => (
           <li
@@ -103,20 +211,23 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                     {faction.leader_status &&
                       faction.leader_status !== "active" && (
                         <span className="text-[10px] ml-1 px-1.5 py-0.5 rounded bg-accent-danger/10 text-accent-danger font-serif">
-                          {LEADER_STATUS_LABELS[faction.leader_status]}
+                          {term.leaderStatusLabels[faction.leader_status] ||
+                            faction.leader_status}
                         </span>
                       )}
                   </span>
                 )}
               </div>
-              <span className={`badge ${getAttitudeStyle(faction.attitude)}`}>
+              <span
+                className={`badge ${getAttitudeStyle(faction.attitude, term.attitudeFallbackMap, term.attitudeLabels)}`}
+              >
                 {faction.attitude}
               </span>
             </div>
 
             {faction.is_new && (
               <div className="mb-2 text-xs font-semibold text-accent-primary">
-                ● 新势力出现
+                {term.factionNewLabel}
               </div>
             )}
 
@@ -132,7 +243,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                   aria-hidden="true"
                 />
                 <span className="text-sm font-semibold text-accent-primary shrink-0">
-                  优势：
+                  {term.factionStrengthLabel}
                 </span>
                 <span className="text-sm font-serif text-text-secondary">
                   {faction.strength}
@@ -145,7 +256,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                   aria-hidden="true"
                 />
                 <span className="text-sm font-semibold text-accent-secondary shrink-0">
-                  弱点：
+                  {term.factionWeaknessLabel}
                 </span>
                 <span className="text-sm font-serif text-text-secondary">
                   {faction.weakness}
@@ -158,7 +269,7 @@ export function IntelligencePanel({ factions }: IntelligencePanelProps) {
                   aria-hidden="true"
                 />
                 <span className="text-sm font-semibold text-accent-danger shrink-0">
-                  急需：
+                  {term.factionNeedsLabel}
                 </span>
                 <span className="text-sm font-serif text-accent-danger">
                   {faction.needs}

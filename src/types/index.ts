@@ -1,4 +1,5 @@
 export * from "./play-style";
+export * from "./life-mode";
 export * from "./scenario";
 export * from "./turn-result";
 export * from "./end-game";
@@ -13,5 +14,12 @@ export type {
   BaseOutcome,
   ConditionalOutcome,
   OutcomeContext,
+  IdentityChangeCount,
+  GameUniverse,
 } from "./game-state";
-export type { AdvisorStatus, FactionLeaderStatus } from "./scenario";
+export type {
+  AdvisorStatus,
+  FactionLeaderStatus,
+  OfficialRank,
+} from "./scenario";
+export type { PlayerContextUpdate } from "./turn-result";

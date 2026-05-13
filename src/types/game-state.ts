@@ -2,7 +2,10 @@ import type { ScenarioData, AdvisorRole, AdvisorData } from "./scenario";
 import type { TurnResult } from "./turn-result";
 import type { EndGameAnalysis } from "./end-game";
 import type { PlayStyle } from "./play-style";
+import type { LifeMode } from "./life-mode";
 import { getAppConfig } from "@/config";
+
+export type GameUniverse = "history" | "life";
 
 export interface GameStats {
   stability: number;
@@ -11,7 +14,12 @@ export interface GameStats {
   international_standing: number;
 }
 
-export type GamePhase = "start" | "selection" | "playing" | "ended";
+export type GamePhase =
+  | "start"
+  | "selection"
+  | "life_selection"
+  | "playing"
+  | "ended";
 
 export type BaseOutcome = "victory" | "neutral" | "defeat";
 
@@ -23,7 +31,8 @@ export interface ConditionalOutcome {
 
 export interface OutcomeContext {
   stats: GameStats;
-  playStyle: PlayStyle;
+  playStyle?: PlayStyle;
+  lifeMode?: LifeMode;
   factions: { attitude: string; is_destroyed?: boolean }[];
   turnCount: number;
   playerRank?: number;
@@ -75,6 +84,7 @@ export interface GameState {
   playerActions: string[];
   currentAdvisors: AdvisorData[];
   identityChangeCount: IdentityChangeCount;
+  universe: GameUniverse;
 }
 
 export type GameOutcome = BaseOutcome;
@@ -98,6 +108,7 @@ export const INITIAL_GAME_STATE: GameState = {
   playerActions: [],
   currentAdvisors: [],
   identityChangeCount: { nation_name: 0, leader_title: 0 },
+  universe: "history" as GameUniverse,
 };
 
 export function clampStat(value: number): number {
@@ -137,6 +148,27 @@ const PLAY_STYLE_WEIGHTS: Record<
     military: 0.25,
     international_standing: 0.25,
   },
+};
+
+function weightedScore(stats: GameStats, playStyle: PlayStyle): number {
+  const w = PLAY_STYLE_WEIGHTS[playStyle];
+  return (
+    stats.stability * w.stability +
+    stats.economy * w.economy +
+    stats.military * w.military +
+    stats.international_standing * w.international_standing
+  );
+}
+
+const LIFE_MODE_WEIGHTS: Record<
+  LifeMode,
+  {
+    stability: number;
+    economy: number;
+    military: number;
+    international_standing: number;
+  }
+> = {
   Officialdom: {
     stability: 0.3,
     economy: 0.1,
@@ -145,8 +177,8 @@ const PLAY_STYLE_WEIGHTS: Record<
   },
 };
 
-function weightedScore(stats: GameStats, playStyle: PlayStyle): number {
-  const w = PLAY_STYLE_WEIGHTS[playStyle];
+function lifeWeightedScore(stats: GameStats, lifeMode: LifeMode): number {
+  const w = LIFE_MODE_WEIGHTS[lifeMode];
   return (
     stats.stability * w.stability +
     stats.economy * w.economy +
@@ -164,10 +196,159 @@ export function determineOutcome(stats: GameStats): BaseOutcome {
   return "defeat";
 }
 
+function determineLifeConditionalOutcome(
+  ctx: OutcomeContext,
+): ConditionalOutcome {
+  const {
+    stats,
+    lifeMode = "Officialdom",
+    factions,
+    turnCount,
+    playerRank,
+  } = ctx;
+  const base = determineOutcome(stats);
+  const wScore = lifeWeightedScore(stats, lifeMode);
+  const activeFactions = factions.filter((f) => !f.is_destroyed);
+  const hostileFactions = activeFactions.filter((f) => f.attitude === "打压");
+  const isSpeedRun = turnCount <= 10;
+  const isLongRun = turnCount >= 22;
+
+  if (base === "defeat") {
+    if (stats.international_standing <= 10) {
+      return {
+        base: "defeat",
+        title: "魂断刑场",
+        description:
+          "圣眷尽失，上位者震怒。你被押赴刑场，曾经的荣华富贵化为一场空梦。",
+      };
+    }
+    if (stats.international_standing <= 20 && stats.stability <= 20) {
+      return {
+        base: "defeat",
+        title: "贬谪天涯",
+        description:
+          "一纸诏书，贬谪蛮荒。你带着满腔不甘，踏上了流放之路，再无回朝之日。",
+      };
+    }
+    return {
+      base: "defeat",
+      title: "身败名裂",
+      description:
+        "你的仕途走向了终结，曾经的功名利禄如过眼云烟，只留下千古骂名。",
+    };
+  }
+
+  if (base === "victory") {
+    if (
+      playerRank !== undefined &&
+      playerRank <= 0 &&
+      stats.stability >= 75 &&
+      stats.international_standing >= 75
+    ) {
+      return {
+        base: "victory",
+        title: "只手遮天",
+        description:
+          "你已位极人臣，权倾朝野。天下大事，皆决于你一人之手，连上位者也要仰你鼻息。",
+      };
+    }
+    if (stats.stability >= 75 && stats.international_standing >= 75) {
+      return {
+        base: "victory",
+        title: "位极人臣",
+        description:
+          "威望与圣眷并重，你已成为朝堂之上举足轻重的人物，名垂青史。",
+      };
+    }
+    if (
+      stats.stability >= 80 &&
+      stats.international_standing >= 80 &&
+      isSpeedRun
+    ) {
+      return {
+        base: "victory",
+        title: "青云直上",
+        description:
+          "仕途顺遂，平步青云。你在极短时间内便赢得了上位者的信任，堪称传奇。",
+      };
+    }
+    if (
+      stats.stability >= 70 &&
+      stats.international_standing >= 70 &&
+      isLongRun
+    ) {
+      return {
+        base: "victory",
+        title: "老成谋国",
+        description: "多年宦海沉浮，你以稳健之手辅佐朝政，终成一代名臣。",
+      };
+    }
+    if (wScore >= 70 && hostileFactions.length === 0) {
+      return {
+        base: "victory",
+        title: "朝堂砥柱",
+        description:
+          "朝堂之上，你稳如磐石。同僚敬服，上位者倚重，你的仕途堪称典范。",
+      };
+    }
+    return {
+      base: "victory",
+      title: "功成名就",
+      description:
+        "你的仕途虽非一帆风顺，但终有所成。历史会记住这位勤勉的官员。",
+    };
+  }
+
+  if (playerRank !== undefined && playerRank <= 3 && stats.stability >= 55) {
+    return {
+      base: "neutral",
+      title: "中流砥柱",
+      description:
+        "身居高位，虽非权倾朝野，却也稳如泰山。你是朝堂上不可或缺的柱石。",
+    };
+  }
+  if (stats.international_standing >= 60 && stats.stability < 40) {
+    return {
+      base: "neutral",
+      title: "伴驾之臣",
+      description: "圣眷虽隆，却根基不稳。你在上位者身边如履薄冰，前途未卜。",
+    };
+  }
+  if (
+    playerRank !== undefined &&
+    playerRank >= 5 &&
+    stats.international_standing >= 50
+  ) {
+    return {
+      base: "neutral",
+      title: "安守本分",
+      description:
+        "品级不高，却也得上位者青睐。你安分守己，在官场中找到了自己的位置。",
+    };
+  }
+  if (wScore >= 35) {
+    return {
+      base: "neutral",
+      title: "随波逐流",
+      description:
+        "宦海沉浮，你既非最耀眼的那颗星，也非最暗淡的那粒尘。历史对你只是轻轻一瞥。",
+    };
+  }
+  return {
+    base: "neutral",
+    title: "浮沉不定",
+    description: "仕途坎坷，时好时坏。你仍在宦海中挣扎，前路茫茫。",
+  };
+}
+
 export function determineConditionalOutcome(
   ctx: OutcomeContext,
 ): ConditionalOutcome {
-  const { stats, playStyle, factions, turnCount } = ctx;
+  if (ctx.lifeMode) {
+    return determineLifeConditionalOutcome(ctx);
+  }
+
+  const { stats, playStyle = "Survival", factions, turnCount } = ctx;
   const base = determineOutcome(stats);
   const wScore = weightedScore(stats, playStyle);
   const activeFactions = factions.filter((f) => !f.is_destroyed);
@@ -178,26 +359,6 @@ export function determineConditionalOutcome(
   const isLongRun = turnCount >= 22;
 
   if (base === "defeat") {
-    if (playStyle === "Officialdom" && stats.international_standing <= 10) {
-      return {
-        base: "defeat",
-        title: "魂断刑场",
-        description:
-          "触怒天颜，身首异处。你的名字成为后世的警示，史书上只留下寥寥数语。",
-      };
-    }
-    if (
-      playStyle === "Officialdom" &&
-      stats.international_standing <= 20 &&
-      stats.stability <= 20
-    ) {
-      return {
-        base: "defeat",
-        title: "贬谪天涯",
-        description:
-          "一纸诏书，万劫不复。你被流放至蛮荒之地，再无翻身之日，只能在异乡遥望故土。",
-      };
-    }
     if (playStyle === "Survival" && wScore >= 35) {
       return {
         base: "neutral",
@@ -215,62 +376,13 @@ export function determineConditionalOutcome(
     }
     return {
       base: "defeat",
-      title: playStyle === "Officialdom" ? "身败名裂" : "国破家亡",
+      title: "国破家亡",
       description:
-        playStyle === "Officialdom"
-          ? "官场失意，身败名裂。你的仕途以最不堪的方式画上了句号，后人提及唯有叹息。"
-          : "你的统治走向了终结，历史的车轮碾过你的王朝，只留下断壁残垣。",
+        "你的统治走向了终结，历史的车轮碾过你的王朝，只留下断壁残垣。",
     };
   }
 
   if (base === "victory") {
-    if (
-      playStyle === "Officialdom" &&
-      stats.stability >= 75 &&
-      stats.international_standing >= 75
-    ) {
-      const rank = ctx.playerRank;
-      if (rank !== undefined && rank <= 0) {
-        return {
-          base: "victory",
-          title: "只手遮天",
-          description:
-            "摄政天下，权倾朝野。你已超越了臣子的极限，成为帝国真正的掌舵者。史书将你与霍光、曹操并列。",
-        };
-      }
-      return {
-        base: "victory",
-        title: "位极人臣",
-        description:
-          "一人之下，万人之上。你从微末小吏走到了权力的巅峰，成为一代名臣。后世史家将你与管仲、诸葛亮并论。",
-      };
-    }
-    if (
-      playStyle === "Officialdom" &&
-      stats.stability >= 80 &&
-      stats.international_standing >= 80 &&
-      isSpeedRun
-    ) {
-      return {
-        base: "victory",
-        title: "青云直上",
-        description:
-          "平步青云，势不可挡。你以惊人的速度攀上高位，令朝野侧目。如此际遇，百年难遇。",
-      };
-    }
-    if (
-      playStyle === "Officialdom" &&
-      stats.stability >= 70 &&
-      stats.international_standing >= 70 &&
-      isLongRun
-    ) {
-      return {
-        base: "victory",
-        title: "老成谋国",
-        description:
-          "历经沉浮，终成栋梁。你用时间和智慧证明了自己的价值，成为朝廷不可或缺的定海神针。",
-      };
-    }
     if (
       playStyle === "Conquest" &&
       stats.military >= 75 &&
@@ -349,39 +461,6 @@ export function determineConditionalOutcome(
     };
   }
 
-  if (playStyle === "Officialdom" && stats.stability >= 55) {
-    const rank = ctx.playerRank;
-    if (rank !== undefined && rank <= 3) {
-      return {
-        base: "neutral",
-        title: "中流砥柱",
-        description:
-          "你在朝堂上站稳了脚跟，虽未至巅峰，却也是不可或缺的重臣。后人评说，你是那个时代的脊梁。",
-      };
-    }
-    if (stats.international_standing >= 60 && stats.stability < 40) {
-      return {
-        base: "neutral",
-        title: "伴驾之臣",
-        description:
-          "深得上意，却无实权。你是上位者信任的近臣，却永远走不到台前。荣华富贵皆有，唯独缺少真正的力量。",
-      };
-    }
-    if (rank !== undefined && rank >= 5 && stats.international_standing >= 50) {
-      return {
-        base: "neutral",
-        title: "安守本分",
-        description:
-          "不求闻达于诸侯，但求无过于当下。你选择了一条安稳的仕途，虽无大功，亦无大过。",
-      };
-    }
-    return {
-      base: "neutral",
-      title: "随波逐流",
-      description:
-        "宦海浮沉，起起落落。你既非权臣，也非庸吏，只是官场中普通的一员，随波逐流而已。",
-    };
-  }
   if (
     playStyle === "Conquest" &&
     stats.military >= 60 &&

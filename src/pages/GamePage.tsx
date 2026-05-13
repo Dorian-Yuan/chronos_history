@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useGameState, useGameDispatch } from "@/lib/game";
 import {
   evaluateTurn,
@@ -22,8 +22,10 @@ import type {
   ScenarioData,
   FactionData,
   AdvisorData,
+  GameUniverse,
 } from "@/types";
 import { determineConditionalOutcome, checkGameOver, clampStat } from "@/types";
+import { getTerminology } from "@/config/terminology";
 import {
   Settings,
   Save,
@@ -73,36 +75,21 @@ function safeGetDelta(turnResults: TurnResult[]) {
   return undefined;
 }
 
-const TAB_CONFIG = {
-  chronicle: {
-    icon: BookOpen,
-    label: "编年史",
-    colorVar: "--color-tab-chronicle",
-  },
-  cabinet: { icon: Users, label: "内阁", colorVar: "--color-tab-cabinet" },
-  courtDebate: {
-    icon: Scale,
-    label: "廷议",
-    colorVar: "--color-tab-court-debate",
-  },
-  intelligence: {
-    icon: Radar,
-    label: "情报",
-    colorVar: "--color-tab-intelligence",
-  },
-} as const;
-
 export function GamePage() {
   const state = useGameState();
   const dispatch = useGameDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
-  const [mobileTab, setMobileTab] =
-    useState<keyof typeof TAB_CONFIG>("chronicle");
+  const [mobileTab, setMobileTab] = useState<
+    "chronicle" | "cabinet" | "courtDebate" | "intelligence"
+  >("chronicle");
   const [showSaveManager, setShowSaveManager] = useState(false);
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
+
+  const universe: GameUniverse = state.universe || "history";
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   const scenario = state.scenario;
   const turnResults = state.turnResults;
@@ -115,9 +102,69 @@ export function GamePage() {
   const currentFactions = safeGetFactions(scenario);
   const currentDelta = safeGetDelta(turnResults);
 
-  const nationName = scenario?.player_context?.nation_name || "未知国家";
-  const leaderTitle = scenario?.player_context?.leader_title || "统治者";
-  const scenarioTitle = scenario?.title || "未知剧本";
+  const nationName =
+    scenario?.player_context?.nation_name || term.defaultNationName;
+  const leaderTitle =
+    scenario?.player_context?.leader_title || term.defaultLeaderTitle;
+  const scenarioTitle = scenario?.title || term.defaultScenarioTitle;
+
+  const superiorInfo =
+    universe === "life" && scenario?.player_context?.superior_title
+      ? {
+          title: scenario.player_context.superior_title,
+          name: scenario.player_context.superior_name || "",
+        }
+      : undefined;
+  const favorValue =
+    universe === "life" ? state.stats.international_standing : undefined;
+
+  const TAB_CONFIG = useMemo(
+    () => ({
+      chronicle: {
+        icon: BookOpen,
+        label: term.chronicleLabel,
+        colorVar: "--color-tab-chronicle",
+      },
+      cabinet: {
+        icon: Users,
+        label: term.cabinetLabel,
+        colorVar: "--color-tab-cabinet",
+      },
+      courtDebate: {
+        icon: Scale,
+        label: term.courtDebateLabel,
+        colorVar: "--color-tab-court-debate",
+      },
+      intelligence: {
+        icon: Radar,
+        label: term.intelligenceLabel,
+        colorVar: "--color-tab-intelligence",
+      },
+    }),
+    [term],
+  );
+
+  const STAT_CONFIG = useMemo(
+    () => [
+      {
+        key: "stability" as const,
+        label: term.statLabels.stability,
+        Icon: Scale,
+      },
+      { key: "economy" as const, label: term.statLabels.economy, Icon: Coins },
+      {
+        key: "military" as const,
+        label: term.statLabels.military,
+        Icon: Swords,
+      },
+      {
+        key: "international_standing" as const,
+        label: term.statLabels.international_standing,
+        Icon: Globe,
+      },
+    ],
+    [term],
+  );
 
   useEffect(() => {
     if (state.turnCount > 1 && scenario) {
@@ -148,6 +195,8 @@ export function GamePage() {
           currentAdvisors,
           lastDateDisplay,
           recentActions,
+          state.identityChangeCount,
+          universe,
         );
 
         dispatch({ type: "PROCESS_TURN", result, playerAction: action });
@@ -175,6 +224,7 @@ export function GamePage() {
             const conditionalOutcome = determineConditionalOutcome({
               stats: newStats,
               playStyle: scenario.play_style,
+              lifeMode: scenario.life_mode,
               factions: newFactions,
               turnCount: state.turnCount + 1,
               playerRank: scenario.player_context?.official_rank?.level,
@@ -184,6 +234,7 @@ export function GamePage() {
               scenario,
               [...state.historyLog, result.hidden_consequences],
               conditionalOutcome,
+              universe,
             );
             dispatch({ type: "GAME_OVER", analysis });
 
@@ -215,13 +266,13 @@ export function GamePage() {
         }
       } catch (e) {
         console.error("Turn evaluation failed:", e);
-        const msg = e instanceof Error ? e.message : "推演失败";
+        const msg = e instanceof Error ? e.message : term.evaluateError;
         if (
           msg.includes("JSON") ||
           msg.includes("json") ||
           msg.includes("Unrecognized token")
         ) {
-          setError("AI 返回格式异常，请检查 API 配置或更换模型");
+          setError(term.jsonParseError);
         } else {
           setError(msg);
         }
@@ -229,17 +280,28 @@ export function GamePage() {
         setIsLoading(false);
       }
     },
-    [isLoading, scenario, state, currentAdvisors, turnResults, dispatch],
+    [
+      isLoading,
+      scenario,
+      state,
+      currentAdvisors,
+      turnResults,
+      dispatch,
+      universe,
+      term,
+    ],
   );
 
   const handleEndGame = useCallback(async () => {
-    if (!scenario || state.phase !== "playing") return;
+    if (!scenario || state.phase !== "playing" || isLoading) return;
+    setShowEndGameConfirm(false);
     setIsLoading(true);
     setError(null);
     try {
       const conditionalOutcome = determineConditionalOutcome({
         stats: state.stats,
         playStyle: scenario.play_style,
+        lifeMode: scenario.life_mode,
         factions: scenario.factions,
         turnCount: state.turnCount,
         playerRank: scenario.player_context?.official_rank?.level,
@@ -249,6 +311,7 @@ export function GamePage() {
         scenario,
         state.historyLog,
         conditionalOutcome,
+        universe,
       );
       dispatch({ type: "GAME_OVER", analysis });
 
@@ -275,13 +338,13 @@ export function GamePage() {
       );
     } catch (e) {
       console.error("Failed to end game:", e);
-      const msg = e instanceof Error ? e.message : "结束推演失败";
+      const msg = e instanceof Error ? e.message : term.endGameError;
       setError(msg);
     } finally {
       setIsLoading(false);
       setShowEndGameConfirm(false);
     }
-  }, [scenario, state, dispatch]);
+  }, [scenario, state, dispatch, universe, term, isLoading]);
 
   if (!scenario) {
     return (
@@ -332,13 +395,11 @@ export function GamePage() {
 
   return (
     <div className="flex h-full flex-col gap-2">
-      {/* Merged identity + stat bar card - inline padding ensures pixel-exact alignment with chronicle and input */}
       <div
         className="mt-4"
         style={{ paddingLeft: "1.25rem", paddingRight: "1.25rem" }}
       >
         <div className="rounded-lg border border-border bg-bg-card shadow-sm">
-          {/* Identity row */}
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex flex-col gap-0.5 min-w-0 overflow-hidden">
               <span className="text-base font-serif font-bold text-text-primary truncate">
@@ -352,15 +413,16 @@ export function GamePage() {
               <button
                 onClick={() => dispatch({ type: "RESET" })}
                 className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
-                aria-label="返回主页"
+                aria-label={term.backButton}
               >
                 <Home size={16} strokeWidth={1.5} />
               </button>
               {state.turnCount >= 8 && state.phase === "playing" && (
                 <button
                   onClick={() => setShowEndGameConfirm(true)}
-                  className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-accent-primary transition-all w-7 h-7"
-                  aria-label="结束推演"
+                  disabled={isLoading}
+                  className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-accent-primary transition-all w-7 h-7 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label={term.endGameTitle}
                 >
                   <Flag size={16} strokeWidth={1.5} />
                 </button>
@@ -368,7 +430,7 @@ export function GamePage() {
               <button
                 onClick={() => setShowSaveManager(true)}
                 className="flex items-center justify-center rounded-md text-text-tertiary hover:bg-bg-hover hover:text-text-primary transition-all w-7 h-7"
-                aria-label="存档管理"
+                aria-label={term.saveButton}
               >
                 <Save size={16} strokeWidth={1.5} />
               </button>
@@ -381,24 +443,13 @@ export function GamePage() {
               </button>
             </div>
           </div>
-          {/* Divider */}
           <div className="h-px bg-border mx-4" />
-          {/* Stat bars */}
           <div
             className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 py-3"
             role="group"
-            aria-label="国家属性"
+            aria-label={term.statAriaLabel}
           >
-            {[
-              { key: "stability" as const, label: "稳定性", Icon: Scale },
-              { key: "economy" as const, label: "经济", Icon: Coins },
-              { key: "military" as const, label: "军事", Icon: Swords },
-              {
-                key: "international_standing" as const,
-                label: "国际声望",
-                Icon: Globe,
-              },
-            ].map(({ key, label, Icon }) => {
+            {STAT_CONFIG.map(({ key, label, Icon }) => {
               const value = state.stats[key];
               const deltaValue = currentDelta?.[key] ?? 0;
               const barColor =
@@ -466,11 +517,12 @@ export function GamePage() {
               turnCount={state.turnCount}
               turnResults={turnResults}
               isLoading={isLoading}
+              universe={universe}
             />
             <GameInput
               onSubmit={handleSubmit}
               disabled={isLoading || state.phase === "ended"}
-              placeholder={`下达指令...（外交、经济、军事等）`}
+              placeholder={term.inputPlaceholder}
               decisionOptions={
                 state.turnResults.length > 0
                   ? state.turnResults[state.turnResults.length - 1]
@@ -494,6 +546,7 @@ export function GamePage() {
                     ? turnResults[turnResults.length - 1].situation_update
                     : ""
                 }
+                universe={universe}
               />
             ) : mobileTab === "courtDebate" ? (
               <CourtDebatePanel
@@ -509,9 +562,15 @@ export function GamePage() {
                 turnResults={turnResults}
                 advisors={currentAdvisors}
                 courtDebateSessions={state.courtDebateSessions}
+                universe={universe}
               />
             ) : (
-              <IntelligencePanel factions={currentFactions} />
+              <IntelligencePanel
+                factions={currentFactions}
+                universe={universe}
+                superior={superiorInfo}
+                favor={favorValue}
+              />
             )}
           </div>
         </div>
@@ -520,7 +579,7 @@ export function GamePage() {
           <div
             className="flex border-b border-border"
             role="tablist"
-            aria-label="侧边栏"
+            aria-label={term.sidebarAriaLabel}
           >
             {renderTabButton(
               "cabinet",
@@ -557,6 +616,7 @@ export function GamePage() {
                     ? turnResults[turnResults.length - 1].situation_update
                     : ""
                 }
+                universe={universe}
               />
             </div>
             <div
@@ -577,6 +637,7 @@ export function GamePage() {
                 turnResults={turnResults}
                 advisors={currentAdvisors}
                 courtDebateSessions={state.courtDebateSessions}
+                universe={universe}
               />
             </div>
             <div
@@ -584,7 +645,12 @@ export function GamePage() {
               role="tabpanel"
               className={sideTab === "intelligence" ? "" : "hidden"}
             >
-              <IntelligencePanel factions={currentFactions} />
+              <IntelligencePanel
+                factions={currentFactions}
+                universe={universe}
+                superior={superiorInfo}
+                favor={favorValue}
+              />
             </div>
           </div>
         </div>
@@ -597,7 +663,7 @@ export function GamePage() {
           backdropFilter: "blur(20px) saturate(180%)",
           WebkitBackdropFilter: "blur(20px) saturate(180%)",
         }}
-        aria-label="游戏面板"
+        aria-label={term.gamePanelAriaLabel}
       >
         {renderTabButton(
           "chronicle",
@@ -633,7 +699,7 @@ export function GamePage() {
           className="flex items-center gap-1.5 text-text-tertiary hover:text-text-primary transition-colors"
         >
           <Save size={12} />
-          存档
+          {term.saveButton}
         </button>
       </footer>
 
@@ -653,6 +719,8 @@ export function GamePage() {
           turnCount={state.turnCount}
           onConfirm={handleEndGame}
           onCancel={() => setShowEndGameConfirm(false)}
+          universe={universe}
+          isLoading={isLoading}
         />
       )}
     </div>

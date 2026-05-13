@@ -1,9 +1,12 @@
+import { useMemo } from "react";
 import type {
   EndGameAnalysis,
   GameStats,
   GameOutcome,
   ConditionalOutcome,
+  GameUniverse,
 } from "@/types";
+import { getTerminology } from "@/config/terminology";
 
 interface EndGameReportProps {
   analysis: EndGameAnalysis;
@@ -11,6 +14,7 @@ interface EndGameReportProps {
   outcome: GameOutcome;
   conditionalOutcome?: ConditionalOutcome;
   turnCount: number;
+  universe?: GameUniverse;
 }
 
 const OUTCOME_CONFIG: Record<
@@ -37,21 +41,16 @@ const OUTCOME_CONFIG: Record<
   },
 };
 
-const DIMENSION_LABELS: Record<string, string> = {
-  Authority: "权威",
-  Strategy: "战略",
-  Empathy: "共情",
-  Vision: "远见",
-  Economy: "经济",
-};
-
 export function EndGameReport({
   analysis,
   stats,
   outcome,
   conditionalOutcome,
   turnCount,
+  universe = "history",
 }: EndGameReportProps) {
+  const term = useMemo(() => getTerminology(universe), [universe]);
+
   const outcomeConfig = OUTCOME_CONFIG[outcome];
 
   const avgStat = Math.round(
@@ -76,7 +75,9 @@ export function EndGameReport({
           </div>
         )}
         <div className="text-sm text-text-tertiary">
-          历经 {turnCount} 回合 · 综合评分 {avgStat}
+          {term.endGameTurnSummary
+            .replace("{turn}", String(turnCount))
+            .replace("{score}", String(avgStat))}
         </div>
       </div>
 
@@ -91,17 +92,20 @@ export function EndGameReport({
 
       <div className={`rounded-lg p-5 ${outcomeConfig.bgClass}`}>
         <div className="font-serif text-sm font-semibold text-accent-primary mb-3">
-          真实历史：{analysis.real_event_title}
+          {term.realHistoryLabel}
+          {analysis.real_event_title}
         </div>
         <div className="space-y-2.5 text-sm">
           <div>
-            <span className="text-text-tertiary">历史结果：</span>
+            <span className="text-text-tertiary">
+              {term.historyResultLabel}
+            </span>
             <span className="font-serif text-text-secondary">
               {analysis.real_outcome_summary}
             </span>
           </div>
           <div>
-            <span className="text-text-tertiary">你的结果：</span>
+            <span className="text-text-tertiary">{term.yourResultLabel}</span>
             <span className="font-serif text-text-secondary">
               {analysis.user_outcome_summary}
             </span>
@@ -111,7 +115,7 @@ export function EndGameReport({
 
       {analysis.modern_echo && (
         <div className="rounded-lg border border-border bg-bg-card p-5">
-          <div className="section-label">历史余响</div>
+          <div className="section-label">{term.modernEchoLabel}</div>
           <div className="font-serif text-sm leading-relaxed text-text-secondary italic">
             {analysis.modern_echo}
           </div>
@@ -120,7 +124,7 @@ export function EndGameReport({
 
       {analysis.alternative_history && (
         <div className="rounded-lg border border-border bg-bg-card p-5">
-          <div className="section-label">平行历史演化</div>
+          <div className="section-label">{term.alternativeHistoryLabel}</div>
           <div className="font-serif text-sm leading-relaxed text-text-secondary">
             {analysis.alternative_history}
           </div>
@@ -128,12 +132,12 @@ export function EndGameReport({
       )}
 
       <div className="rounded-lg border border-border bg-bg-card p-5">
-        <div className="section-label">对比分析</div>
+        <div className="section-label">{term.comparisonLabel}</div>
         <div className="font-serif text-sm leading-relaxed text-text-secondary">
           {analysis.comparison_text}
         </div>
         <div className="mt-4 text-sm">
-          <span className="text-text-tertiary">相似历史人物：</span>
+          <span className="text-text-tertiary">{term.similarFigureLabel}</span>
           <span className="font-serif text-accent-primary font-medium">
             {analysis.similar_historical_figure}
           </span>
@@ -141,12 +145,12 @@ export function EndGameReport({
       </div>
 
       <div className="rounded-lg border border-border bg-bg-card p-5">
-        <div className="section-label">统治者画像</div>
+        <div className="section-label">{term.rulerPortraitLabel}</div>
         <div className="space-y-4">
           {analysis.radar_stats.map((stat) => (
             <div key={stat.dimension} className="flex items-center gap-4">
               <span className="w-14 text-xs text-text-tertiary shrink-0">
-                {DIMENSION_LABELS[stat.dimension] || stat.dimension}
+                {term.dimensionLabels[stat.dimension] || stat.dimension}
               </span>
               <div className="flex-1 h-2.5 overflow-hidden rounded-full bg-bg-tertiary">
                 <div
@@ -164,7 +168,7 @@ export function EndGameReport({
 
       {analysis.turn_reviews.length > 0 && (
         <div className="rounded-lg border border-border bg-bg-card p-5">
-          <div className="section-label">决策复盘</div>
+          <div className="section-label">{term.decisionReviewLabel}</div>
           <div className="space-y-5">
             {analysis.turn_reviews.map((review) => (
               <div key={review.turn} className="flex gap-4">

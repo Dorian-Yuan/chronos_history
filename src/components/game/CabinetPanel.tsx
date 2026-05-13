@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type {
   AdvisorData,
   ScenarioData,
   GameStats,
   CounselMessage,
   AdvisorRole,
+  GameUniverse,
 } from "@/types";
 import { useGameState, useGameDispatch } from "@/lib/game";
-import { TERMINOLOGY } from "@/config/terminology";
 import { AdvisorCard } from "./AdvisorCard";
 import { CounselDialog } from "./CounselDialog";
+import { getTerminology } from "@/config/terminology";
 
 interface CabinetPanelProps {
   advisors: AdvisorData[];
@@ -17,6 +18,7 @@ interface CabinetPanelProps {
   stats: GameStats;
   historyLog: string[];
   currentSituation: string;
+  universe?: GameUniverse;
 }
 
 export function CabinetPanel({
@@ -25,15 +27,14 @@ export function CabinetPanel({
   stats,
   historyLog,
   currentSituation,
+  universe = "history",
 }: CabinetPanelProps) {
   const [counselAdvisor, setCounselAdvisor] = useState<AdvisorData | null>(
     null,
   );
   const gameState = useGameState();
   const dispatch = useGameDispatch();
-  const terms = scenario
-    ? TERMINOLOGY[scenario.play_style]
-    : TERMINOLOGY.Conquest;
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   const getCounselMessages = (role: AdvisorRole): CounselMessage[] => {
     const session = (gameState.counselSessions ?? []).find(
@@ -56,9 +57,9 @@ export function CabinetPanel({
     return (
       <div className="flex flex-col gap-4 px-5 py-2">
         <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
-          <p className="text-xs font-serif">暂无{terms.advisorLabel}信息</p>
+          <p className="text-xs font-serif">暂无{term.cabinetLabel}信息</p>
           <p className="text-xs mt-1 text-text-tertiary/60 font-serif">
-            完成第一回合后将显示{terms.advisorLabel}建议
+            完成第一回合后将显示{term.cabinetLabel}建议
           </p>
         </div>
       </div>
@@ -75,6 +76,7 @@ export function CabinetPanel({
               key={advisor.role}
               advisor={advisor}
               onCounsel={scenario ? (a) => setCounselAdvisor(a) : undefined}
+              universe={universe}
             />
           ))}
         {advisors
@@ -83,6 +85,7 @@ export function CabinetPanel({
             <AdvisorCard
               key={`${advisor.role}-${advisor.name}`}
               advisor={advisor}
+              universe={universe}
             />
           ))}
       </div>
@@ -99,6 +102,7 @@ export function CabinetPanel({
             updateCounselMessages(counselAdvisor.role, messages)
           }
           onClose={() => setCounselAdvisor(null)}
+          universe={universe}
         />
       )}
     </div>

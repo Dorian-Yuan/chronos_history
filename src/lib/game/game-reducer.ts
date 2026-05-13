@@ -1,6 +1,7 @@
 import type {
   GameState,
   GameStats,
+  GameUniverse,
   ScenarioData,
   TurnResult,
   EndGameAnalysis,
@@ -12,9 +13,11 @@ import type {
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
 import { getAppConfig } from "@/config";
+import { normalizeAttitude } from "./utils";
 
 export type GameAction =
   | { type: "ENTER_SELECTION" }
+  | { type: "ENTER_LIFE_SELECTION" }
   | { type: "SET_SCENARIO"; scenario: ScenarioData }
   | { type: "PROCESS_TURN"; result: TurnResult; playerAction: string }
   | { type: "GAME_OVER"; analysis: EndGameAnalysis }
@@ -59,40 +62,6 @@ function applyStatsDelta(
       delta.international_standing,
     ),
   };
-}
-
-const VALID_ATTITUDES = ["敌对", "求和", "中立", "友好", "臣服"];
-
-const ATTITUDE_NORMALIZE_MAP: Record<string, string> = {
-  即将归附: "友好",
-  倾向臣服: "友好",
-  即将臣服: "友好",
-  表面臣服: "臣服",
-  归附: "臣服",
-  归顺: "臣服",
-  降服: "臣服",
-  倾向敌对: "敌对",
-  敌视: "敌对",
-  仇恨: "敌对",
-  敌意: "敌对",
-  亲近: "友好",
-  友善: "友好",
-  亲善: "友好",
-  和平: "求和",
-  议和: "求和",
-  示好: "求和",
-  冷淡: "中立",
-  疏远: "中立",
-  观望: "中立",
-};
-
-function normalizeAttitude(attitude: string): string {
-  if (VALID_ATTITUDES.includes(attitude)) return attitude;
-  if (ATTITUDE_NORMALIZE_MAP[attitude]) return ATTITUDE_NORMALIZE_MAP[attitude];
-  for (const valid of VALID_ATTITUDES) {
-    if (attitude.includes(valid)) return valid;
-  }
-  return "中立";
 }
 
 function updateAdvisors(
@@ -192,7 +161,18 @@ function updateFactions(
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "ENTER_SELECTION":
-      return { ...state, phase: "selection" };
+      return {
+        ...state,
+        phase: "selection",
+        universe: "history" as GameUniverse,
+      };
+
+    case "ENTER_LIFE_SELECTION":
+      return {
+        ...state,
+        phase: "life_selection",
+        universe: "life" as GameUniverse,
+      };
 
     case "SET_SCENARIO": {
       const scenario = action.scenario;
@@ -211,8 +191,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         endGameAnalysis: null,
         turnResults: [],
         counselSessions: [],
+        courtDebateSessions: [],
         playerActions: [],
         currentAdvisors: initialAdvisors,
+        identityChangeCount: { nation_name: 0, leader_title: 0 },
       };
     }
 
@@ -223,39 +205,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         result.stats_delta,
         state.turnCount,
       );
-
-      const playerContextUpdate = result.player_context_update;
-      const newIdentityChangeCount = { ...state.identityChangeCount };
-      let updatedPlayerContext = state.scenario?.player_context;
-
-      if (playerContextUpdate && state.scenario) {
-        updatedPlayerContext = {
-          ...state.scenario.player_context,
-          ...(playerContextUpdate.nation_name && {
-            nation_name: playerContextUpdate.nation_name,
-          }),
-          ...(playerContextUpdate.leader_title && {
-            leader_title: playerContextUpdate.leader_title,
-          }),
-          ...(playerContextUpdate.background_summary && {
-            background_summary: playerContextUpdate.background_summary,
-          }),
-          ...(playerContextUpdate.official_rank && {
-            official_rank: playerContextUpdate.official_rank,
-          }),
-          ...(playerContextUpdate.superior_title && {
-            superior_title: playerContextUpdate.superior_title,
-          }),
-          ...(playerContextUpdate.superior_name && {
-            superior_name: playerContextUpdate.superior_name,
-          }),
-        };
-        if (playerContextUpdate.nation_name)
-          newIdentityChangeCount.nation_name++;
-        if (playerContextUpdate.leader_title)
-          newIdentityChangeCount.leader_title++;
-      }
-
       const newScenario = state.scenario
         ? {
             ...state.scenario,
@@ -263,9 +212,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
               state.scenario.factions,
               result.factions_update,
             ),
-            ...(updatedPlayerContext !== state.scenario.player_context && {
-              player_context: updatedPlayerContext!,
-            }),
           }
         : null;
 
@@ -274,13 +220,83 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         result.advisors,
       );
 
+      const playerContextUpdate = result.player_context_update;
+      const newIdentityChangeCount = { ...state.identityChangeCount };
+      let updatedPlayerContext = state.scenario?.player_context;
+
+      if (playerContextUpdate && state.scenario) {
+        const hasActualChange =
+          playerContextUpdate.nation_name ||
+          playerContextUpdate.leader_title ||
+          playerContextUpdate.official_rank ||
+          playerContextUpdate.superior_name;
+
+        if (!hasActualChange) {
+          result.player_context_update = undefined;
+          if (playerContextUpdate.change_reason) {
+            result.narrative = result.narrative
+              ? `${result.narrative}\n\n【${playerContextUpdate.change_reason}】`
+              : playerContextUpdate.change_reason;
+          }
+        } else {
+          const oldContext = state.scenario.player_context;
+          playerContextUpdate.previous_nation_name = oldContext.nation_name;
+          playerContextUpdate.previous_leader_title = oldContext.leader_title;
+          if (oldContext.official_rank) {
+            playerContextUpdate.previous_official_rank = {
+              ...oldContext.official_rank,
+            };
+          }
+          if (oldContext.superior_title) {
+            playerContextUpdate.previous_superior_title =
+              oldContext.superior_title;
+          }
+          if (oldContext.superior_name) {
+            playerContextUpdate.previous_superior_name =
+              oldContext.superior_name;
+          }
+
+          updatedPlayerContext = {
+            ...state.scenario.player_context,
+            ...(playerContextUpdate.nation_name && {
+              nation_name: playerContextUpdate.nation_name,
+            }),
+            ...(playerContextUpdate.leader_title && {
+              leader_title: playerContextUpdate.leader_title,
+            }),
+            ...(playerContextUpdate.background_summary && {
+              background_summary: playerContextUpdate.background_summary,
+            }),
+            ...(playerContextUpdate.official_rank && {
+              official_rank: playerContextUpdate.official_rank,
+            }),
+            ...(playerContextUpdate.superior_title && {
+              superior_title: playerContextUpdate.superior_title,
+            }),
+            ...(playerContextUpdate.superior_name && {
+              superior_name: playerContextUpdate.superior_name,
+            }),
+          };
+          if (playerContextUpdate.nation_name)
+            newIdentityChangeCount.nation_name++;
+          if (playerContextUpdate.leader_title)
+            newIdentityChangeCount.leader_title++;
+        }
+      }
+
+      const finalScenario = newScenario
+        ? updatedPlayerContext
+          ? { ...newScenario, player_context: updatedPlayerContext }
+          : newScenario
+        : null;
+
       return {
         ...state,
         stats: newStats,
         turnCount: state.turnCount + 1,
         historyLog: [...state.historyLog, result.hidden_consequences],
         currentTurnResult: result,
-        scenario: newScenario,
+        scenario: finalScenario,
         turnResults: [...state.turnResults, result],
         counselSessions: [],
         playerActions: [...state.playerActions, action.playerAction],

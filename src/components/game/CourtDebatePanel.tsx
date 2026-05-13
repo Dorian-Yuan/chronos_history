@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import type {
   AdvisorData,
   AdvisorRole,
@@ -7,9 +7,10 @@ import type {
   ScenarioData,
   GameStats,
   TurnResult,
+  GameUniverse,
 } from "@/types";
-import { TERMINOLOGY } from "@/config/terminology";
 import { useGameDispatch, courtDebate } from "@/lib/game";
+import { getTerminology } from "@/config/terminology";
 import {
   Shield,
   Scroll,
@@ -29,21 +30,18 @@ interface CourtDebatePanelProps {
   turnResults: TurnResult[];
   advisors: AdvisorData[];
   courtDebateSessions: CourtDebateSession[];
+  universe?: GameUniverse;
 }
 
-const ROLE_CONFIG: Record<
+const ROLE_STATIC: Record<
   AdvisorRole,
-  { label: string; icon: typeof Shield; colorVar: string }
+  { icon: typeof Shield; colorVar: string }
 > = {
-  General: { label: "将军", icon: Shield, colorVar: "--color-role-general" },
-  Diplomat: {
-    label: "外交官",
-    icon: Scroll,
-    colorVar: "--color-role-diplomat",
-  },
-  Intel: { label: "密探", icon: Eye, colorVar: "--color-role-intel" },
-  Scholar: { label: "学者", icon: BookOpen, colorVar: "--color-role-scholar" },
-  Merchant: { label: "商人", icon: Coins, colorVar: "--color-role-merchant" },
+  General: { icon: Shield, colorVar: "--color-role-general" },
+  Diplomat: { icon: Scroll, colorVar: "--color-role-diplomat" },
+  Intel: { icon: Eye, colorVar: "--color-role-intel" },
+  Scholar: { icon: BookOpen, colorVar: "--color-role-scholar" },
+  Merchant: { icon: Coins, colorVar: "--color-role-merchant" },
 };
 
 const STANCE_CONFIG: Record<
@@ -76,13 +74,26 @@ export function CourtDebatePanel({
   turnResults,
   advisors,
   courtDebateSessions,
+  universe = "history",
 }: CourtDebatePanelProps) {
   const dispatch = useGameDispatch();
+  const term = useMemo(() => getTerminology(universe), [universe]);
+
+  const roleConfig = useMemo(() => {
+    const cfg = {} as Record<
+      AdvisorRole,
+      { label: string; icon: typeof Shield; colorVar: string }
+    >;
+    for (const role of Object.keys(ROLE_STATIC) as AdvisorRole[]) {
+      cfg[role] = { ...ROLE_STATIC[role], label: term.advisorRoles[role] };
+    }
+    return cfg;
+  }, [term]);
+
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const terms = TERMINOLOGY[scenario.play_style];
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const currentDateDisplay =
@@ -161,6 +172,7 @@ export function CourtDebatePanel({
           advisors,
           [...previousDebateMessages, ...localMessages],
           remainingRounds,
+          universe,
         );
 
         const advisorMessage: CourtDebateMessage = {
@@ -183,7 +195,7 @@ export function CourtDebatePanel({
       dispatch({ type: "FINISH_COURT_DEBATE" });
     } catch (e) {
       console.error("[CourtDebatePanel] Debate failed:", e);
-      const msg = e instanceof Error ? e.message : "廷议失败";
+      const msg = e instanceof Error ? e.message : term.debateError;
       setError(msg);
       dispatch({ type: "FINISH_COURT_DEBATE" });
     } finally {
@@ -201,6 +213,8 @@ export function CourtDebatePanel({
     dispatch,
     turnCount,
     courtDebateSessions,
+    universe,
+    term,
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -212,13 +226,13 @@ export function CourtDebatePanel({
 
   const getRoleColor = (role?: AdvisorRole) => {
     if (!role) return "var(--color-text-tertiary)";
-    const config = ROLE_CONFIG[role];
+    const config = roleConfig[role];
     return config ? `var(${config.colorVar})` : "var(--color-text-tertiary)";
   };
 
   const getRoleLabel = (role?: AdvisorRole) => {
     if (!role) return "";
-    const config = ROLE_CONFIG[role];
+    const config = roleConfig[role];
     return config?.label ?? role;
   };
 
@@ -291,20 +305,21 @@ export function CourtDebatePanel({
           ref={scrollRef}
           className="flex-1 overflow-y-auto p-4"
           role="log"
-          aria-label={terms.courtDebateLabel}
+          aria-label={term.courtDebateLabel}
           aria-live="polite"
         >
           {!hasAnyContent && (
             <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
               <MessageCircle size={24} className="mb-2 opacity-30" />
               <p className="text-xs font-serif">
-                {terms.courtDebatePrompt.replace(
+                {term.debateEmptyPrompt.replace(
                   "{title}",
-                  scenario.player_context?.leader_title || "阁下",
+                  scenario.player_context?.leader_title ||
+                    term.defaultLeaderTitle,
                 )}
               </p>
               <p className="text-[10px] mt-1 text-text-tertiary/60 font-serif">
-                {terms.courtDebateLabel}结果仅供决策参考
+                {term.debateResultHint}
               </p>
             </div>
           )}
@@ -321,7 +336,8 @@ export function CourtDebatePanel({
               <div key={sessionIdx}>
                 <div className="section-label">
                   第{session.turnNumber}回合 · {turnDate}
-                  {courtDebateSessions.length > 1 && ` · 廷议${sessionIdx + 1}`}
+                  {courtDebateSessions.length > 1 &&
+                    ` · ${term.courtDebateLabel}${sessionIdx + 1}`}
                 </div>
 
                 {session.topic && (
@@ -341,8 +357,8 @@ export function CourtDebatePanel({
                     <div className="rounded-lg px-3 py-2 bg-bg-tertiary">
                       <span className="text-[10px] text-text-tertiary font-serif">
                         {session.currentRound > 0
-                          ? "群臣商议中..."
-                          : "群臣准备陈词..."}
+                          ? term.debateDiscussing
+                          : term.debatePreparing}
                       </span>
                     </div>
                     <div
@@ -357,7 +373,10 @@ export function CourtDebatePanel({
 
                 {session.isFinished && (
                   <div className="text-[10px] text-accent-primary font-serif text-center mb-2">
-                    廷议已结束 · 共{session.totalRounds}轮
+                    {term.debateFinished.replace(
+                      "{rounds}",
+                      String(session.totalRounds),
+                    )}
                   </div>
                 )}
 
@@ -376,8 +395,9 @@ export function CourtDebatePanel({
         {isDebating && activeSession && (
           <div className="px-4 py-1 border-t border-border/50">
             <div className="text-[10px] text-text-tertiary font-serif text-center">
-              廷议进行中 · 第{activeSession.currentRound}/
-              {activeSession.totalRounds}轮
+              {term.debateInProgress
+                .replace("{current}", String(activeSession.currentRound))
+                .replace("{total}", String(activeSession.totalRounds))}
             </div>
           </div>
         )}
@@ -409,8 +429,12 @@ export function CourtDebatePanel({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isDebating ? "廷议进行中..." : "提出议题..."}
-              aria-label="廷议输入"
+              placeholder={
+                isDebating
+                  ? term.debateInProgressShort
+                  : term.debateInputPlaceholder
+              }
+              aria-label={`${term.courtDebateLabel}输入`}
               rows={1}
               className="flex-1 resize-none bg-transparent text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none leading-relaxed"
               style={{ maxHeight: "120px", overflowY: "auto" }}
@@ -422,7 +446,7 @@ export function CourtDebatePanel({
             onClick={handleSubmit}
             disabled={!input.trim() || isLoading || isDebating}
             className="shrink-0 flex items-center justify-center w-9 h-9 rounded-[var(--radius-md)] bg-accent-primary text-text-inverse disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 transition-all hover:bg-accent-primary/90"
-            aria-label="发起廷议"
+            aria-label={term.debateSubmitLabel}
           >
             <Send size={15} />
           </button>

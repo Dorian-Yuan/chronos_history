@@ -1,19 +1,26 @@
-import { useEffect, useRef } from "react";
-import { X, AlertTriangle, Flag } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { X, AlertTriangle, Flag, Loader2 } from "lucide-react";
+import type { GameUniverse } from "@/types";
+import { getTerminology } from "@/config/terminology";
 
 interface EndGameConfirmModalProps {
   turnCount: number;
   onConfirm: () => void;
   onCancel: () => void;
+  universe?: GameUniverse;
+  isLoading?: boolean;
 }
 
 export function EndGameConfirmModal({
   turnCount,
   onConfirm,
   onCancel,
+  universe = "history",
+  isLoading = false,
 }: EndGameConfirmModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const isEarly = turnCount < 16;
+  const term = useMemo(() => getTerminology(universe), [universe]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -41,7 +48,7 @@ export function EndGameConfirmModal({
       <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
-            结束推演
+            {term.endGameTitle}
           </h2>
           <button
             onClick={onCancel}
@@ -61,10 +68,13 @@ export function EndGameConfirmModal({
               />
               <div className="space-y-2">
                 <p className="text-sm font-serif text-text-primary">
-                  当前局势尚未明朗，建议继续推演以获得更完整的结局。
+                  {term.endGameEarlyHint}
                 </p>
                 <p className="text-xs font-serif text-text-tertiary">
-                  当前第{turnCount}回合，历史仍在书写中。确定要提前结束吗？
+                  {term.endGameEarlyConfirm.replace(
+                    "{turn}",
+                    String(turnCount),
+                  )}
                 </p>
               </div>
             </div>
@@ -73,10 +83,13 @@ export function EndGameConfirmModal({
               <Flag size={20} className="shrink-0 text-accent-primary mt-0.5" />
               <div className="space-y-2">
                 <p className="text-sm font-serif text-text-primary">
-                  确定要结束本次推演吗？
+                  {term.endGameConfirm}
                 </p>
                 <p className="text-xs font-serif text-text-tertiary">
-                  当前第{turnCount}回合，将生成终局分析报告。
+                  {term.endGameNormalConfirm.replace(
+                    "{turn}",
+                    String(turnCount),
+                  )}
                 </p>
               </div>
             </div>
@@ -87,14 +100,17 @@ export function EndGameConfirmModal({
           <button
             onClick={onCancel}
             className="btn-ghost flex-1 max-w-[10rem] mx-0"
+            disabled={isLoading}
           >
-            继续推演
+            {term.continueButton}
           </button>
           <button
             onClick={onConfirm}
-            className="btn-primary flex-1 max-w-[10rem] mx-0"
+            className="btn-primary flex-1 max-w-[10rem] mx-0 flex items-center justify-center gap-2"
+            disabled={isLoading}
           >
-            确认结束
+            {isLoading && <Loader2 size={14} className="animate-spin" />}
+            {term.confirmEndButton}
           </button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useUIStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AIProviderConfig } from "./AIProviderConfig";
 import { getAppConfig } from "@/config";
@@ -13,6 +14,8 @@ export function SettingsPanel() {
   const isMobile = useUIStore((s) => s.isMobile);
   const appConfig = getAppConfig();
   const [currentTheme, setCurrentTheme] = useState(getTheme().name);
+  const experimentalMode = useSettingsStore((s) => s.experimentalMode);
+  const setExperimentalMode = useSettingsStore((s) => s.setExperimentalMode);
 
   if (!settingsOpen) return null;
 
@@ -60,6 +63,33 @@ export function SettingsPanel() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="divider" />
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium font-serif text-text-secondary">
+              实验模式
+            </label>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-text-tertiary font-serif">
+                启用后可体验开发中的新功能
+              </span>
+              <button
+                onClick={() => setExperimentalMode(!experimentalMode)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  experimentalMode ? "bg-accent-primary" : "bg-bg-tertiary"
+                }`}
+                role="switch"
+                aria-checked={experimentalMode}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    experimentalMode ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
 
           <div className="divider" />

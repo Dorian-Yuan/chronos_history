@@ -15,8 +15,10 @@ import {
   BookOpen,
   FolderOpen,
   Trophy,
+  Compass,
 } from "lucide-react";
 import { useUIStore } from "@/stores";
+import { useSettingsStore } from "@/stores";
 
 export function StartPage() {
   const dispatch = useGameDispatch();
@@ -25,11 +27,16 @@ export function StartPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [showCompendium, setShowCompendium] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
+  const experimentalMode = useSettingsStore((s) => s.experimentalMode);
 
   const canContinue = hasAutoSave();
 
-  const handleEnter = () => {
+  const handleEnterHistory = () => {
     dispatch({ type: "ENTER_SELECTION" });
+  };
+
+  const handleEnterLife = () => {
+    dispatch({ type: "ENTER_LIFE_SELECTION" });
   };
 
   const handleContinue = () => {
@@ -54,12 +61,22 @@ export function StartPage() {
 
       <div className="absolute top-[60%] left-1/2 -translate-x-1/2 z-10 flex flex-col gap-4 w-full max-w-[240px] animate-slide-up">
         <button
-          onClick={handleEnter}
+          onClick={handleEnterHistory}
           className="btn-primary w-full h-14 text-base"
         >
           <BookOpen size={18} className="text-btn-primary-text" />
           进入历史
         </button>
+
+        {experimentalMode && (
+          <button
+            onClick={handleEnterLife}
+            className="btn-secondary w-full h-14 text-base"
+          >
+            <Compass size={18} />
+            进入人生
+          </button>
+        )}
 
         {canContinue && (
           <button

@@ -1,4 +1,5 @@
 import type { PlayStyle } from "./play-style";
+import type { LifeMode } from "./life-mode";
 import type { DecisionOption } from "./turn-result";
 
 export type AdvisorRole =
@@ -62,7 +63,8 @@ export interface ScenarioData {
     international_standing: number;
   };
   hidden_real_event: string;
-  play_style: PlayStyle;
+  play_style?: PlayStyle;
+  life_mode?: LifeMode;
   start_date: string;
   initial_advisors: AdvisorData[];
   factions: FactionData[];

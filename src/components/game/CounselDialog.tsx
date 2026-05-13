@@ -1,13 +1,14 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import type {
   AdvisorData,
   AdvisorRole,
   CounselMessage,
   ScenarioData,
   GameStats,
+  GameUniverse,
 } from "@/types";
 import { counselAdvisor } from "@/lib/game";
-import { TERMINOLOGY } from "@/config/terminology";
+import { getTerminology } from "@/config/terminology";
 import {
   Shield,
   Scroll,
@@ -28,21 +29,18 @@ interface CounselDialogProps {
   initialMessages?: CounselMessage[];
   onMessagesChange?: (messages: CounselMessage[]) => void;
   onClose: () => void;
+  universe?: GameUniverse;
 }
 
-const ROLE_CONFIG: Record<
+const ROLE_STATIC: Record<
   AdvisorRole,
-  { label: string; icon: typeof Shield; colorVar: string }
+  { icon: typeof Shield; colorVar: string }
 > = {
-  General: { label: "将军", icon: Shield, colorVar: "--color-role-general" },
-  Diplomat: {
-    label: "外交官",
-    icon: Scroll,
-    colorVar: "--color-role-diplomat",
-  },
-  Intel: { label: "密探", icon: Eye, colorVar: "--color-role-intel" },
-  Scholar: { label: "学者", icon: BookOpen, colorVar: "--color-role-scholar" },
-  Merchant: { label: "商人", icon: Coins, colorVar: "--color-role-merchant" },
+  General: { icon: Shield, colorVar: "--color-role-general" },
+  Diplomat: { icon: Scroll, colorVar: "--color-role-diplomat" },
+  Intel: { icon: Eye, colorVar: "--color-role-intel" },
+  Scholar: { icon: BookOpen, colorVar: "--color-role-scholar" },
+  Merchant: { icon: Coins, colorVar: "--color-role-merchant" },
 };
 
 export function CounselDialog({
@@ -54,9 +52,22 @@ export function CounselDialog({
   initialMessages,
   onMessagesChange,
   onClose,
+  universe = "history",
 }: CounselDialogProps) {
-  const config = ROLE_CONFIG[advisor.role];
-  const terms = TERMINOLOGY[scenario.play_style];
+  const term = useMemo(() => getTerminology(universe), [universe]);
+
+  const roleConfig = useMemo(() => {
+    const cfg = {} as Record<
+      AdvisorRole,
+      { label: string; icon: typeof Shield; colorVar: string }
+    >;
+    for (const role of Object.keys(ROLE_STATIC) as AdvisorRole[]) {
+      cfg[role] = { ...ROLE_STATIC[role], label: term.advisorRoles[role] };
+    }
+    return cfg;
+  }, [term]);
+
+  const config = roleConfig[advisor.role];
   const [messages, setMessages] = useState<CounselMessage[]>(
     initialMessages ?? [],
   );
@@ -110,6 +121,7 @@ export function CounselDialog({
         historyLog,
         currentSituation,
         newMessages,
+        universe,
       );
 
       const assistantMessage: CounselMessage = {
@@ -121,7 +133,7 @@ export function CounselDialog({
       onMessagesChange?.(updatedMessages);
     } catch (e) {
       console.error("[CounselDialog] Failed to get response:", e);
-      const errorMsg = e instanceof Error ? e.message : "问对失败";
+      const errorMsg = e instanceof Error ? e.message : term.counselError;
       setError(errorMsg);
     } finally {
       setIsLoading(false);
@@ -136,6 +148,8 @@ export function CounselDialog({
     historyLog,
     currentSituation,
     onMessagesChange,
+    universe,
+    term,
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -169,7 +183,7 @@ export function CounselDialog({
               {advisor.name} · {config?.label}
             </h2>
             <span className="text-[10px] px-2 py-0.5 rounded bg-accent-secondary/10 text-accent-secondary font-serif self-center">
-              {terms.counselLabel}
+              {term.counselPrivateLabel}
             </span>
           </div>
           <button
@@ -185,9 +199,11 @@ export function CounselDialog({
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-6 text-text-tertiary">
               <MessageCircle size={24} className="mb-2 opacity-30" />
-              <p className="text-xs font-serif">向{advisor.name}提出你的问题</p>
+              <p className="text-xs font-serif">
+                {term.counselAskPrompt.replace("{name}", advisor.name)}
+              </p>
               <p className="text-[10px] mt-1 text-text-tertiary/60 font-serif">
-                此番对话仅你与{advisor.name}知晓
+                {term.counselPrivateHint.replace("{name}", advisor.name)}
               </p>
             </div>
           )}
@@ -221,7 +237,7 @@ export function CounselDialog({
                 style={{ borderLeft: `3px solid ${roleColor}` }}
               >
                 <span className="text-[10px] text-text-tertiary font-serif">
-                  {advisor.name}正在低语...
+                  {term.counselWhispering.replace("{name}", advisor.name)}
                 </span>
               </div>
               <div
@@ -247,7 +263,10 @@ export function CounselDialog({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`向${advisor.name}提问...`}
+              placeholder={term.counselInputPlaceholder.replace(
+                "{name}",
+                advisor.name,
+              )}
               rows={1}
               disabled={isLoading}
               className="flex-1 resize-none rounded-md border border-border bg-bg-secondary text-xs font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none focus:border-accent-primary/50 disabled:opacity-40 max-h-20"

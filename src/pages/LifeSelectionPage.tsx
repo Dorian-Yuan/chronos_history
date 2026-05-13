@@ -1,64 +1,48 @@
 import { useState } from "react";
 import { useGameDispatch } from "@/lib/game";
 import { generateScenario } from "@/lib/game";
-import type { PlayStyle } from "@/types";
-import { PLAY_STYLES } from "@/types";
-import { Swords, Coins, BookOpen, Shield } from "lucide-react";
+import type { LifeMode } from "@/types";
+import { LIFE_MODES } from "@/types";
+import { Compass } from "lucide-react";
 import { ScenarioHintModal } from "@/components/game";
 
-const STYLE_ICONS: Record<PlayStyle, typeof Swords> = {
-  Conquest: Swords,
-  Prosperity: Coins,
-  Reform: BookOpen,
-  Survival: Shield,
+const MODE_ICONS: Record<LifeMode, typeof Compass> = {
+  Officialdom: Compass,
 };
 
-const STYLE_COLORS: Record<
-  PlayStyle,
+const MODE_COLORS: Record<
+  LifeMode,
   { border: string; bg: string; text: string; glow: string }
 > = {
-  Conquest: {
-    border: "border-accent-danger/40",
-    bg: "bg-status-error-bg",
-    text: "text-accent-danger",
-    glow: "group-hover:shadow-accent-danger/20",
-  },
-  Prosperity: {
+  Officialdom: {
     border: "border-accent-secondary/40",
     bg: "bg-status-warning-bg",
     text: "text-accent-secondary",
     glow: "group-hover:shadow-accent-secondary/20",
   },
-  Reform: {
-    border: "border-accent-info/40",
-    bg: "bg-status-info-bg",
-    text: "text-accent-info",
-    glow: "group-hover:shadow-accent-info/20",
-  },
-  Survival: {
-    border: "border-accent-primary/40",
-    bg: "bg-status-success-bg",
-    text: "text-accent-primary",
-    glow: "group-hover:shadow-accent-primary/20",
-  },
 };
 
-export function SelectionPage() {
+export function LifeSelectionPage() {
   const dispatch = useGameDispatch();
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedStyle, setSelectedStyle] = useState<PlayStyle | null>(null);
+  const [selectedMode, setSelectedMode] = useState<LifeMode | null>(null);
   const [progressText, setProgressText] = useState("正在生成剧本...");
 
-  const handleSelect = async (playStyle: PlayStyle, userHint?: string) => {
+  const handleSelect = async (lifeMode: LifeMode, userHint?: string) => {
     setGenerating(true);
     setError(null);
-    setSelectedStyle(null);
+    setSelectedMode(null);
 
     try {
-      const scenario = await generateScenario(playStyle, userHint, (stage) => {
-        setProgressText(stage);
-      });
+      const scenario = await generateScenario(
+        lifeMode,
+        userHint,
+        (stage) => {
+          setProgressText(stage);
+        },
+        "life",
+      );
       dispatch({ type: "SET_SCENARIO", scenario });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "生成剧本失败，请重试";
@@ -79,7 +63,7 @@ export function SelectionPage() {
     <main className="flex h-full flex-col items-center justify-center px-6">
       <div className="mb-8 text-center animate-fade-in">
         <h1 className="font-serif text-2xl font-bold text-text-primary">
-          选择执政基调
+          选择人生轨迹
         </h1>
       </div>
 
@@ -106,13 +90,13 @@ export function SelectionPage() {
         </div>
       ) : (
         <div className="grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-2">
-          {PLAY_STYLES.map((style, idx) => {
-            const Icon = STYLE_ICONS[style.id];
-            const colors = STYLE_COLORS[style.id];
+          {LIFE_MODES.map((mode, idx) => {
+            const Icon = MODE_ICONS[mode.id];
+            const colors = MODE_COLORS[mode.id];
             return (
               <button
-                key={style.id}
-                onClick={() => setSelectedStyle(style.id)}
+                key={mode.id}
+                onClick={() => setSelectedMode(mode.id)}
                 className={`group card-interactive text-left ${colors.border} ${colors.bg} shadow-md ${colors.glow}`}
                 style={{ animationDelay: `${idx * 80}ms` }}
               >
@@ -123,15 +107,15 @@ export function SelectionPage() {
                     <Icon size={13} className={colors.text} />
                   </div>
                   <h2 className="text-sm font-serif font-bold text-text-primary">
-                    {style.name}
+                    {mode.name}
                   </h2>
                   <span className="font-serif text-xs italic text-text-tertiary/70 truncate">
-                    &ldquo;{style.quote}&rdquo;
+                    &ldquo;{mode.quote}&rdquo;
                   </span>
                 </div>
 
                 <p className="text-xs font-serif text-text-tertiary leading-relaxed">
-                  {style.description}
+                  {mode.description}
                 </p>
               </button>
             );
@@ -148,11 +132,11 @@ export function SelectionPage() {
         </div>
       )}
 
-      {selectedStyle && (
+      {selectedMode && (
         <ScenarioHintModal
-          playStyle={selectedStyle}
-          onConfirm={(hint) => handleSelect(selectedStyle, hint)}
-          onCancel={() => setSelectedStyle(null)}
+          playStyle={selectedMode}
+          onConfirm={(hint) => handleSelect(selectedMode, hint)}
+          onCancel={() => setSelectedMode(null)}
         />
       )}
     </main>

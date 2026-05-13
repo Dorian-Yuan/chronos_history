@@ -19,42 +19,11 @@ export const scenarioCoreSchema = {
         leader_title: {
           type: "string" as const,
           description:
-            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等。Officialdom模式为官员头衔如县令、侍郎等）",
+            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
         },
         background_summary: {
           type: "string" as const,
           description: "背景简介",
-        },
-        official_rank: {
-          type: "object" as const,
-          additionalProperties: false,
-          properties: {
-            level: {
-              type: "number" as const,
-              minimum: 0,
-              maximum: 9,
-              description: "品级（0=超品，1-9对应一品到九品）",
-            },
-            title: {
-              type: "string" as const,
-              description: "官职名称（如七品县令、三品侍郎）",
-            },
-            department: {
-              type: "string" as const,
-              description: "所属部门（如吏部、兵部、地方、禁军）",
-            },
-            is_military: { type: "boolean" as const, description: "是否武职" },
-          },
-          required: ["level", "title", "department", "is_military"],
-          description: "品级信息（Officialdom模式必填）",
-        },
-        superior_title: {
-          type: "string" as const,
-          description: "上位者头衔（如皇帝、大将军），Officialdom模式必填",
-        },
-        superior_name: {
-          type: "string" as const,
-          description: "上位者姓名，Officialdom模式必填",
         },
       },
       required: ["nation_name", "leader_title", "background_summary"],
@@ -80,7 +49,7 @@ export const scenarioCoreSchema = {
     },
     play_style: {
       type: "string" as const,
-      enum: ["Conquest", "Prosperity", "Reform", "Survival", "Officialdom"],
+      enum: ["Conquest", "Prosperity", "Reform", "Survival"],
     },
     start_date: {
       type: "string" as const,
@@ -120,42 +89,11 @@ export const scenarioSchema = {
         leader_title: {
           type: "string" as const,
           description:
-            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等。Officialdom模式为官员头衔如县令、侍郎等）",
+            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
         },
         background_summary: {
           type: "string" as const,
           description: "背景简介",
-        },
-        official_rank: {
-          type: "object" as const,
-          additionalProperties: false,
-          properties: {
-            level: {
-              type: "number" as const,
-              minimum: 0,
-              maximum: 9,
-              description: "品级（0=超品，1-9对应一品到九品）",
-            },
-            title: {
-              type: "string" as const,
-              description: "官职名称（如七品县令、三品侍郎）",
-            },
-            department: {
-              type: "string" as const,
-              description: "所属部门（如吏部、兵部、地方、禁军）",
-            },
-            is_military: { type: "boolean" as const, description: "是否武职" },
-          },
-          required: ["level", "title", "department", "is_military"],
-          description: "品级信息（Officialdom模式必填）",
-        },
-        superior_title: {
-          type: "string" as const,
-          description: "上位者头衔（如皇帝、大将军），Officialdom模式必填",
-        },
-        superior_name: {
-          type: "string" as const,
-          description: "上位者姓名，Officialdom模式必填",
         },
       },
       required: ["nation_name", "leader_title", "background_summary"],
@@ -181,7 +119,7 @@ export const scenarioSchema = {
     },
     play_style: {
       type: "string" as const,
-      enum: ["Conquest", "Prosperity", "Reform", "Survival", "Officialdom"],
+      enum: ["Conquest", "Prosperity", "Reform", "Survival"],
     },
     start_date: {
       type: "string" as const,
@@ -340,6 +278,12 @@ export const turnResultSchema = {
               "倾向（前4字为核心总结，共15字以内，如'主战派：主张以武力解决'）",
           },
           hidden_motive: { type: "string" as const },
+          status: {
+            type: "string" as const,
+            enum: ["active", "dead", "exiled", "retired"],
+            description:
+              "顾问状态（仅当该顾问本回合发生变故时填写，默认active）",
+          },
         },
         required: ["role", "name", "advice", "bias"],
       },
@@ -400,54 +344,35 @@ export const turnResultSchema = {
         required: ["title", "description", "recommended_advisor"],
       },
     },
-    is_game_over: { type: "boolean" as const },
-    game_over_reason: {
-      type: "string" as const,
-      description: "结束原因（简体中文）",
-    },
     player_context_update: {
       type: "object" as const,
+      description:
+        "玩家身份变更（仅在重大剧情转折时触发，如改朝换代、称帝封王等。大部分回合应留空）",
       additionalProperties: false,
       properties: {
         nation_name: {
           type: "string" as const,
-          description:
-            "新国名/势力名（仅政权根本性变更时填写，如改朝换代、吞并他国后改国号）",
+          description: "新的国家/派系名称（仅在重大变更时提供）",
         },
         leader_title: {
           type: "string" as const,
-          description:
-            "新头衔（仅身份根本性变化时填写，如称帝、封王、被俘降级）",
+          description: "新的玩家头衔（仅在重大变更时提供）",
         },
         background_summary: {
           type: "string" as const,
-          description: "新背景概述（仅重大变故时填写）",
+          description: "更新后的背景简介",
         },
         change_reason: {
           type: "string" as const,
-          description: "变更原因（简述，如'统一天下称帝''兵败被俘降为藩王'）",
+          description: "变更原因（简体中文，20-50字）",
         },
-        official_rank: {
-          type: "object" as const,
-          additionalProperties: false,
-          properties: {
-            level: { type: "number" as const, minimum: 0, maximum: 9 },
-            title: { type: "string" as const },
-            department: { type: "string" as const },
-            is_military: { type: "boolean" as const },
-          },
-          required: ["level", "title", "department", "is_military"],
-          description: "新品级信息（Officialdom模式下升迁/降职时填写）",
-        },
-        superior_title: {
-          type: "string" as const,
-          description: "新上位者头衔（如老皇帝驾崩新帝即位）",
-        },
-        superior_name: { type: "string" as const, description: "新上位者姓名" },
       },
       required: ["change_reason"],
-      description:
-        "玩家身份变更（极其谨慎，仅重大历史节点时填写，绝大多数回合省略此字段）",
+    },
+    is_game_over: { type: "boolean" as const },
+    game_over_reason: {
+      type: "string" as const,
+      description: "结束原因（简体中文）",
     },
   },
   required: [
@@ -532,6 +457,288 @@ export const analysisSchema = {
     "turn_reviews",
     "modern_echo",
     "alternative_history",
+  ],
+};
+
+export const lifeScenarioCoreSchema = {
+  type: "object" as const,
+  additionalProperties: false,
+  properties: {
+    id: { type: "string" as const },
+    title: { type: "string" as const, description: "4字中文标题" },
+    description: {
+      type: "string" as const,
+      description: "匿名化的情境描述（简体中文）",
+    },
+    player_context: {
+      type: "object" as const,
+      additionalProperties: false,
+      properties: {
+        nation_name: {
+          type: "string" as const,
+          description: "玩家所在衙门/机构名称",
+        },
+        leader_title: {
+          type: "string" as const,
+          description:
+            "玩家头衔（如县令、知府、侍郎、尚书、总督、巡抚等官员头衔，禁止统治者头衔）",
+        },
+        background_summary: {
+          type: "string" as const,
+          description: "背景简介",
+        },
+        official_rank: {
+          type: "object" as const,
+          additionalProperties: false,
+          properties: {
+            level: {
+              type: "number" as const,
+              description: "品级（0=超品，1-9品）",
+            },
+            title: { type: "string" as const, description: "品级头衔" },
+            department: { type: "string" as const, description: "所属部门" },
+            is_military: { type: "boolean" as const, description: "是否武职" },
+          },
+          required: ["level", "title", "department", "is_military"],
+        },
+        superior_title: {
+          type: "string" as const,
+          description: "上位者头衔（如皇帝、摄政王等）",
+        },
+        superior_name: {
+          type: "string" as const,
+          description: "上位者姓名",
+        },
+      },
+      required: [
+        "nation_name",
+        "leader_title",
+        "background_summary",
+        "official_rank",
+        "superior_title",
+        "superior_name",
+      ],
+    },
+    initial_stats: {
+      type: "object" as const,
+      additionalProperties: false,
+      properties: {
+        stability: { type: "number" as const, minimum: 0, maximum: 60 },
+        economy: { type: "number" as const, minimum: 0, maximum: 60 },
+        military: { type: "number" as const, minimum: 0, maximum: 60 },
+        international_standing: {
+          type: "number" as const,
+          minimum: 0,
+          maximum: 60,
+        },
+      },
+      required: ["stability", "economy", "military", "international_standing"],
+    },
+    hidden_real_event: {
+      type: "string" as const,
+      description: "真实历史事件名称（隐藏，结局揭示）",
+    },
+    life_mode: {
+      type: "string" as const,
+      enum: ["Officialdom"],
+    },
+    start_date: {
+      type: "string" as const,
+      description: "中文日期字符串（风格与时代一致）",
+    },
+  },
+  required: [
+    "id",
+    "title",
+    "description",
+    "player_context",
+    "initial_stats",
+    "hidden_real_event",
+    "life_mode",
+    "start_date",
+  ],
+};
+
+export const lifeTurnResultSchema = {
+  type: "object" as const,
+  additionalProperties: false,
+  properties: {
+    narrative: {
+      type: "string" as const,
+      description: "用户行动的直接后果（创意性描述）",
+    },
+    situation_update: { type: "string" as const, description: "新挑战/危机" },
+    date_display: { type: "string" as const, description: "当前相对日期" },
+    headline: {
+      type: "string" as const,
+      description: "公文/邸报标题（简体中文）",
+    },
+    rumor: { type: "string" as const, description: "坊间传闻（简体中文）" },
+    historian_commentary: {
+      type: "string" as const,
+      description:
+        "同僚评语：以旁观者视角评价本回合决策，暗含褒贬（简体中文，50-100字）",
+    },
+    stats_delta: {
+      type: "object" as const,
+      additionalProperties: false,
+      properties: {
+        stability: { type: "number" as const, minimum: -10, maximum: 10 },
+        economy: { type: "number" as const, minimum: -10, maximum: 10 },
+        military: { type: "number" as const, minimum: -10, maximum: 10 },
+        international_standing: {
+          type: "number" as const,
+          minimum: -10,
+          maximum: 10,
+        },
+      },
+      required: ["stability", "economy", "military", "international_standing"],
+    },
+    advisors: {
+      type: "array" as const,
+      items: {
+        type: "object" as const,
+        additionalProperties: false,
+        properties: {
+          role: {
+            type: "string" as const,
+            enum: ["General", "Diplomat", "Intel", "Scholar", "Merchant"],
+          },
+          name: { type: "string" as const },
+          advice: { type: "string" as const },
+          bias: {
+            type: "string" as const,
+            description: "倾向（前4字为核心总结，共15字以内）",
+          },
+          hidden_motive: { type: "string" as const },
+          status: {
+            type: "string" as const,
+            enum: ["active", "dead", "exiled", "retired"],
+            description:
+              "同僚状态（仅当该同僚本回合发生变故时填写，默认active）",
+          },
+        },
+        required: ["role", "name", "advice", "bias"],
+      },
+    },
+    factions_update: {
+      type: "array" as const,
+      items: {
+        type: "object" as const,
+        additionalProperties: false,
+        properties: {
+          name: { type: "string" as const },
+          description: { type: "string" as const },
+          strength: { type: "string" as const },
+          weakness: { type: "string" as const },
+          needs: { type: "string" as const },
+          attitude: { type: "string" as const },
+          is_new: { type: "boolean" as const },
+          is_destroyed: { type: "boolean" as const },
+          leader: { type: "string" as const },
+        },
+        required: [
+          "name",
+          "description",
+          "strength",
+          "weakness",
+          "needs",
+          "attitude",
+          "is_new",
+          "is_destroyed",
+          "leader",
+        ],
+      },
+    },
+    hidden_consequences: {
+      type: "string" as const,
+      description: "回合总结（AI长期记忆）",
+    },
+    decision_options: {
+      type: "array" as const,
+      items: {
+        type: "object" as const,
+        additionalProperties: false,
+        properties: {
+          title: {
+            type: "string" as const,
+            description: "决策选项标题（简体中文，2-6字）",
+          },
+          description: {
+            type: "string" as const,
+            description: "决策选项简述（简体中文，30-60字）",
+          },
+          recommended_advisor: {
+            type: "string" as const,
+            description: "推荐此选择的同僚角色名",
+          },
+        },
+        required: ["title", "description", "recommended_advisor"],
+      },
+    },
+    player_context_update: {
+      type: "object" as const,
+      description:
+        "玩家身份变更（仅在升迁/降职/调任等重大转折时触发。大部分回合应留空）",
+      additionalProperties: false,
+      properties: {
+        nation_name: {
+          type: "string" as const,
+          description: "新的衙门/机构名称（仅在调任时提供）",
+        },
+        leader_title: {
+          type: "string" as const,
+          description: "新的玩家头衔（仅在升迁/降职时提供）",
+        },
+        background_summary: {
+          type: "string" as const,
+          description: "更新后的背景简介",
+        },
+        change_reason: {
+          type: "string" as const,
+          description: "变更原因（简体中文，20-50字）",
+        },
+        official_rank: {
+          type: "object" as const,
+          additionalProperties: false,
+          properties: {
+            level: { type: "number" as const },
+            title: { type: "string" as const },
+            department: { type: "string" as const },
+            is_military: { type: "boolean" as const },
+          },
+          required: ["level", "title", "department", "is_military"],
+        },
+        superior_title: {
+          type: "string" as const,
+          description: "新上位者头衔",
+        },
+        superior_name: {
+          type: "string" as const,
+          description: "新上位者姓名",
+        },
+      },
+      required: ["change_reason"],
+    },
+    is_game_over: { type: "boolean" as const },
+    game_over_reason: {
+      type: "string" as const,
+      description: "结束原因（简体中文）",
+    },
+  },
+  required: [
+    "narrative",
+    "situation_update",
+    "date_display",
+    "headline",
+    "rumor",
+    "historian_commentary",
+    "stats_delta",
+    "advisors",
+    "factions_update",
+    "hidden_consequences",
+    "decision_options",
+    "is_game_over",
   ],
 };
 

@@ -24,7 +24,6 @@ export function GameInput({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
-      // ~5 lines of text at ~1.5rem line-height * 5 = 120px
       textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
     }
   }, []);

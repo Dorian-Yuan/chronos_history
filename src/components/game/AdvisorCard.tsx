@@ -1,5 +1,11 @@
-import { useState } from "react";
-import type { AdvisorData, AdvisorRole, AdvisorStatus } from "@/types";
+import { useMemo, useState } from "react";
+import type {
+  AdvisorData,
+  AdvisorRole,
+  AdvisorStatus,
+  GameUniverse,
+} from "@/types";
+import { getTerminology } from "@/config/terminology";
 import {
   Shield,
   Scroll,
@@ -12,19 +18,12 @@ import {
 interface AdvisorCardProps {
   advisor: AdvisorData;
   onCounsel?: (advisor: AdvisorData) => void;
+  universe?: GameUniverse;
 }
 
-const STATUS_LABELS: Record<AdvisorStatus, string> = {
-  active: "",
-  dead: "已故",
-  exiled: "已流放",
-  retired: "已致仕",
-};
-
-const ROLE_CONFIG: Record<
+const ROLE_STATIC: Record<
   AdvisorRole,
   {
-    label: string;
     icon: typeof Shield;
     colorVar: string;
     bgColorVar: string;
@@ -32,35 +31,30 @@ const ROLE_CONFIG: Record<
   }
 > = {
   General: {
-    label: "将军",
     icon: Shield,
     colorVar: "--color-role-general",
     bgColorVar: "--color-role-general-bg",
     borderColorVar: "--color-role-general-border",
   },
   Diplomat: {
-    label: "外交官",
     icon: Scroll,
     colorVar: "--color-role-diplomat",
     bgColorVar: "--color-role-diplomat-bg",
     borderColorVar: "--color-role-diplomat-border",
   },
   Intel: {
-    label: "密探",
     icon: Eye,
     colorVar: "--color-role-intel",
     bgColorVar: "--color-role-intel-bg",
     borderColorVar: "--color-role-intel-border",
   },
   Scholar: {
-    label: "学者",
     icon: BookOpen,
     colorVar: "--color-role-scholar",
     bgColorVar: "--color-role-scholar-bg",
     borderColorVar: "--color-role-scholar-border",
   },
   Merchant: {
-    label: "商人",
     icon: Coins,
     colorVar: "--color-role-merchant",
     bgColorVar: "--color-role-merchant-bg",
@@ -68,14 +62,45 @@ const ROLE_CONFIG: Record<
   },
 };
 
-export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
-  const config = ROLE_CONFIG[advisor.role];
+export function AdvisorCard({
+  advisor,
+  onCounsel,
+  universe = "history",
+}: AdvisorCardProps) {
+  const term = useMemo(() => getTerminology(universe), [universe]);
+
+  const roleConfig = useMemo(() => {
+    const cfg = {} as Record<
+      AdvisorRole,
+      {
+        label: string;
+        icon: typeof Shield;
+        colorVar: string;
+        bgColorVar: string;
+        borderColorVar: string;
+      }
+    >;
+    for (const role of Object.keys(ROLE_STATIC) as AdvisorRole[]) {
+      cfg[role] = {
+        ...ROLE_STATIC[role],
+        label: term.advisorRoles[role],
+      };
+    }
+    return cfg;
+  }, [term]);
+
+  const statusLabels = useMemo(
+    () => term.advisorStatusLabels as Record<AdvisorStatus, string>,
+    [term],
+  );
+
+  const config = roleConfig[advisor.role];
   const [showMotive, setShowMotive] = useState(false);
   if (!config) return null;
 
   const Icon = config.icon;
   const isActive = !advisor.status || advisor.status === "active";
-  const statusLabel = advisor.status ? STATUS_LABELS[advisor.status] : "";
+  const statusLabel = advisor.status ? statusLabels[advisor.status] : "";
 
   const roleColor = `var(${config.colorVar})`;
   const roleBgColor = `var(${config.bgColorVar})`;
@@ -119,10 +144,10 @@ export function AdvisorCard({ advisor, onCounsel }: AdvisorCardProps) {
             <button
               onClick={() => onCounsel(advisor)}
               className="flex items-center gap-1 text-xs font-serif text-accent-secondary/70 hover:text-accent-secondary transition-colors"
-              aria-label={`与${advisor.name}密谈`}
+              aria-label={`与${advisor.name}${term.counselLabel}`}
             >
               <MessageCircle size={11} />
-              密谈
+              {term.counselLabel}
             </button>
           )}
 

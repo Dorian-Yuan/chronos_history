@@ -19,16 +19,6 @@ export interface StatsDelta {
   international_standing: number;
 }
 
-export interface FactionUpdate extends FactionData {
-  is_new: boolean;
-  is_destroyed: boolean;
-  leader_status?: FactionLeaderStatus;
-}
-
-export interface AdvisorUpdate extends AdvisorData {
-  status?: AdvisorStatus;
-}
-
 export interface PlayerContextUpdate {
   nation_name?: string;
   leader_title?: string;
@@ -37,6 +27,21 @@ export interface PlayerContextUpdate {
   official_rank?: OfficialRank;
   superior_title?: string;
   superior_name?: string;
+  previous_nation_name?: string;
+  previous_leader_title?: string;
+  previous_official_rank?: OfficialRank;
+  previous_superior_title?: string;
+  previous_superior_name?: string;
+}
+
+export interface FactionUpdate extends FactionData {
+  is_new: boolean;
+  is_destroyed: boolean;
+  leader_status?: FactionLeaderStatus;
+}
+
+export interface AdvisorUpdate extends AdvisorData {
+  status?: AdvisorStatus;
 }
 
 export interface TurnResult {
@@ -51,7 +56,7 @@ export interface TurnResult {
   factions_update: FactionUpdate[];
   hidden_consequences: string;
   decision_options: DecisionOption[];
+  player_context_update?: PlayerContextUpdate;
   is_game_over: boolean;
   game_over_reason?: string;
-  player_context_update?: PlayerContextUpdate;
 }
