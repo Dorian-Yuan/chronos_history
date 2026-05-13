@@ -26,6 +26,7 @@ export interface OutcomeContext {
   playStyle: PlayStyle;
   factions: { attitude: string; is_destroyed?: boolean }[];
   turnCount: number;
+  playerRank?: number;
 }
 
 export interface CounselMessage {
@@ -55,6 +56,11 @@ export interface CourtDebateSession {
   turnNumber: number;
 }
 
+export interface IdentityChangeCount {
+  nation_name: number;
+  leader_title: number;
+}
+
 export interface GameState {
   phase: GamePhase;
   scenario: ScenarioData | null;
@@ -68,6 +74,7 @@ export interface GameState {
   courtDebateSessions: CourtDebateSession[];
   playerActions: string[];
   currentAdvisors: AdvisorData[];
+  identityChangeCount: IdentityChangeCount;
 }
 
 export type GameOutcome = BaseOutcome;
@@ -90,6 +97,7 @@ export const INITIAL_GAME_STATE: GameState = {
   courtDebateSessions: [],
   playerActions: [],
   currentAdvisors: [],
+  identityChangeCount: { nation_name: 0, leader_title: 0 },
 };
 
 export function clampStat(value: number): number {
@@ -129,6 +137,12 @@ const PLAY_STYLE_WEIGHTS: Record<
     military: 0.25,
     international_standing: 0.25,
   },
+  Officialdom: {
+    stability: 0.3,
+    economy: 0.1,
+    military: 0.25,
+    international_standing: 0.35,
+  },
 };
 
 function weightedScore(stats: GameStats, playStyle: PlayStyle): number {
@@ -164,6 +178,26 @@ export function determineConditionalOutcome(
   const isLongRun = turnCount >= 22;
 
   if (base === "defeat") {
+    if (playStyle === "Officialdom" && stats.international_standing <= 10) {
+      return {
+        base: "defeat",
+        title: "魂断刑场",
+        description:
+          "触怒天颜，身首异处。你的名字成为后世的警示，史书上只留下寥寥数语。",
+      };
+    }
+    if (
+      playStyle === "Officialdom" &&
+      stats.international_standing <= 20 &&
+      stats.stability <= 20
+    ) {
+      return {
+        base: "defeat",
+        title: "贬谪天涯",
+        description:
+          "一纸诏书，万劫不复。你被流放至蛮荒之地，再无翻身之日，只能在异乡遥望故土。",
+      };
+    }
     if (playStyle === "Survival" && wScore >= 35) {
       return {
         base: "neutral",
@@ -181,13 +215,62 @@ export function determineConditionalOutcome(
     }
     return {
       base: "defeat",
-      title: "国破家亡",
+      title: playStyle === "Officialdom" ? "身败名裂" : "国破家亡",
       description:
-        "你的统治走向了终结，历史的车轮碾过你的王朝，只留下断壁残垣。",
+        playStyle === "Officialdom"
+          ? "官场失意，身败名裂。你的仕途以最不堪的方式画上了句号，后人提及唯有叹息。"
+          : "你的统治走向了终结，历史的车轮碾过你的王朝，只留下断壁残垣。",
     };
   }
 
   if (base === "victory") {
+    if (
+      playStyle === "Officialdom" &&
+      stats.stability >= 75 &&
+      stats.international_standing >= 75
+    ) {
+      const rank = ctx.playerRank;
+      if (rank !== undefined && rank <= 0) {
+        return {
+          base: "victory",
+          title: "只手遮天",
+          description:
+            "摄政天下，权倾朝野。你已超越了臣子的极限，成为帝国真正的掌舵者。史书将你与霍光、曹操并列。",
+        };
+      }
+      return {
+        base: "victory",
+        title: "位极人臣",
+        description:
+          "一人之下，万人之上。你从微末小吏走到了权力的巅峰，成为一代名臣。后世史家将你与管仲、诸葛亮并论。",
+      };
+    }
+    if (
+      playStyle === "Officialdom" &&
+      stats.stability >= 80 &&
+      stats.international_standing >= 80 &&
+      isSpeedRun
+    ) {
+      return {
+        base: "victory",
+        title: "青云直上",
+        description:
+          "平步青云，势不可挡。你以惊人的速度攀上高位，令朝野侧目。如此际遇，百年难遇。",
+      };
+    }
+    if (
+      playStyle === "Officialdom" &&
+      stats.stability >= 70 &&
+      stats.international_standing >= 70 &&
+      isLongRun
+    ) {
+      return {
+        base: "victory",
+        title: "老成谋国",
+        description:
+          "历经沉浮，终成栋梁。你用时间和智慧证明了自己的价值，成为朝廷不可或缺的定海神针。",
+      };
+    }
     if (
       playStyle === "Conquest" &&
       stats.military >= 75 &&
@@ -266,6 +349,39 @@ export function determineConditionalOutcome(
     };
   }
 
+  if (playStyle === "Officialdom" && stats.stability >= 55) {
+    const rank = ctx.playerRank;
+    if (rank !== undefined && rank <= 3) {
+      return {
+        base: "neutral",
+        title: "中流砥柱",
+        description:
+          "你在朝堂上站稳了脚跟，虽未至巅峰，却也是不可或缺的重臣。后人评说，你是那个时代的脊梁。",
+      };
+    }
+    if (stats.international_standing >= 60 && stats.stability < 40) {
+      return {
+        base: "neutral",
+        title: "伴驾之臣",
+        description:
+          "深得上意，却无实权。你是上位者信任的近臣，却永远走不到台前。荣华富贵皆有，唯独缺少真正的力量。",
+      };
+    }
+    if (rank !== undefined && rank >= 5 && stats.international_standing >= 50) {
+      return {
+        base: "neutral",
+        title: "安守本分",
+        description:
+          "不求闻达于诸侯，但求无过于当下。你选择了一条安稳的仕途，虽无大功，亦无大过。",
+      };
+    }
+    return {
+      base: "neutral",
+      title: "随波逐流",
+      description:
+        "宦海浮沉，起起落落。你既非权臣，也非庸吏，只是官场中普通的一员，随波逐流而已。",
+    };
+  }
   if (
     playStyle === "Conquest" &&
     stats.military >= 60 &&

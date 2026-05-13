@@ -13,6 +13,7 @@ export function EndPage() {
     playStyle: state.scenario.play_style,
     factions: state.scenario.factions,
     turnCount: state.turnCount,
+    playerRank: state.scenario.player_context?.official_rank?.level,
   });
 
   return (

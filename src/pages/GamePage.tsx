@@ -177,6 +177,7 @@ export function GamePage() {
               playStyle: scenario.play_style,
               factions: newFactions,
               turnCount: state.turnCount + 1,
+              playerRank: scenario.player_context?.official_rank?.level,
             });
 
             const analysis = await analyzeGame(
@@ -241,6 +242,7 @@ export function GamePage() {
         playStyle: scenario.play_style,
         factions: scenario.factions,
         turnCount: state.turnCount,
+        playerRank: scenario.player_context?.official_rank?.level,
       });
 
       const analysis = await analyzeGame(

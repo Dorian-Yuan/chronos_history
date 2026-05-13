@@ -19,11 +19,42 @@ export const scenarioCoreSchema = {
         leader_title: {
           type: "string" as const,
           description:
-            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
+            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等。Officialdom模式为官员头衔如县令、侍郎等）",
         },
         background_summary: {
           type: "string" as const,
           description: "背景简介",
+        },
+        official_rank: {
+          type: "object" as const,
+          additionalProperties: false,
+          properties: {
+            level: {
+              type: "number" as const,
+              minimum: 0,
+              maximum: 9,
+              description: "品级（0=超品，1-9对应一品到九品）",
+            },
+            title: {
+              type: "string" as const,
+              description: "官职名称（如七品县令、三品侍郎）",
+            },
+            department: {
+              type: "string" as const,
+              description: "所属部门（如吏部、兵部、地方、禁军）",
+            },
+            is_military: { type: "boolean" as const, description: "是否武职" },
+          },
+          required: ["level", "title", "department", "is_military"],
+          description: "品级信息（Officialdom模式必填）",
+        },
+        superior_title: {
+          type: "string" as const,
+          description: "上位者头衔（如皇帝、大将军），Officialdom模式必填",
+        },
+        superior_name: {
+          type: "string" as const,
+          description: "上位者姓名，Officialdom模式必填",
         },
       },
       required: ["nation_name", "leader_title", "background_summary"],
@@ -49,7 +80,7 @@ export const scenarioCoreSchema = {
     },
     play_style: {
       type: "string" as const,
-      enum: ["Conquest", "Prosperity", "Reform", "Survival"],
+      enum: ["Conquest", "Prosperity", "Reform", "Survival", "Officialdom"],
     },
     start_date: {
       type: "string" as const,
@@ -89,11 +120,42 @@ export const scenarioSchema = {
         leader_title: {
           type: "string" as const,
           description:
-            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等）",
+            "玩家头衔（如皇帝、国王、执政官、总督、大公、首相、摄政王、城邦领主等。Officialdom模式为官员头衔如县令、侍郎等）",
         },
         background_summary: {
           type: "string" as const,
           description: "背景简介",
+        },
+        official_rank: {
+          type: "object" as const,
+          additionalProperties: false,
+          properties: {
+            level: {
+              type: "number" as const,
+              minimum: 0,
+              maximum: 9,
+              description: "品级（0=超品，1-9对应一品到九品）",
+            },
+            title: {
+              type: "string" as const,
+              description: "官职名称（如七品县令、三品侍郎）",
+            },
+            department: {
+              type: "string" as const,
+              description: "所属部门（如吏部、兵部、地方、禁军）",
+            },
+            is_military: { type: "boolean" as const, description: "是否武职" },
+          },
+          required: ["level", "title", "department", "is_military"],
+          description: "品级信息（Officialdom模式必填）",
+        },
+        superior_title: {
+          type: "string" as const,
+          description: "上位者头衔（如皇帝、大将军），Officialdom模式必填",
+        },
+        superior_name: {
+          type: "string" as const,
+          description: "上位者姓名，Officialdom模式必填",
         },
       },
       required: ["nation_name", "leader_title", "background_summary"],
@@ -119,7 +181,7 @@ export const scenarioSchema = {
     },
     play_style: {
       type: "string" as const,
-      enum: ["Conquest", "Prosperity", "Reform", "Survival"],
+      enum: ["Conquest", "Prosperity", "Reform", "Survival", "Officialdom"],
     },
     start_date: {
       type: "string" as const,
@@ -342,6 +404,50 @@ export const turnResultSchema = {
     game_over_reason: {
       type: "string" as const,
       description: "结束原因（简体中文）",
+    },
+    player_context_update: {
+      type: "object" as const,
+      additionalProperties: false,
+      properties: {
+        nation_name: {
+          type: "string" as const,
+          description:
+            "新国名/势力名（仅政权根本性变更时填写，如改朝换代、吞并他国后改国号）",
+        },
+        leader_title: {
+          type: "string" as const,
+          description:
+            "新头衔（仅身份根本性变化时填写，如称帝、封王、被俘降级）",
+        },
+        background_summary: {
+          type: "string" as const,
+          description: "新背景概述（仅重大变故时填写）",
+        },
+        change_reason: {
+          type: "string" as const,
+          description: "变更原因（简述，如'统一天下称帝''兵败被俘降为藩王'）",
+        },
+        official_rank: {
+          type: "object" as const,
+          additionalProperties: false,
+          properties: {
+            level: { type: "number" as const, minimum: 0, maximum: 9 },
+            title: { type: "string" as const },
+            department: { type: "string" as const },
+            is_military: { type: "boolean" as const },
+          },
+          required: ["level", "title", "department", "is_military"],
+          description: "新品级信息（Officialdom模式下升迁/降职时填写）",
+        },
+        superior_title: {
+          type: "string" as const,
+          description: "新上位者头衔（如老皇帝驾崩新帝即位）",
+        },
+        superior_name: { type: "string" as const, description: "新上位者姓名" },
+      },
+      required: ["change_reason"],
+      description:
+        "玩家身份变更（极其谨慎，仅重大历史节点时填写，绝大多数回合省略此字段）",
     },
   },
   required: [

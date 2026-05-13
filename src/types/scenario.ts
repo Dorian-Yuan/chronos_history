@@ -12,10 +12,20 @@ export type AdvisorStatus = "active" | "dead" | "exiled" | "retired";
 
 export type FactionLeaderStatus = "active" | "dead" | "exiled" | "overthrown";
 
+export interface OfficialRank {
+  level: number;
+  title: string;
+  department: string;
+  is_military: boolean;
+}
+
 export interface PlayerContext {
   nation_name: string;
   leader_title: string;
   background_summary: string;
+  official_rank?: OfficialRank;
+  superior_title?: string;
+  superior_name?: string;
 }
 
 export interface AdvisorData {

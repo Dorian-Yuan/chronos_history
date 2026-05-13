@@ -3,6 +3,7 @@ import type {
   FactionData,
   AdvisorStatus,
   FactionLeaderStatus,
+  OfficialRank,
 } from "./scenario";
 
 export interface DecisionOption {
@@ -28,6 +29,16 @@ export interface AdvisorUpdate extends AdvisorData {
   status?: AdvisorStatus;
 }
 
+export interface PlayerContextUpdate {
+  nation_name?: string;
+  leader_title?: string;
+  background_summary?: string;
+  change_reason: string;
+  official_rank?: OfficialRank;
+  superior_title?: string;
+  superior_name?: string;
+}
+
 export interface TurnResult {
   narrative: string;
   situation_update: string;
@@ -42,4 +53,5 @@ export interface TurnResult {
   decision_options: DecisionOption[];
   is_game_over: boolean;
   game_over_reason?: string;
+  player_context_update?: PlayerContextUpdate;
 }

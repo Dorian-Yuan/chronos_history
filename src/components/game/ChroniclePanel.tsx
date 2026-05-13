@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ScenarioData, TurnResult } from "@/types";
+import { TERMINOLOGY } from "@/config/terminology";
 
 interface ChroniclePanelProps {
   scenario: ScenarioData;
@@ -15,6 +16,7 @@ export function ChroniclePanel({
   isLoading,
 }: ChroniclePanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const terms = TERMINOLOGY[scenario.play_style];
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -37,7 +39,7 @@ export function ChroniclePanel({
           ref={scrollRef}
           className="flex-1 overflow-y-auto p-4"
           role="log"
-          aria-label="编年史"
+          aria-label={terms.chronicleLabel}
           aria-live="polite"
         >
           {turnCount === 1 && turnResults.length === 0 && (
@@ -80,8 +82,10 @@ export function ChroniclePanel({
 
               <div className="border-l-[3px] border-accent-primary pl-3">
                 <div className="font-serif text-sm text-text-secondary leading-relaxed">
-                  阁下，作为{scenario.player_context?.leader_title || "统治者"}
-                  ，您的第一道政令是什么？
+                  {terms.chroniclePrompt.replace(
+                    "{title}",
+                    scenario.player_context?.leader_title || "统治者",
+                  )}
                 </div>
               </div>
             </div>
@@ -119,6 +123,36 @@ export function ChroniclePanel({
                   {result.narrative}
                 </div>
               </div>
+
+              {result.player_context_update && (
+                <div className="border-l-[3px] border-accent-warning bg-accent-warning/5 px-4 py-3 rounded-r-lg">
+                  <div className="font-serif font-bold text-sm text-accent-warning tracking-widest uppercase mb-1">
+                    身份变更
+                  </div>
+                  <div className="font-serif text-sm text-accent-warning leading-relaxed">
+                    {result.player_context_update.change_reason}
+                  </div>
+                  {result.player_context_update.leader_title && (
+                    <div className="font-serif text-xs text-accent-warning/80 mt-1">
+                      头衔 → {result.player_context_update.leader_title}
+                    </div>
+                  )}
+                  {result.player_context_update.nation_name && (
+                    <div className="font-serif text-xs text-accent-warning/80 mt-1">
+                      国号 → {result.player_context_update.nation_name}
+                    </div>
+                  )}
+                  {result.player_context_update.official_rank && (
+                    <div className="font-serif text-xs text-accent-warning/80 mt-1">
+                      品级 →{" "}
+                      {result.player_context_update.official_rank.level === 0
+                        ? "超品"
+                        : `${result.player_context_update.official_rank.level}品`}
+                      {result.player_context_update.official_rank.title}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {result.situation_update && (
                 <div className="border-l-[3px] border-accent-primary bg-accent-primary/5 px-4 py-3 rounded-r-lg my-4">

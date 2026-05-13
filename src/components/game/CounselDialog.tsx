@@ -7,6 +7,7 @@ import type {
   GameStats,
 } from "@/types";
 import { counselAdvisor } from "@/lib/game";
+import { TERMINOLOGY } from "@/config/terminology";
 import {
   Shield,
   Scroll,
@@ -55,6 +56,7 @@ export function CounselDialog({
   onClose,
 }: CounselDialogProps) {
   const config = ROLE_CONFIG[advisor.role];
+  const terms = TERMINOLOGY[scenario.play_style];
   const [messages, setMessages] = useState<CounselMessage[]>(
     initialMessages ?? [],
   );
@@ -167,7 +169,7 @@ export function CounselDialog({
               {advisor.name} · {config?.label}
             </h2>
             <span className="text-[10px] px-2 py-0.5 rounded bg-accent-secondary/10 text-accent-secondary font-serif self-center">
-              私下密谈
+              {terms.counselLabel}
             </span>
           </div>
           <button

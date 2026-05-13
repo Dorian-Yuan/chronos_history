@@ -8,6 +8,7 @@ import type {
   GameStats,
   TurnResult,
 } from "@/types";
+import { TERMINOLOGY } from "@/config/terminology";
 import { useGameDispatch, courtDebate } from "@/lib/game";
 import {
   Shield,
@@ -81,6 +82,7 @@ export function CourtDebatePanel({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const terms = TERMINOLOGY[scenario.play_style];
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const currentDateDisplay =
@@ -289,18 +291,20 @@ export function CourtDebatePanel({
           ref={scrollRef}
           className="flex-1 overflow-y-auto p-4"
           role="log"
-          aria-label="廷议"
+          aria-label={terms.courtDebateLabel}
           aria-live="polite"
         >
           {!hasAnyContent && (
             <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
               <MessageCircle size={24} className="mb-2 opacity-30" />
               <p className="text-xs font-serif">
-                {scenario.player_context?.leader_title || "阁下"}
-                ，可在朝堂上提出议题，令群臣廷议
+                {terms.courtDebatePrompt.replace(
+                  "{title}",
+                  scenario.player_context?.leader_title || "阁下",
+                )}
               </p>
               <p className="text-[10px] mt-1 text-text-tertiary/60 font-serif">
-                廷议结果仅供决策参考
+                {terms.courtDebateLabel}结果仅供决策参考
               </p>
             </div>
           )}

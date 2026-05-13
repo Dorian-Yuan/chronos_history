@@ -1,4 +1,9 @@
-export type PlayStyle = "Conquest" | "Prosperity" | "Reform" | "Survival";
+export type PlayStyle =
+  | "Conquest"
+  | "Prosperity"
+  | "Reform"
+  | "Survival"
+  | "Officialdom";
 
 export interface PlayStyleOption {
   id: PlayStyle;
@@ -31,5 +36,11 @@ export const PLAY_STYLES: PlayStyleOption[] = [
     name: "绝境求生",
     description: "高难度的崩溃边缘剧本",
     quote: "活下去，就是最大的胜利。",
+  },
+  {
+    id: "Officialdom",
+    name: "宦海沉浮",
+    description: "居庙堂之高则忧其民",
+    quote: "如临深渊，如履薄冰。",
   },
 ];

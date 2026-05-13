@@ -223,6 +223,39 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         result.stats_delta,
         state.turnCount,
       );
+
+      const playerContextUpdate = result.player_context_update;
+      const newIdentityChangeCount = { ...state.identityChangeCount };
+      let updatedPlayerContext = state.scenario?.player_context;
+
+      if (playerContextUpdate && state.scenario) {
+        updatedPlayerContext = {
+          ...state.scenario.player_context,
+          ...(playerContextUpdate.nation_name && {
+            nation_name: playerContextUpdate.nation_name,
+          }),
+          ...(playerContextUpdate.leader_title && {
+            leader_title: playerContextUpdate.leader_title,
+          }),
+          ...(playerContextUpdate.background_summary && {
+            background_summary: playerContextUpdate.background_summary,
+          }),
+          ...(playerContextUpdate.official_rank && {
+            official_rank: playerContextUpdate.official_rank,
+          }),
+          ...(playerContextUpdate.superior_title && {
+            superior_title: playerContextUpdate.superior_title,
+          }),
+          ...(playerContextUpdate.superior_name && {
+            superior_name: playerContextUpdate.superior_name,
+          }),
+        };
+        if (playerContextUpdate.nation_name)
+          newIdentityChangeCount.nation_name++;
+        if (playerContextUpdate.leader_title)
+          newIdentityChangeCount.leader_title++;
+      }
+
       const newScenario = state.scenario
         ? {
             ...state.scenario,
@@ -230,6 +263,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
               state.scenario.factions,
               result.factions_update,
             ),
+            ...(updatedPlayerContext !== state.scenario.player_context && {
+              player_context: updatedPlayerContext!,
+            }),
           }
         : null;
 
@@ -249,6 +285,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         counselSessions: [],
         playerActions: [...state.playerActions, action.playerAction],
         currentAdvisors: updatedAdvisors,
+        identityChangeCount: newIdentityChangeCount,
       };
     }
 

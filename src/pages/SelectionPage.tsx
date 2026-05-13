@@ -3,7 +3,7 @@ import { useGameDispatch } from "@/lib/game";
 import { generateScenario } from "@/lib/game";
 import type { PlayStyle } from "@/types";
 import { PLAY_STYLES } from "@/types";
-import { Swords, Coins, BookOpen, Shield } from "lucide-react";
+import { Swords, Coins, BookOpen, Shield, ScrollText } from "lucide-react";
 import { ScenarioHintModal } from "@/components/game";
 
 const STYLE_ICONS: Record<PlayStyle, typeof Swords> = {
@@ -11,6 +11,7 @@ const STYLE_ICONS: Record<PlayStyle, typeof Swords> = {
   Prosperity: Coins,
   Reform: BookOpen,
   Survival: Shield,
+  Officialdom: ScrollText,
 };
 
 const STYLE_COLORS: Record<
@@ -40,6 +41,12 @@ const STYLE_COLORS: Record<
     bg: "bg-status-success-bg",
     text: "text-accent-primary",
     glow: "group-hover:shadow-accent-primary/20",
+  },
+  Officialdom: {
+    border: "border-accent-warning/40",
+    bg: "bg-status-warning-bg",
+    text: "text-accent-warning",
+    glow: "group-hover:shadow-accent-warning/20",
   },
 };
 
