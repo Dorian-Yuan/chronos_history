@@ -964,6 +964,8 @@ export async function evaluateTurn(
   recentPlayerActions?: string[],
   identityChangeCount?: { nation_name: number; leader_title: number },
   universe: GameUniverse = "history",
+  currentSituation?: string,
+  recentSituations?: string[],
 ): Promise<TurnResult> {
   const provider = getProvider();
   const prompts = getPrompts(universe);
@@ -976,6 +978,15 @@ export async function evaluateTurn(
   const recentActionsSection =
     recentPlayerActions && recentPlayerActions.length > 0
       ? `\n近期玩家行动（以最新为准，旧行动若与新行动矛盾则已自动失效）：\n${recentPlayerActions.map((a, i) => `- 回合${turnCount - recentPlayerActions.length + i}：${a}`).join("\n")}\n`
+      : "";
+
+  const currentSituationSection = currentSituation
+    ? `\n当前局势（上一回合的挑战/危机，你必须在situation_update中先确认其解决状态）：${currentSituation}\n`
+    : "";
+
+  const recentSituationsSection =
+    recentSituations && recentSituations.length > 0
+      ? `\n近期局势演变（供参考，判断问题是否反复出现）：\n${recentSituations.map((s, i) => `- 回合${turnCount - recentSituations.length + i}：${s}`).join("\n")}\n`
       : "";
 
   const statLabels = isLife
@@ -1017,7 +1028,7 @@ ${currentAdvisors && currentAdvisors.length > 0 ? currentAdvisors.map((a) => `- 
 
 历史日志（AI长期记忆）：
 ${historyLog.length > 0 ? historyLog.map((h, i) => `回合${i + 1}: ${h}`).join("\n") : "（无）"}
-${recentActionsSection}
+${recentActionsSection}${currentSituationSection}${recentSituationsSection}
 当前派系：
 ${scenario.factions.map((f) => `- ${f.name}（领袖：${f.leader || "未知"}，${f.attitude}）：${f.description}`).join("\n")}
 

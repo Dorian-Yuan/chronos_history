@@ -195,6 +195,15 @@ export function GamePage() {
 
         const recentActions = state.playerActions.slice(-3);
 
+        const currentSituation =
+          turnResults.length > 0
+            ? turnResults[turnResults.length - 1].situation_update
+            : undefined;
+
+        const recentSituations = turnResults
+          .slice(-3)
+          .map((r) => r.situation_update);
+
         const result = await evaluateTurn(
           scenario,
           state.historyLog,
@@ -206,6 +215,8 @@ export function GamePage() {
           recentActions,
           state.identityChangeCount,
           universe,
+          currentSituation,
+          recentSituations.length > 0 ? recentSituations : undefined,
         );
 
         dispatch({ type: "PROCESS_TURN", result, playerAction: action });
