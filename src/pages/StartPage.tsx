@@ -173,6 +173,7 @@ export function StartPage() {
 
       {showSaveManager && (
         <SaveManager
+          mode="start"
           gameState={state}
           onLoad={(gameState) =>
             dispatch({ type: "LOAD_SAVE", state: gameState })

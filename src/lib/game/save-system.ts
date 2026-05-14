@@ -141,6 +141,12 @@ export function exportAllData(): string {
   return JSON.stringify(data, null, 2);
 }
 
+export function exportSlotData(slotIndex: number): string | null {
+  const data = loadFromSlot(slotIndex);
+  if (!data) return null;
+  return JSON.stringify(data, null, 2);
+}
+
 export function importSave(jsonString: string): SaveData | null {
   try {
     const data = JSON.parse(jsonString);

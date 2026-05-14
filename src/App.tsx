@@ -10,6 +10,7 @@ import { SettingsPanel, WelcomeSetup } from "@/components/settings";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { initLocale } from "@/i18n";
 import { registerServiceWorker } from "@/lib/sw-register";
+import { startThemeListener } from "@/lib/theme";
 import { usePWA } from "@/hooks/usePWA";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useSettingsStore } from "@/stores";
@@ -141,6 +142,7 @@ export default function App() {
   useEffect(() => {
     initLocale();
     registerServiceWorker();
+    startThemeListener();
   }, []);
 
   return <AppContent />;

@@ -30,6 +30,7 @@ export {
   addHistoryRecord,
   getHistoryRecords,
   exportSave,
+  exportSlotData,
   exportAllData,
   importSave,
   importAllData,

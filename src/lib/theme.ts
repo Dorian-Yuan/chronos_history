@@ -8,14 +8,14 @@ export interface ThemeConfig {
 const themes: Record<string, ThemeConfig> = {
   dark: {
     name: "dark",
-    label: "墨韵深色",
-    labelEn: "Ink Dark",
+    label: "暗",
+    labelEn: "Dark",
     variables: {},
   },
   light: {
     name: "light",
-    label: "宣纸浅色",
-    labelEn: "Rice Paper",
+    label: "浅",
+    labelEn: "Light",
     variables: {
       "--color-bg-primary": "#f0ece4",
       "--color-bg-secondary": "#faf7f2",
@@ -101,7 +101,74 @@ const themes: Record<string, ThemeConfig> = {
         "0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(26, 158, 107, 0.03)",
     },
   },
+  system: {
+    name: "system",
+    label: "系统",
+    labelEn: "System",
+    variables: {},
+  },
 };
+
+function getSystemPreferredTheme(): "dark" | "light" {
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return "dark";
+}
+
+function applyThemeVariables(themeName: string): void {
+  const resolvedName =
+    themeName === "system" ? getSystemPreferredTheme() : themeName;
+  const previousTheme = getTheme(
+    localStorage.getItem("chronos_prev_theme") || "dark",
+  );
+  const root = document.documentElement;
+  Object.keys(previousTheme.variables).forEach((key) => {
+    root.style.removeProperty(key);
+  });
+  const theme = themes[resolvedName];
+  if (theme) {
+    Object.entries(theme.variables).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+  }
+  localStorage.setItem("chronos_prev_theme", resolvedName);
+
+  const themeColor =
+    resolvedName === "light"
+      ? getComputedStyle(root).getPropertyValue("--color-bg-primary").trim() ||
+        "#f0ece4"
+      : getComputedStyle(root).getPropertyValue("--color-bg-primary").trim() ||
+        "#0A0A0A";
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute("content", themeColor);
+  }
+}
+
+let systemThemeListener: ((e: MediaQueryListEvent) => void) | null = null;
+
+export function startThemeListener(): void {
+  stopThemeListener();
+  const stored = localStorage.getItem("chronos_theme");
+  if (stored !== "system") return;
+
+  const mql = window.matchMedia("(prefers-color-scheme: dark)");
+  systemThemeListener = () => {
+    applyThemeVariables("system");
+  };
+  mql.addEventListener("change", systemThemeListener);
+}
+
+export function stopThemeListener(): void {
+  if (systemThemeListener) {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    mql.removeEventListener("change", systemThemeListener);
+    systemThemeListener = null;
+  }
+}
 
 export function getTheme(name?: string): ThemeConfig {
   const themeName = name || localStorage.getItem("chronos_theme") || "dark";
@@ -111,34 +178,16 @@ export function getTheme(name?: string): ThemeConfig {
 export function setTheme(name: string): void {
   if (themes[name]) {
     localStorage.setItem("chronos_theme", name);
-    const previousTheme = getTheme(
-      localStorage.getItem("chronos_prev_theme") || "dark",
-    );
-    const root = document.documentElement;
-    Object.keys(previousTheme.variables).forEach((key) => {
-      root.style.removeProperty(key);
-    });
-    const theme = themes[name];
-    Object.entries(theme.variables).forEach(([key, value]) => {
-      root.style.setProperty(key, value);
-    });
-    localStorage.setItem("chronos_prev_theme", name);
+    applyThemeVariables(name);
 
-    const themeColor =
-      name === "light"
-        ? getComputedStyle(root)
-            .getPropertyValue("--color-bg-primary")
-            .trim() || "#f0ece4"
-        : getComputedStyle(root)
-            .getPropertyValue("--color-bg-primary")
-            .trim() || "#0A0A0A";
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute("content", themeColor);
+    if (name === "system") {
+      startThemeListener();
+    } else {
+      stopThemeListener();
     }
   }
 }
 
 export function getAvailableThemes(): ThemeConfig[] {
-  return Object.values(themes);
+  return [themes.dark, themes.light, themes.system];
 }

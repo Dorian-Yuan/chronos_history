@@ -731,6 +731,7 @@ export function GamePage() {
 
       {showSaveManager && (
         <SaveManager
+          mode="game"
           gameState={state}
           onLoad={(gameState) => {
             dispatch({ type: "LOAD_SAVE", state: gameState });
