@@ -219,27 +219,27 @@ const PLACEHOLDER_FACTIONS_HISTORY = [
 
 const PLACEHOLDER_FACTIONS_LIFE = [
   {
-    name: "清流党",
-    description: "以清廉自居的朝堂势力",
-    strength: "声望清高",
-    weakness: "缺乏实权",
-    needs: "圣眷加持",
+    name: "守正派",
+    description: "秉持正统理念的朝堂势力",
+    strength: "根基稳固",
+    weakness: "因循守旧",
+    needs: "扩大影响",
     attitude: "友好" as const,
   },
   {
-    name: "权臣派",
-    description: "把持朝政的实力派系",
-    strength: "权势滔天",
-    weakness: "树敌众多",
-    needs: "巩固地位",
+    name: "务实派",
+    description: "注重实际利益的实力派系",
+    strength: "手段灵活",
+    weakness: "道义薄弱",
+    needs: "稳固根基",
     attitude: "求和" as const,
   },
   {
-    name: "外戚派",
-    description: "依仗后宫关系的势力集团",
-    strength: "圣眷优渥",
-    weakness: "根基不牢",
-    needs: "拉拢朝臣",
+    name: "新兴派",
+    description: "新近崛起的势力集团",
+    strength: "锐意进取",
+    weakness: "根基尚浅",
+    needs: "争取支持",
     attitude: "中立" as const,
   },
 ];
@@ -325,7 +325,17 @@ function fixMissingLifeFields(scenario: ScenarioData): ScenarioData {
     console.log("[fixMissingLifeFields] 自动补充superior_title");
   }
   if (!fixed.player_context.superior_name?.trim()) {
-    fixed.player_context.superior_name = "赵德昭";
+    const fallbackSuperiorNames = [
+      "萧承运",
+      "司马昭明",
+      "李承乾",
+      "宇文泰和",
+      "耶律隆运",
+    ];
+    fixed.player_context.superior_name =
+      fallbackSuperiorNames[
+        Math.floor(Math.random() * fallbackSuperiorNames.length)
+      ];
     console.log("[fixMissingLifeFields] 自动补充superior_name");
   }
 

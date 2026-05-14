@@ -138,7 +138,7 @@ export const scenarioSchema = {
           name: {
             type: "string" as const,
             description:
-              "真实人名（禁止奇幻风格，中国用姓+名如'陈伯年'，欧洲用名+姓，禁止'铁牙''影爪'等）",
+              "真实人名（禁止奇幻风格，中国用姓+名（两字或三字），欧洲用名+姓，禁止'铁牙''影爪'等）",
           },
           advice: { type: "string" as const, description: "建议（简体中文）" },
           bias: {
