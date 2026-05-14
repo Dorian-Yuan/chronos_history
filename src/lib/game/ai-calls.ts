@@ -175,7 +175,7 @@ const FOREIGN_HISTORY_POOL = [
 ];
 
 function getRandomHistoryKeyword(): string {
-  const isChina = Math.random() < 0.5;
+  const isChina = Math.random() < 0.6;
   const pool = isChina ? CHINA_HISTORY_POOL : FOREIGN_HISTORY_POOL;
   const index = Math.floor(Math.random() * pool.length);
   return pool[index];
