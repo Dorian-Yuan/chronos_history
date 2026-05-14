@@ -8,5 +8,5 @@
   "minTurnsBeforeEnd": 8,
   "earlyGameProtectionTurns": 4,
   "maxHistoryRecords": 50,
-  "saveSlots": 6
+  "saveSlots": 5
 }
