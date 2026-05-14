@@ -50,6 +50,8 @@ export interface FactionData {
   is_new?: boolean;
   is_destroyed?: boolean;
   is_external?: boolean;
+  direction?: string;
+  sand_table_color?: string;
 }
 
 export interface ScenarioData {

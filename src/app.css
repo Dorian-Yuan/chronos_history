@@ -141,6 +141,7 @@
   --color-tab-cabinet: #e8833a;
   --color-tab-court-debate: #c9a84c;
   --color-tab-intelligence: #4a9ef5;
+  --color-tab-sand-table: #9b8ec4;
 }
 
 @theme {
@@ -196,6 +197,7 @@
   --color-tab-cabinet: var(--color-tab-cabinet);
   --color-tab-court-debate: var(--color-tab-court-debate);
   --color-tab-intelligence: var(--color-tab-intelligence);
+  --color-tab-sand-table: var(--color-tab-sand-table);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 }

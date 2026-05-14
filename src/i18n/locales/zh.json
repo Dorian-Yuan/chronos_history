@@ -41,7 +41,10 @@
     "noData": "暂无数据",
     "opinionConflict": "⚠ 观点冲突",
     "yearBC": "BC",
-    "currentIdentity": "当前身份"
+    "currentIdentity": "当前身份",
+    "sandTable": "沙盘",
+    "sandTableEmpty": "沙盘生成中",
+    "sandTableUpdating": "推演中..."
   },
   "relation": {
     "ally": "盟友",

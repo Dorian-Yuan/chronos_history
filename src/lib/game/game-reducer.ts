@@ -10,6 +10,8 @@ import type {
   CounselSession,
   CourtDebateMessage,
   CourtDebateSession,
+  SandTableState,
+  SandTableFactionUpdate,
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
 import { getAppConfig } from "@/config";
@@ -33,7 +35,9 @@ export type GameAction =
   | { type: "ADD_COURT_DEBATE_MESSAGE"; message: CourtDebateMessage }
   | { type: "ADVANCE_COURT_DEBATE_ROUND" }
   | { type: "FINISH_COURT_DEBATE" }
-  | { type: "CLEAR_COURT_DEBATE" };
+  | { type: "CLEAR_COURT_DEBATE" }
+  | { type: "SET_SAND_TABLE"; sandTableState: SandTableState }
+  | { type: "UPDATE_SAND_TABLE"; factionUpdates: SandTableFactionUpdate[] };
 
 function applyStatsDelta(
   stats: GameStats,
@@ -444,6 +448,32 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         courtDebateSessions: [],
       };
+
+    case "SET_SAND_TABLE":
+      return {
+        ...state,
+        sandTableState: action.sandTableState,
+      };
+
+    case "UPDATE_SAND_TABLE": {
+      if (!state.sandTableState) return state;
+      const updatedFactions = state.sandTableState.factions.map((f) => {
+        const update = action.factionUpdates.find((u) => u.name === f.name);
+        if (!update || f.dead) return f;
+        let newTarget = f.targetPower + update.power_delta;
+        if (newTarget < 0.1) newTarget = 0.1;
+        if (newTarget > 6.0) newTarget = 6.0;
+        return { ...f, targetPower: newTarget };
+      });
+      return {
+        ...state,
+        sandTableState: {
+          ...state.sandTableState,
+          factions: updatedFactions,
+          lastUpdateTurn: state.turnCount,
+        },
+      };
+    }
 
     default:
       return state;

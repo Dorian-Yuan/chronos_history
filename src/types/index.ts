@@ -6,6 +6,7 @@ export * from "./end-game";
 export * from "./game-state";
 export * from "./save";
 export * from "./ai-provider";
+export * from "./sand-table";
 export type {
   CounselMessage,
   CounselSession,

@@ -14,6 +14,13 @@ export const LIFE_TERMINOLOGY = {
   courtDebateLabel: "议事",
   intelligenceLabel: "风声",
 
+  sandTableLabel: "棋局",
+  sandTableTurnLabel: "棋局",
+  sandTableEmptyLabel: "棋局布阵中",
+  sandTableEmptyHint: "正在推演各方势力...",
+  sandTableUpdatingLabel: "推演中...",
+  sandTablePlayerLabel: "我",
+
   advisorLabel: "同僚",
   advisorRoles: {
     General: "武官",

@@ -41,7 +41,10 @@
     "noData": "No data",
     "opinionConflict": "⚠ Opinion Conflicts",
     "yearBC": "BC",
-    "currentIdentity": "Current Identity"
+    "currentIdentity": "Current Identity",
+    "sandTable": "Sand Table",
+    "sandTableEmpty": "Sand table generating",
+    "sandTableUpdating": "Simulating..."
   },
   "relation": {
     "ally": "Ally",

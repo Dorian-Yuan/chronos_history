@@ -96,7 +96,7 @@ const SCENARIO_DETAILS_SCHEMA_PROMPT = `
     {
       "name": "2字势力简称（必须真实可信，禁止奇幻风格如'暗影''血月'）",
       "leader": "势力领袖姓名（与顾问命名规则一致，禁止奇幻风格）",
-      "description": "势力描述（Conquest以外国势力为主，Prosperity以经济集团为主，Reform以内部政治力量为主，Survival内外兼有）",
+      "description": "势力描述（Conquest全为外国势力，Prosperity以经济集团为主，Reform以内部政治力量为主，Survival全为外部势力）",
       "strength": "主要优势",
       "weakness": "关键弱点",
       "needs": "急需什么",
@@ -124,17 +124,17 @@ const TURN_SYSTEM_PROMPT = `你是Chronos历史推演引擎的回合评估器。
 | 属性阈值 | 限制 |
 |---------|------|
 | military<20 | 只能防守，军事行动可能哗变 |
-| military<30 | 不能进攻，只能防御 |
-| military<50 | 不能多线作战 |
+| military<40 | 不能进攻，只能防御 |
+| military<60 | 不能多线作战 |
 | economy<20 | 国库枯竭，无法启动任何项目 |
-| economy<30 | 不能资助大型项目 |
-| economy<50 | 不能维持长期战争 |
+| economy<40 | 不能资助大型项目 |
+| economy<60 | 不能维持长期战争 |
 | stability<20 | 任何行动可能触发政变/分裂 |
-| stability<30 | 改革失败率极高 |
-| stability<50 | 不能激进改革 |
+| stability<40 | 改革失败率极高 |
+| stability<60 | 不能激进改革 |
 | international_standing<20 | 外交渠道关闭 |
-| international_standing<30 | 外交倡议被无视 |
-| international_standing<50 | 只能双边谈判 |
+| international_standing<40 | 外交倡议被无视 |
+| international_standing<60 | 只能双边谈判 |
 
 【属性变化与难度缩放】
 | 回合阶段 | 属性范围 | 特点 |
@@ -215,7 +215,7 @@ is_game_over设置规则：
 
 新势力生成规则：
 - 当活跃派系（未灭亡）不足3个时，应在factions_update中新增1-2个势力（is_new=true）
-- 5-10回合期间，如果叙事合理（如叛军崛起、外敌入侵、政治分裂），可新增势力（is_new=true）
+- 5-15回合期间，如果叙事合理（如叛军崛起、外敌入侵、政治分裂、探索发现），可新增势力（is_new=true）
 - 新势力须有独立的name、leader、description，且attitude为5个合法值之一
 - 新势力名不得与已有派系重名
 
@@ -251,7 +251,7 @@ const TURN_SCHEMA_PROMPT = `
 【输出 JSON 结构】你必须严格按以下结构返回JSON：
 {
   "narrative": "用户行动的直接后果（200-500字）",
-  "situation_update": "局势更新（先确认上一回合挑战的解决状态，再描述当前新局势）",
+  "situation_update": "局势更新（先确认上一回合挑战的解决状态，再描述当前新局势，但不要提及“玩家”、“上一回合”等词，不要像在游戏中而是真实的历史情况中）",
   "date_display": "当前相对日期",
   "headline": "报纸/诏令标题",
   "rumor": "民间流言",

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useGameState, useGameDispatch } from "@/lib/game";
 import {
   evaluateTurn,
@@ -16,6 +16,7 @@ import {
   SaveManager,
   CourtDebatePanel,
   EndGameConfirmModal,
+  SandTablePanel,
 } from "@/components/game";
 import type {
   TurnResult,
@@ -38,10 +39,15 @@ import {
   Swords,
   Globe,
   Flag,
+  Map as MapIcon,
 } from "lucide-react";
-import { useUIStore } from "@/stores";
+import { useUIStore, useSettingsStore } from "@/stores";
+import {
+  generateSandTableMap,
+  updateSandTable,
+} from "@/lib/sand-table/sand-table-ai";
 
-type SideTab = "cabinet" | "intelligence" | "courtDebate";
+type SideTab = "cabinet" | "intelligence" | "courtDebate" | "sandTable";
 
 function safeGetAdvisors(
   scenario: ScenarioData | null,
@@ -91,11 +97,14 @@ export function GamePage() {
   const [error, setError] = useState<string | null>(null);
   const [sideTab, setSideTab] = useState<SideTab>("cabinet");
   const [mobileTab, setMobileTab] = useState<
-    "chronicle" | "cabinet" | "courtDebate" | "intelligence"
+    "chronicle" | "cabinet" | "courtDebate" | "intelligence" | "sandTable"
   >("chronicle");
   const [showSaveManager, setShowSaveManager] = useState(false);
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
+  const [isSandTableLoading, setIsSandTableLoading] = useState(false);
+  const sandTableLoadingRef = useRef(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
+  const experimentalMode = useSettingsStore((s) => s.experimentalMode);
 
   const universe: GameUniverse = state.universe || "history";
   const term = useMemo(() => getTerminology(universe), [universe]);
@@ -127,8 +136,21 @@ export function GamePage() {
   const favorValue =
     universe === "life" ? state.stats.international_standing : undefined;
 
-  const TAB_CONFIG = useMemo(
-    () => ({
+  const showSandTable =
+    experimentalMode &&
+    universe === "history" &&
+    (scenario?.play_style === "Conquest" ||
+      scenario?.play_style === "Survival");
+
+  const TAB_CONFIG = useMemo(() => {
+    const config: Record<
+      string,
+      {
+        icon: typeof BookOpen;
+        label: string;
+        colorVar: string;
+      }
+    > = {
       chronicle: {
         icon: BookOpen,
         label: term.chronicleLabel,
@@ -149,9 +171,18 @@ export function GamePage() {
         label: term.intelligenceLabel,
         colorVar: "--color-tab-intelligence",
       },
-    }),
-    [term],
-  );
+    };
+    if (showSandTable) {
+      config.sandTable = {
+        icon: MapIcon,
+        label:
+          ((term as Record<string, unknown>).sandTableLabel as string) ||
+          "沙盘",
+        colorVar: "--color-tab-sand-table",
+      };
+    }
+    return config;
+  }, [term, showSandTable]);
 
   const STAT_CONFIG = useMemo(
     () => [
@@ -180,6 +211,50 @@ export function GamePage() {
       autoSave(state);
     }
   }, [state.turnCount, state.stats, scenario, state]);
+
+  useEffect(() => {
+    if (
+      !showSandTable ||
+      !scenario ||
+      state.sandTableState ||
+      sandTableLoadingRef.current
+    )
+      return;
+    let cancelled = false;
+    sandTableLoadingRef.current = true;
+    setIsSandTableLoading(true);
+    generateSandTableMap(scenario, state.stats)
+      .then((sandTableResult) => {
+        if (cancelled) return;
+        dispatch({
+          type: "SET_SAND_TABLE",
+          sandTableState: {
+            factions: sandTableResult.factions,
+            regions: sandTableResult.regions,
+            mapWidth: 360,
+            mapHeight: 480,
+            lastUpdateTurn: state.turnCount,
+          },
+        });
+      })
+      .catch((e) => {
+        console.error("Sand table initialization failed:", e);
+      })
+      .finally(() => {
+        sandTableLoadingRef.current = false;
+        if (!cancelled) setIsSandTableLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    showSandTable,
+    scenario,
+    state.sandTableState,
+    state.turnCount,
+    state.stats,
+    dispatch,
+  ]);
 
   const handleSubmit = useCallback(
     async (action: string) => {
@@ -220,6 +295,52 @@ export function GamePage() {
         );
 
         dispatch({ type: "PROCESS_TURN", result, playerAction: action });
+
+        if (
+          showSandTable &&
+          state.sandTableState &&
+          !checkGameOver(state, result)
+        ) {
+          setIsSandTableLoading(true);
+          try {
+            const sandTableUpdate = await updateSandTable(
+              scenario,
+              currentFactions,
+              state.sandTableState.factions.map((f) => ({
+                name: f.name,
+                power: f.power,
+                dead: f.dead,
+                isPlayer: f.isPlayer,
+              })),
+              result.stats_delta,
+              {
+                stability: clampStat(
+                  state.stats.stability + result.stats_delta.stability,
+                ),
+                economy: clampStat(
+                  state.stats.economy + result.stats_delta.economy,
+                ),
+                military: clampStat(
+                  state.stats.military + result.stats_delta.military,
+                ),
+                international_standing: clampStat(
+                  state.stats.international_standing +
+                    result.stats_delta.international_standing,
+                ),
+              },
+              action,
+              state.turnCount + 1,
+            );
+            dispatch({
+              type: "UPDATE_SAND_TABLE",
+              factionUpdates: sandTableUpdate.factions,
+            });
+          } catch (e) {
+            console.error("Sand table update failed:", e);
+          } finally {
+            setIsSandTableLoading(false);
+          }
+        }
 
         if (checkGameOver(state, result)) {
           try {
@@ -305,10 +426,12 @@ export function GamePage() {
       scenario,
       state,
       currentAdvisors,
+      currentFactions,
       turnResults,
       dispatch,
       universe,
       term,
+      showSandTable,
     ],
   );
 
@@ -588,6 +711,12 @@ export function GamePage() {
                 courtDebateSessions={state.courtDebateSessions}
                 universe={universe}
               />
+            ) : mobileTab === "sandTable" && showSandTable ? (
+              <SandTablePanel
+                sandTableState={state.sandTableState}
+                isLoading={isSandTableLoading}
+                universe={universe}
+              />
             ) : (
               <IntelligencePanel
                 factions={currentFactions}
@@ -623,6 +752,13 @@ export function GamePage() {
               sideTab === "intelligence",
               "bottom",
             )}
+            {showSandTable &&
+              renderTabButton(
+                "sandTable",
+                () => setSideTab("sandTable"),
+                sideTab === "sandTable",
+                "bottom",
+              )}
           </div>
           <div className="flex-1 overflow-y-auto">
             <div
@@ -676,6 +812,19 @@ export function GamePage() {
                 favor={favorValue}
               />
             </div>
+            {showSandTable && (
+              <div
+                id="panel-sand-table"
+                role="tabpanel"
+                className={sideTab === "sandTable" ? "" : "hidden"}
+              >
+                <SandTablePanel
+                  sandTableState={state.sandTableState}
+                  isLoading={isSandTableLoading}
+                  universe={universe}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -713,6 +862,13 @@ export function GamePage() {
           mobileTab === "intelligence",
           "top",
         )}
+        {showSandTable &&
+          renderTabButton(
+            "sandTable",
+            () => setMobileTab("sandTable"),
+            mobileTab === "sandTable",
+            "top",
+          )}
       </nav>
 
       <footer className="hidden md:flex items-center justify-between h-10 px-6 border-t border-border bg-bg-secondary text-xs text-text-tertiary">

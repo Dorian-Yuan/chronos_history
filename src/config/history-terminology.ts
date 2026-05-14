@@ -14,6 +14,13 @@ export const HISTORY_TERMINOLOGY = {
   courtDebateLabel: "廷议",
   intelligenceLabel: "情报",
 
+  sandTableLabel: "沙盘",
+  sandTableTurnLabel: "沙盘",
+  sandTableEmptyLabel: "沙盘生成中",
+  sandTableEmptyHint: "正在推演天下大势...",
+  sandTableUpdatingLabel: "推演中...",
+  sandTablePlayerLabel: "我",
+
   advisorLabel: "顾问",
   advisorRoles: {
     General: "将军",

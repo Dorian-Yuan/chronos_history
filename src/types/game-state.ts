@@ -3,6 +3,7 @@ import type { TurnResult } from "./turn-result";
 import type { EndGameAnalysis } from "./end-game";
 import type { PlayStyle } from "./play-style";
 import type { LifeMode } from "./life-mode";
+import type { SandTableState } from "./sand-table";
 import { getAppConfig } from "@/config";
 
 export type GameUniverse = "history" | "life";
@@ -86,6 +87,7 @@ export interface GameState {
   pendingAdvisors: AdvisorData[];
   identityChangeCount: IdentityChangeCount;
   universe: GameUniverse;
+  sandTableState: SandTableState | null;
 }
 
 export type GameOutcome = BaseOutcome;
@@ -111,6 +113,7 @@ export const INITIAL_GAME_STATE: GameState = {
   pendingAdvisors: [],
   identityChangeCount: { nation_name: 0, leader_title: 0 },
   universe: "history" as GameUniverse,
+  sandTableState: null,
 };
 
 export function clampStat(value: number): number {

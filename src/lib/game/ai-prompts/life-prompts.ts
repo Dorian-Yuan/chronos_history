@@ -170,17 +170,17 @@ const TURN_SYSTEM_PROMPT = `你是Chronos人生推演引擎的回合评估器。
 | 属性阈值 | 限制 |
 |---------|------|
 | 权势(military)<20 | 无实权，任何行动可能被无视 |
-| 权势(military)<30 | 只能执行日常公务 |
-| 权势(military)<50 | 不能主导重大决策 |
+| 权势(military)<40 | 只能执行日常公务 |
+| 权势(military)<60 | 不能主导重大决策 |
 | 财力(economy)<20 | 囊中羞涩，无法打点关系 |
-| 财力(economy)<30 | 不能资助任何项目 |
-| 财力(economy)<50 | 不能进行大额花费 |
+| 财力(economy)<40 | 不能资助任何项目 |
+| 财力(economy)<60 | 不能进行大额花费 |
 | 威望(stability)<20 | 名声扫地，任何行动可能被弹劾 |
-| 威望(stability)<30 | 提议被轻视 |
-| 威望(stability)<50 | 不能提出激进改革 |
+| 威望(stability)<40 | 提议被轻视 |
+| 威望(stability)<60 | 不能提出激进改革 |
 | 圣眷(international_standing)<20 | 上位者震怒，随时可能被贬 |
-| 圣眷(international_standing)<30 | 上位者猜忌，奏折被驳回 |
-| 圣眷(international_standing)<50 | 只能执行安全保守的行动 |
+| 圣眷(international_standing)<40 | 上位者猜忌，奏折被驳回 |
+| 圣眷(international_standing)<60 | 只能执行安全保守的行动 |
 
 【叙事要求】
 - narrative：200-500字，生动有画面感，官员视角
@@ -220,7 +220,7 @@ const TURN_SYSTEM_PROMPT = `你是Chronos人生推演引擎的回合评估器。
 
 新势力生成规则：
 - 当活跃派系（未灭亡）不足3个时，应在factions_update中新增1-2个势力（is_new=true）
-- 5-10回合期间，如果叙事合理（如党争新派系崛起、朝堂权力重组），可新增势力（is_new=true）
+- 5-15回合期间，如果叙事合理（如党争新派系崛起、朝堂权力重组、某个势力分裂），可新增势力（is_new=true）
 - 新势力须为朝堂内部派系，有独立的name、leader、description，且attitude为5个合法值之一
 - 新势力名不得与已有派系重名
 
