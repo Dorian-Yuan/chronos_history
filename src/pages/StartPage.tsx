@@ -4,7 +4,6 @@ import { hasAutoSave, loadAutoSave } from "@/lib/game";
 import {
   DisclaimerModal,
   SaveManager,
-  HistoryArchive,
   EndingCompendium,
 } from "@/components/game";
 import {
@@ -13,7 +12,6 @@ import {
   Save,
   BookOpen,
   FolderOpen,
-  Trophy,
   Compass,
   Crown,
   Sword,
@@ -54,7 +52,6 @@ const START_ICONS = [
   Feather,
   Gem,
   TreePine,
-  Trophy,
   Compass,
   BookOpen,
 ] as const;
@@ -63,8 +60,7 @@ export function StartPage() {
   const dispatch = useGameDispatch();
   const state = useGameState();
   const [showSaveManager, setShowSaveManager] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showCompendium, setShowCompendium] = useState(false);
+  const [showArchive, setShowArchive] = useState(false);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
   const experimentalMode = useSettingsStore((s) => s.experimentalMode);
 
@@ -135,14 +131,6 @@ export function StartPage() {
             继续游戏
           </button>
         )}
-
-        <button
-          onClick={() => setShowCompendium(true)}
-          className="btn-secondary w-full h-14 text-base"
-        >
-          <Trophy size={18} />
-          结局图鉴
-        </button>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 z-10 safe-bottom">
@@ -155,7 +143,7 @@ export function StartPage() {
             存档
           </button>
           <button
-            onClick={() => setShowHistory(true)}
+            onClick={() => setShowArchive(true)}
             className="btn-ghost py-2.5 text-sm"
           >
             <Archive size={14} />
@@ -182,16 +170,9 @@ export function StartPage() {
         />
       )}
 
-      {showHistory && (
-        <HistoryArchive
-          onClose={() => setShowHistory(false)}
-          universe={state.universe}
-        />
-      )}
-
-      {showCompendium && (
+      {showArchive && (
         <EndingCompendium
-          onClose={() => setShowCompendium(false)}
+          onClose={() => setShowArchive(false)}
           universe={state.universe}
         />
       )}

@@ -66,7 +66,7 @@ export const HISTORY_TERMINOLOGY = {
   alternativeHistoryLabel: "平行历史演化",
   comparisonLabel: "对比分析",
   similarFigureLabel: "相似历史人物：",
-  rulerPortraitLabel: "统治者画像",
+  rulerPortraitLabel: "角色画像",
   dimensionLabels: {
     Authority: "权威",
     Strategy: "战略",

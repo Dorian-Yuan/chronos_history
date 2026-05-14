@@ -5,11 +5,7 @@ import type {
   CompendiumEntry,
   FullExportData,
 } from "@/types";
-import {
-  SAVE_VERSION,
-  MAX_HISTORY_RECORDS,
-  FULL_EXPORT_VERSION,
-} from "@/types";
+import { SAVE_VERSION, FULL_EXPORT_VERSION } from "@/types";
 
 const AUTOSAVE_KEY = "chronos_autosave";
 const SAVE_KEY_PREFIX = "chronos_save_";
@@ -98,9 +94,6 @@ export function getAllSaves(): { slotIndex: number; data: SaveData }[] {
 export function addHistoryRecord(record: HistoryRecord): void {
   const history = loadFromLocalStorage<HistoryRecord[]>(HISTORY_KEY) || [];
   history.unshift(record);
-  if (history.length > MAX_HISTORY_RECORDS) {
-    history.length = MAX_HISTORY_RECORDS;
-  }
   saveToLocalStorage(HISTORY_KEY, history);
 }
 
@@ -190,9 +183,9 @@ export function importAllData(jsonString: string): boolean {
     const newHistory = (data.historyRecords || []).filter(
       (nr) => !existingHistory.some((er) => er.id === nr.id),
     );
-    const mergedHistory = [...newHistory, ...existingHistory]
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, MAX_HISTORY_RECORDS);
+    const mergedHistory = [...newHistory, ...existingHistory].sort(
+      (a, b) => b.timestamp - a.timestamp,
+    );
     saveToLocalStorage(HISTORY_KEY, mergedHistory);
 
     const existingPersona = getPersonaCompendium();

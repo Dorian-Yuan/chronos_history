@@ -66,7 +66,7 @@ export const LIFE_TERMINOLOGY = {
   alternativeHistoryLabel: "平行命运演化",
   comparisonLabel: "对比分析",
   similarFigureLabel: "相似历史人物：",
-  rulerPortraitLabel: "仕途画像",
+  rulerPortraitLabel: "角色画像",
   dimensionLabels: {
     Authority: "权谋",
     Strategy: "手腕",

@@ -7,7 +7,6 @@ export { EndGameReport } from "./EndGameReport";
 export { GameInput } from "./GameInput";
 export { DisclaimerModal } from "./DisclaimerModal";
 export { SaveManager } from "./SaveManager";
-export { HistoryArchive } from "./HistoryArchive";
 export { ScenarioHintModal } from "./ScenarioHintModal";
 export { CounselDialog } from "./CounselDialog";
 export { EndingCompendium } from "./EndingCompendium";

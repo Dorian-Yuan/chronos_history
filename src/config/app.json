@@ -1,5 +1,5 @@
 {
-  "version": "1.12.0",
+  "version": "1.12.1",
   "defaultLocale": "zh",
   "defaultTheme": "dark",
   "appName": "Chronos: 历史的回响",
@@ -7,6 +7,5 @@
   "maxTurns": 28,
   "minTurnsBeforeEnd": 8,
   "earlyGameProtectionTurns": 4,
-  "maxHistoryRecords": 50,
   "saveSlots": 5
 }

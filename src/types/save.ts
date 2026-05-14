@@ -33,7 +33,6 @@ export interface CompendiumEntry {
   timestamp: number;
 }
 
-export const MAX_HISTORY_RECORDS = 50;
 export const SAVE_VERSION = 1;
 export const FULL_EXPORT_VERSION = 1;
 

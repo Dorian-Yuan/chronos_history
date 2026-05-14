@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import type { CompendiumEntry, GameUniverse } from "@/types";
-import { getPersonaCompendium, getHistoryCompendium } from "@/lib/game";
-import { X, Crown, ScrollText } from "lucide-react";
+import type { CompendiumEntry, HistoryRecord, GameUniverse } from "@/types";
+import {
+  getPersonaCompendium,
+  getHistoryCompendium,
+  getHistoryRecords,
+} from "@/lib/game";
+import { X, Crown, ScrollText, ClipboardList } from "lucide-react";
 import { getTerminology } from "@/config/terminology";
 
 interface EndingCompendiumProps {
@@ -9,13 +13,14 @@ interface EndingCompendiumProps {
   universe?: GameUniverse;
 }
 
-type CompendiumTab = "persona" | "history";
+type CompendiumTab = "records" | "persona" | "history";
 
 export function EndingCompendium({
   onClose,
   universe = "history",
 }: EndingCompendiumProps) {
-  const [tab, setTab] = useState<CompendiumTab>("persona");
+  const [tab, setTab] = useState<CompendiumTab>("records");
+  const [records] = useState<HistoryRecord[]>(() => getHistoryRecords());
   const [personaEntries] = useState<CompendiumEntry[]>(() =>
     getPersonaCompendium(),
   );
@@ -45,6 +50,11 @@ export function EndingCompendium({
     CompendiumTab,
     { label: string; icon: typeof Crown; colorVar: string }
   > = {
+    records: {
+      label: "记录存档",
+      icon: ClipboardList,
+      colorVar: "--color-accent-primary",
+    },
     persona: {
       label: term.rulerPortraitLabel,
       icon: Crown,
@@ -57,7 +67,14 @@ export function EndingCompendium({
     },
   };
 
-  const currentEntries = tab === "persona" ? personaEntries : historyEntries;
+  const OUTCOME_STYLES: Record<string, string> = {
+    victory:
+      "bg-status-success-bg text-status-success-text border border-status-success-border",
+    neutral:
+      "bg-status-warning-bg text-status-warning-text border border-status-warning-border",
+    defeat:
+      "bg-status-error-bg text-status-error-text border border-status-error-border",
+  };
 
   return (
     <div
@@ -69,7 +86,7 @@ export function EndingCompendium({
       <div ref={modalRef} className="modal-content max-w-md">
         <div className="modal-header">
           <h2 className="font-serif text-lg font-semibold text-text-primary">
-            结局图鉴
+            档案图鉴
           </h2>
           <button
             onClick={onClose}
@@ -117,43 +134,122 @@ export function EndingCompendium({
         </div>
 
         <div className="modal-body max-h-[60vh]">
-          {currentEntries.length === 0 ? (
-            <div className="text-center py-12 text-sm text-text-tertiary font-serif">
-              {tab === "persona"
-                ? `尚未收集任何${term.rulerPortraitLabel}`
-                : "尚未收集任何历史事件"}
-              <p className="text-xs mt-2 text-text-tertiary/60">
-                完成游戏后自动收录
-              </p>
-            </div>
-          ) : (
-            <ul className="space-y-3">
-              {currentEntries.map((entry) => (
-                <li
-                  key={entry.id}
-                  className="rounded-lg border border-border bg-bg-card p-4"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-serif font-bold text-text-primary">
-                      {entry.title}
-                    </span>
-                  </div>
-                  <p className="text-xs font-serif text-text-secondary leading-relaxed">
-                    {entry.description}
+          {tab === "records" && (
+            <>
+              {records.length === 0 ? (
+                <div className="text-center py-12 text-sm text-text-tertiary font-serif">
+                  暂无游戏记录
+                  <p className="text-xs mt-2 text-text-tertiary/60">
+                    完成游戏后自动收录
                   </p>
-                  <div className="text-xs text-text-tertiary/60 mt-2">
-                    {new Date(entry.timestamp).toLocaleDateString()}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {records.map((record) => (
+                    <li
+                      key={record.id}
+                      className="rounded-lg border border-border bg-bg-card p-4"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-bold font-serif text-text-primary">
+                          {record.scenarioTitle}
+                        </span>
+                        <span
+                          className={`badge ${OUTCOME_STYLES[record.outcome] || "bg-bg-tertiary text-text-tertiary"}`}
+                        >
+                          {term.outcomeLabels[
+                            record.outcome as keyof typeof term.outcomeLabels
+                          ] || record.outcome}
+                        </span>
+                      </div>
+                      <div className="text-xs text-text-tertiary font-serif leading-relaxed">
+                        {record.nationName} · {record.leaderTitle} ·{" "}
+                        {record.turnCount}
+                        {term.turnLabel}
+                      </div>
+                      <div className="text-xs text-text-tertiary/60 mt-2">
+                        {new Date(record.timestamp).toLocaleString()}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+
+          {tab === "persona" && (
+            <>
+              {personaEntries.length === 0 ? (
+                <div className="text-center py-12 text-sm text-text-tertiary font-serif">
+                  {`尚未收集任何${term.rulerPortraitLabel}`}
+                  <p className="text-xs mt-2 text-text-tertiary/60">
+                    完成游戏后自动收录
+                  </p>
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {personaEntries.map((entry) => (
+                    <li
+                      key={entry.id}
+                      className="rounded-lg border border-border bg-bg-card p-4"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-sm font-serif font-bold text-text-primary">
+                          {entry.title}
+                        </span>
+                      </div>
+                      <p className="text-xs font-serif text-text-secondary leading-relaxed">
+                        {entry.description}
+                      </p>
+                      <div className="text-xs text-text-tertiary/60 mt-2">
+                        {new Date(entry.timestamp).toLocaleDateString()}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+
+          {tab === "history" && (
+            <>
+              {historyEntries.length === 0 ? (
+                <div className="text-center py-12 text-sm text-text-tertiary font-serif">
+                  尚未收集任何历史事件
+                  <p className="text-xs mt-2 text-text-tertiary/60">
+                    完成游戏后自动收录
+                  </p>
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {historyEntries.map((entry) => (
+                    <li
+                      key={entry.id}
+                      className="rounded-lg border border-border bg-bg-card p-4"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-sm font-serif font-bold text-text-primary">
+                          {entry.title}
+                        </span>
+                      </div>
+                      <p className="text-xs font-serif text-text-secondary leading-relaxed">
+                        {entry.description}
+                      </p>
+                      <div className="text-xs text-text-tertiary/60 mt-2">
+                        {new Date(entry.timestamp).toLocaleDateString()}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
 
         <div className="modal-footer text-center">
           <span className="text-xs text-text-tertiary font-serif">
-            已收集 {personaEntries.length} 个画像 · {historyEntries.length}{" "}
-            个历史事件
+            已进行 {records.length} 局游戏 · 收集 {personaEntries.length} 个画像
+            · {historyEntries.length} 个历史事件
           </span>
         </div>
       </div>
