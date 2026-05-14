@@ -144,6 +144,7 @@ function updateFactions(
         attitude: normalizeAttitude(update.attitude ?? result[idx].attitude),
         leader: update.leader ?? result[idx].leader,
         leader_status: update.leader_status || result[idx].leader_status,
+        is_external: update.is_external ?? result[idx].is_external,
         is_new: false,
       };
     } else if (update.is_new) {
@@ -156,6 +157,7 @@ function updateFactions(
         attitude: normalizeAttitude(update.attitude),
         leader: update.leader,
         leader_status: update.leader_status,
+        is_external: update.is_external,
         is_new: true,
       });
     }

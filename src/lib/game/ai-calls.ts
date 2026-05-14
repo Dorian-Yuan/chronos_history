@@ -262,21 +262,50 @@ function fixInternalFactions(scenario: ScenarioData): ScenarioData {
     "农民",
     "百姓",
     "朝臣",
+    "守旧",
+    "革新",
+    "世家",
+    "门阀",
+    "宗室",
+    "藩镇",
+    "文官",
+    "武将",
+    "士族",
+    "寒门",
+    "权臣",
+    "党争",
+    "派系",
+    "集团",
+    "联盟",
+    "内阁",
+    "议政",
+    "辅政",
+    "摄政",
+    "监国",
+    "太子",
+    "亲王",
   ];
 
-  const internalFactions = scenario.factions.filter((f) => {
+  function isInternalFaction(f: {
+    is_external?: boolean;
+    name: string;
+    description: string;
+    attitude: string;
+  }): boolean {
+    if (f.is_external === false) return true;
+    if (f.is_external === true) return false;
     const text = `${f.name} ${f.description} ${f.attitude}`;
     return internalKeywords.some((kw) => text.includes(kw));
-  });
+  }
+
+  const internalFactions = scenario.factions.filter(isInternalFaction);
 
   if (internalFactions.length <= 1) return scenario;
 
   const firstInternalName = internalFactions[0].name;
   const fixedFactions = scenario.factions.filter((f) => {
     if (f.name === firstInternalName) return true;
-    const text = `${f.name} ${f.description} ${f.attitude}`;
-    const isInternal = internalKeywords.some((kw) => text.includes(kw));
-    return !isInternal;
+    return !isInternalFaction(f);
   });
 
   console.log(
@@ -320,18 +349,18 @@ function fixExternalFactions(scenario: ScenarioData): ScenarioData {
 }
 
 const PLACEHOLDER_NAMES_HISTORY = [
-  "陈伯年",
+  "陆承渊",
   "林正则",
-  "赵明远",
+  "方守正",
   "周守义",
-  "吴承恩",
+  "沈怀瑾",
 ];
 const PLACEHOLDER_NAMES_LIFE = [
   "沈清臣",
   "顾怀安",
   "刘慎行",
   "杨守正",
-  "韩世忠",
+  "钱慎行",
 ];
 
 function generatePlaceholderName(
@@ -351,6 +380,7 @@ const PLACEHOLDER_FACTIONS_HISTORY = [
     weakness: "缺乏创新",
     needs: "维持现状",
     attitude: "中立" as const,
+    is_external: false,
   },
   {
     name: "革新派",
@@ -359,6 +389,7 @@ const PLACEHOLDER_FACTIONS_HISTORY = [
     weakness: "根基尚浅",
     needs: "扩大影响",
     attitude: "求和" as const,
+    is_external: false,
   },
   {
     name: "中立派",
@@ -367,6 +398,37 @@ const PLACEHOLDER_FACTIONS_HISTORY = [
     weakness: "立场不稳",
     needs: "各方认可",
     attitude: "中立" as const,
+    is_external: false,
+  },
+];
+
+const PLACEHOLDER_FACTIONS_CONQUEST = [
+  {
+    name: "北境联盟",
+    description: "北方边境的游牧军事联盟，觊觎南方富庶",
+    strength: "骑兵精锐",
+    weakness: "后勤薄弱",
+    needs: "劫掠资源",
+    attitude: "敌对" as const,
+    is_external: true,
+  },
+  {
+    name: "南方诸国",
+    description: "南方多国组成的贸易与军事同盟",
+    strength: "水军强盛",
+    weakness: "内部不和",
+    needs: "扩张领土",
+    attitude: "敌对" as const,
+    is_external: true,
+  },
+  {
+    name: "西域汗国",
+    description: "西方草原上的强大汗国，频繁入侵边境",
+    strength: "兵锋锐利",
+    weakness: "补给线长",
+    needs: "征服土地",
+    attitude: "敌对" as const,
+    is_external: true,
   },
 ];
 
@@ -378,6 +440,7 @@ const PLACEHOLDER_FACTIONS_LIFE = [
     weakness: "因循守旧",
     needs: "扩大影响",
     attitude: "友好" as const,
+    is_external: false,
   },
   {
     name: "务实派",
@@ -386,6 +449,7 @@ const PLACEHOLDER_FACTIONS_LIFE = [
     weakness: "道义薄弱",
     needs: "稳固根基",
     attitude: "求和" as const,
+    is_external: false,
   },
   {
     name: "新兴派",
@@ -394,6 +458,7 @@ const PLACEHOLDER_FACTIONS_LIFE = [
     weakness: "根基尚浅",
     needs: "争取支持",
     attitude: "中立" as const,
+    is_external: false,
   },
 ];
 
@@ -481,7 +546,7 @@ function fixMissingLifeFields(scenario: ScenarioData): ScenarioData {
     const fallbackSuperiorNames = [
       "萧承运",
       "司马昭明",
-      "李承乾",
+      "赵承乾",
       "宇文泰和",
       "耶律隆运",
     ];
@@ -518,10 +583,13 @@ function fixFactionsCount(
     return scenario;
 
   const fixed = [...(scenario.factions || [])];
+
   const placeholders =
     universe === "life"
       ? PLACEHOLDER_FACTIONS_LIFE
-      : PLACEHOLDER_FACTIONS_HISTORY;
+      : scenario.play_style === "Conquest"
+        ? PLACEHOLDER_FACTIONS_CONQUEST
+        : PLACEHOLDER_FACTIONS_HISTORY;
 
   while (fixed.length < 3) {
     const idx = fixed.length;
@@ -534,10 +602,13 @@ function fixFactionsCount(
       weakness: p.weakness,
       needs: p.needs,
       attitude: p.attitude,
+      is_external: p.is_external,
     });
   }
 
-  console.log(`[fixFactionsCount] 派系不足3个，补充至${fixed.length}个`);
+  console.log(
+    `[fixFactionsCount] 派系不足3个，补充至${fixed.length}个（play_style=${scenario.play_style}）`,
+  );
 
   return { ...scenario, factions: fixed };
 }
@@ -629,13 +700,51 @@ function validateScenario(data: ScenarioData, universe: GameUniverse): void {
       "农民",
       "百姓",
       "朝臣",
+      "守旧",
+      "革新",
+      "世家",
+      "门阀",
+      "宗室",
+      "藩镇",
+      "文官",
+      "武将",
+      "士族",
+      "寒门",
+      "权臣",
+      "党争",
+      "派系",
+      "集团",
+      "联盟",
+      "内阁",
+      "议政",
+      "辅政",
+      "摄政",
+      "监国",
+      "太子",
+      "亲王",
     ];
     const internalFactions = data.factions.filter((f) => {
+      if (f.is_external === false) return true;
+      if (f.is_external === true) return false;
       const text = `${f.name} ${f.description} ${f.attitude}`;
       return internalKeywords.some((kw) => text.includes(kw));
     });
+    const externalFactions = data.factions.filter((f) => {
+      if (f.is_external === true) return true;
+      if (f.is_external === false) return false;
+      return !internalKeywords.some((kw) =>
+        `${f.name} ${f.description} ${f.attitude}`.includes(kw),
+      );
+    });
     if (internalFactions.length > 1) {
-      errors.push(`征服模式内部势力过多（${internalFactions.length}个）`);
+      errors.push(
+        `征服模式内部势力过多（${internalFactions.length}个，外部仅${externalFactions.length}个）`,
+      );
+    }
+    if (externalFactions.length < 3) {
+      errors.push(
+        `征服模式外部势力不足（仅${externalFactions.length}个，需至少3个）`,
+      );
     }
   }
 
@@ -801,11 +910,19 @@ export async function generateScenario(
   const styleValue = playStyleOrLifeMode;
 
   let effectiveHint = userHint;
+  let isRandomHint = false;
   if (!effectiveHint && !isLife) {
     effectiveHint = getRandomHistoryKeyword();
+    isRandomHint = true;
   }
 
-  const userContent = `${styleLabel}：${styleValue}\n\n请以50%概率选择中国封建王朝（清朝之前）、50%概率选择其他文明。优先选择冷门时期，绝对禁止选择三国、楚汉等大热门，绝对禁止草原汗国/游牧帝国背景。所有人物名必须是虚构的，不能使用真实历史人物名。${effectiveHint ? `\n\n【玩家自定义要求——极其重要，必须重点参考】\n${effectiveHint}\n\n你必须在生成剧本时重点考虑以上玩家要求。` : ""}`;
+  const hintSection = effectiveHint
+    ? isRandomHint
+      ? `\n\n【历史背景参考——极其重要】\n系统随机选取了以下历史背景供你参考：${effectiveHint}\n\n【强约束——必须严格遵守】\n1. 你只能以"${effectiveHint}"作为历史时代背景和文化风格的参考\n2. 绝对禁止直接使用真实历史中的国号、朝代名、人名、事件名\n3. 必须虚构一个与该时代风格相似但完全独立的国家/政权，使用虚构的国名、人名、事件名\n4. 剧本中的政治格局、军事冲突、文化风貌可以借鉴该时代特征，但所有具体细节必须是原创虚构的\n5. 简而言之：借其神韵，换其骨肉——时代风格为真，具体设定为假`
+      : `\n\n【玩家自定义要求——极其重要，必须重点参考】\n${effectiveHint}\n\n你必须在生成剧本时重点考虑以上玩家要求。`
+    : "";
+
+  const userContent = `${styleLabel}：${styleValue}\n\n请以50%概率选择中国封建王朝（清朝之前）、50%概率选择其他文明。优先选择冷门时期，绝对禁止选择三国、楚汉等大热门，绝对禁止草原汗国/游牧帝国背景。所有人物名必须是虚构的，不能使用真实历史人物名。${hintSection}`;
 
   onProgress?.(isLife ? "正在构思仕途背景..." : "正在构思历史背景...");
   const coreSystemPrompt = structuredOutputSupported
@@ -869,18 +986,23 @@ export async function generateScenario(
 
 【硬性约束——必须全部满足，否则输出无效】
 1. 必须恰好5个顾问，角色分别为：General、Diplomat、Intel、Scholar、Merchant，缺一不可
-2. 3-4个派系，每个含leader字段
+2. 3-4个派系，每个含leader字段和is_external字段
 3. 人名全部虚构，禁止奇幻风格，按文明传统命名
 4. 派系名真实可信，禁止奇幻风格
 5. 2-3个initial_decision_options
-6. 派系构成须符合基调：Conquest至少3外部，Prosperity经济集团为主，Reform至少3内部，Survival内外兼有
-7. 派系attitude只能取以下5个值之一：敌对、求和、中立、友好、臣服。禁止使用其他任何值（如"归顺""敌视"等均不合法）
+6. 派系构成须严格符合基调：
+   - Conquest：4个派系中至少3个外部敌对势力，内部至多1个。禁止以内部政治派系为主
+   - Prosperity：经济利益集团和贸易伙伴/竞争对手为主，禁止纯军事入侵者
+   - Reform：改革vs保守内部力量为主（至少3个内部），外部至多1-2个
+   - Survival：至少2个内部+至少1个外部，内外交困
+7. 每个派系必须正确标注is_external字段（true=外国/外部势力，false=内部势力），此字段用于约束验证，标注错误将导致剧本无效
+8. 派系attitude只能取以下5个值之一：敌对、求和、中立、友好、臣服。禁止使用其他任何值（如"归顺""敌视"等均不合法）
 
 【生成后自检——返回前必须逐项确认】
 1. 是否恰好5个顾问且5个角色齐全（General/Diplomat/Intel/Scholar/Merchant）？
-2. 是否3-4个派系且每个有leader？
+2. 是否3-4个派系且每个有leader和is_external？
 3. 人名是否符合文明传统？无奇幻风格？
-4. 派系构成是否符合基调？
+4. 派系构成是否符合基调？is_external标注是否与实际内外一致？
 5. 是否有2-3个initial_decision_options？
 6. 每个派系attitude是否为5个合法值之一（敌对/求和/中立/友好/臣服）？
 7. 所有文本是否为简体中文？

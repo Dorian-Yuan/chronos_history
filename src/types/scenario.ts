@@ -49,6 +49,7 @@ export interface FactionData {
   attitude: string;
   is_new?: boolean;
   is_destroyed?: boolean;
+  is_external?: boolean;
 }
 
 export interface ScenarioData {
