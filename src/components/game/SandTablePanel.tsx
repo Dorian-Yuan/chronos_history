@@ -107,6 +107,7 @@ export function SandTablePanel({
         engine.factions,
         engine.terrainMap,
         dark,
+        engine.seed,
       );
       offCtx.putImageData(imgData, 0, 0);
 
@@ -238,8 +239,8 @@ export function SandTablePanel({
               border: "2px solid var(--color-border)",
               borderRadius: "var(--radius-lg)",
               boxShadow: isDarkRef.current
-                ? "0 10px 30px rgba(0,0,0,0.8)"
-                : "0 10px 30px rgba(0,0,0,0.15)",
+                ? "0 4px 12px rgba(0,0,0,0.25)"
+                : "0 4px 12px rgba(0,0,0,0.06)",
               background: canvasBg,
             }}
           />
@@ -259,12 +260,6 @@ export function SandTablePanel({
                   <span className="text-xs font-serif text-text-secondary">
                     {f.name}
                   </span>
-                  {f.isPlayer && (
-                    <span className="text-[10px] px-1 py-0.5 rounded bg-accent-primary/10 text-accent-primary font-serif">
-                      {((term as Record<string, unknown>)
-                        .sandTablePlayerLabel as string) || "我"}
-                    </span>
-                  )}
                   <span className="text-[10px] font-mono text-text-tertiary">
                     {f.targetPower.toFixed(1)}
                   </span>

@@ -32,10 +32,25 @@ export function assignFactionColors(
   });
 }
 
+export interface TerrainSeed {
+  seedX: number;
+  seedY: number;
+  seedZ: number;
+}
+
+export function createTerrainSeed(): TerrainSeed {
+  return {
+    seedX: Math.random() * Math.PI * 2,
+    seedY: Math.random() * Math.PI * 2,
+    seedZ: Math.random() * Math.PI * 2,
+  };
+}
+
 function createTerrainMap(
   simW: number,
   simH: number,
   regions: SandTableRegion[],
+  seed: TerrainSeed,
 ): Float32Array {
   const terrainMap = new Float32Array(simW * simH);
   const heightMap = new Float32Array(simW * simH);
@@ -45,7 +60,8 @@ function createTerrainMap(
       const nx = x * 0.05;
       const ny = y * 0.05;
       const noise =
-        Math.sin(nx) * Math.cos(ny) + 0.5 * Math.sin(nx * 2.5 + ny * 1.5);
+        Math.sin(nx + seed.seedX) * Math.cos(ny + seed.seedY) +
+        0.5 * Math.sin(nx * 2.5 + ny * 1.5 + seed.seedZ);
       const index = y * simW + x;
       const height = (noise + 1.5) / 3.0;
       heightMap[index] = height;
@@ -137,6 +153,7 @@ export function renderSandTableToImageData(
   factions: SandTableFaction[],
   terrainMap: Float32Array,
   isDark: boolean = true,
+  seed?: TerrainSeed,
 ): void {
   const pixels = imageData.data;
 
@@ -148,7 +165,7 @@ export function renderSandTableToImageData(
   const borderG = isDark ? 35 : 90;
   const borderB = isDark ? 30 : 80;
 
-  const BORDER_THRESHOLD = 0.92;
+  const BORDER_THRESHOLD = 0.935;
   const BORDER_FADE_END = 0.95;
 
   for (let y = 0; y < simH; y++) {
@@ -182,7 +199,8 @@ export function renderSandTableToImageData(
       const nx = x * 0.05;
       const ny = y * 0.05;
       const noise =
-        Math.sin(nx) * Math.cos(ny) + 0.5 * Math.sin(nx * 2.5 + ny * 1.5);
+        Math.sin(nx + (seed?.seedX ?? 0)) * Math.cos(ny + (seed?.seedY ?? 0)) +
+        0.5 * Math.sin(nx * 2.5 + ny * 1.5 + (seed?.seedZ ?? 0));
       const h = (noise + 1.5) / 3.0;
       const shadow = 0.7 + h * 0.4;
       const sR = baseR * shadow;
@@ -319,7 +337,8 @@ export function createSandTableEngine(state: SandTableState) {
   const simW = Math.ceil(renderW / SCALE);
   const simH = Math.ceil(renderH / SCALE);
 
-  const terrainMap = createTerrainMap(simW, simH, state.regions);
+  const seed = createTerrainSeed();
+  const terrainMap = createTerrainMap(simW, simH, state.regions, seed);
 
   const scaledFactions = state.factions.map((f) => ({
     ...f,
@@ -337,6 +356,7 @@ export function createSandTableEngine(state: SandTableState) {
     terrainMap,
     factions: scaledFactions,
     scale: SCALE,
+    seed,
   };
 }
 
