@@ -12,7 +12,10 @@ import type { AIMessage } from "@/types/ai-provider";
 import { createProvider } from "@/lib/ai";
 import { useSettingsStore } from "@/stores";
 import { JSON_OUTPUT_INSTRUCTION } from "@/lib/game/ai-prompts/shared-prompts";
-import { assignFactionColors } from "@/lib/sand-table/engine";
+import {
+  assignFactionColors,
+  createTerrainSeed,
+} from "@/lib/sand-table/engine";
 
 function getProvider() {
   const settings = useSettingsStore.getState();
@@ -281,6 +284,7 @@ export function generateDeterministicSandTableMap(
     mapWidth: 360,
     mapHeight: 480,
     lastUpdateTurn: 1,
+    seed: createTerrainSeed(),
   };
 }
 

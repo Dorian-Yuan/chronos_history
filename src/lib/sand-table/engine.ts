@@ -337,7 +337,7 @@ export function createSandTableEngine(state: SandTableState) {
   const simW = Math.ceil(renderW / SCALE);
   const simH = Math.ceil(renderH / SCALE);
 
-  const seed = createTerrainSeed();
+  const seed = state.seed;
   const terrainMap = createTerrainMap(simW, simH, state.regions, seed);
 
   const scaledFactions = state.factions.map((f) => ({

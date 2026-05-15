@@ -278,6 +278,11 @@ export function GamePage() {
             mapWidth: 360,
             mapHeight: 480,
             lastUpdateTurn: currentTurnCount,
+            seed: {
+              seedX: Math.random() * Math.PI * 2,
+              seedY: Math.random() * Math.PI * 2,
+              seedZ: Math.random() * Math.PI * 2,
+            },
           },
         });
         setSandTableError(null);

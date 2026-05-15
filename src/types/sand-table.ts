@@ -42,4 +42,5 @@ export interface SandTableState {
   mapWidth: number;
   mapHeight: number;
   lastUpdateTurn: number;
+  seed: { seedX: number; seedY: number; seedZ: number };
 }
