@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import type { SandTableState, GameUniverse } from "@/types";
 import { getTerminology } from "@/config/terminology";
+import { useSettingsStore } from "@/stores";
 import {
   createSandTableEngine,
   updateFactionPowers,
@@ -14,12 +15,23 @@ interface SandTablePanelProps {
   sandTableState: SandTableState | null;
   isLoading: boolean;
   universe?: GameUniverse;
+  error?: string | null;
+  onRetry?: () => void;
+}
+
+function isDarkMode(): boolean {
+  const theme = useSettingsStore.getState().theme;
+  if (theme === "dark") return true;
+  if (theme === "light") return false;
+  return !window.matchMedia("(prefers-color-scheme: light)").matches;
 }
 
 export function SandTablePanel({
   sandTableState,
   isLoading,
   universe = "history",
+  error,
+  onRetry,
 }: SandTablePanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenRef = useRef<HTMLCanvasElement | null>(null);
@@ -28,7 +40,11 @@ export function SandTablePanel({
     null,
   );
   const needsInitialRenderRef = useRef(true);
+  const isDarkRef = useRef(isDarkMode());
   const term = getTerminology(universe);
+  const theme = useSettingsStore((s) => s.theme);
+
+  isDarkRef.current = isDarkMode();
 
   const initEngine = useCallback(() => {
     if (!sandTableState) return;
@@ -46,11 +62,20 @@ export function SandTablePanel({
     const engine = engineRef.current;
     const canvas = canvasRef.current;
     const offscreen = offscreenRef.current;
-    if (!engine || !canvas || !offscreen) return;
+
+    if (!engine || !canvas || !offscreen) {
+      animFrameRef.current = requestAnimationFrame(render);
+      return;
+    }
 
     const ctx = canvas.getContext("2d", { alpha: false });
     const offCtx = offscreen.getContext("2d", { alpha: false });
-    if (!ctx || !offCtx) return;
+    if (!ctx || !offCtx) {
+      animFrameRef.current = requestAnimationFrame(render);
+      return;
+    }
+
+    const dark = isDarkRef.current;
 
     const needsRedraw =
       updateFactionPowers(engine.factions) || needsInitialRenderRef.current;
@@ -81,14 +106,15 @@ export function SandTablePanel({
         engine.simH,
         engine.factions,
         engine.terrainMap,
+        dark,
       );
       offCtx.putImageData(imgData, 0, 0);
 
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(offscreen, 0, 0, engine.renderW, engine.renderH);
 
-      drawFactionLabels(ctx, engine.factions, engine.scale);
-      drawDirectionLabels(ctx, engine.renderW, engine.renderH);
+      drawFactionLabels(ctx, engine.factions, engine.scale, dark);
+      drawDirectionLabels(ctx, engine.renderW, engine.renderH, dark);
     }
 
     animFrameRef.current = requestAnimationFrame(render);
@@ -101,13 +127,16 @@ export function SandTablePanel({
   useEffect(() => {
     if (!sandTableState) return;
 
+    needsInitialRenderRef.current = true;
     animFrameRef.current = requestAnimationFrame(render);
     return () => {
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
       }
     };
-  }, [sandTableState, render]);
+  }, [sandTableState, render, theme]);
+
+  const canvasBg = isDarkRef.current ? "#111" : "#f0ece4";
 
   if (!sandTableState) {
     return (
@@ -122,16 +151,41 @@ export function SandTablePanel({
       >
         <div className="rounded-lg border border-border bg-bg-card flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2 text-text-tertiary">
-              <p className="text-xs font-serif">
-                {((term as Record<string, unknown>)
-                  .sandTableEmptyLabel as string) || "沙盘尚未生成"}
-              </p>
-              <p className="text-xs text-text-tertiary/60 font-serif">
-                {((term as Record<string, unknown>)
-                  .sandTableEmptyHint as string) || "完成第一回合后将生成沙盘"}
-              </p>
-            </div>
+            {isLoading ? (
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent-primary border-t-transparent" />
+                <p className="text-xs font-serif text-text-tertiary">
+                  {((term as Record<string, unknown>)
+                    .sandTableEmptyHint as string) || "正在推演天下大势..."}
+                </p>
+              </div>
+            ) : error === "failed" ? (
+              <div className="flex flex-col items-center gap-3 text-text-tertiary">
+                <p className="text-xs font-serif">沙盘生成失败</p>
+                <p className="text-xs text-text-tertiary/60 font-serif">
+                  AI 推演未能完成，请重试
+                </p>
+                {onRetry && (
+                  <button
+                    onClick={onRetry}
+                    className="px-3 py-1 text-xs font-serif rounded border border-accent-primary/40 text-accent-primary hover:bg-accent-primary/10 transition-colors"
+                  >
+                    重新推演
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-text-tertiary">
+                <p className="text-xs font-serif">
+                  {((term as Record<string, unknown>)
+                    .sandTableEmptyLabel as string) || "沙盘尚未生成"}
+                </p>
+                <p className="text-xs text-text-tertiary/60 font-serif">
+                  {((term as Record<string, unknown>)
+                    .sandTableEmptyHint as string) || "正在推演天下大势..."}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -157,7 +211,7 @@ export function SandTablePanel({
             {((term as Record<string, unknown>).turnLabel as string) || "回合"}{" "}
             {sandTableState.lastUpdateTurn}
           </span>
-          {isLoading && (
+          {isLoading ? (
             <div className="flex items-center gap-1">
               <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-primary" />
               <span className="text-xs text-text-tertiary">
@@ -165,7 +219,11 @@ export function SandTablePanel({
                   .sandTableUpdatingLabel as string) || "更新中..."}
               </span>
             </div>
-          )}
+          ) : error === "fallback" ? (
+            <span className="text-[10px] text-text-tertiary/60 font-serif">
+              简化版
+            </span>
+          ) : null}
         </div>
         <div className="flex-1 flex items-center justify-center p-4 min-h-0">
           <canvas
@@ -179,8 +237,10 @@ export function SandTablePanel({
               imageRendering: "pixelated",
               border: "2px solid var(--color-border)",
               borderRadius: "var(--radius-lg)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.8)",
-              background: "#111",
+              boxShadow: isDarkRef.current
+                ? "0 10px 30px rgba(0,0,0,0.8)"
+                : "0 10px 30px rgba(0,0,0,0.15)",
+              background: canvasBg,
             }}
           />
         </div>

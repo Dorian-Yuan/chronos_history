@@ -31,6 +31,7 @@ export class GeminiProvider extends BaseAIProvider {
     options?: AISendOptions,
   ): Promise<AIResponse> {
     const url = `${this.baseUrl}/models/${options?.model || this.model}:generateContent?key=${this.apiKey}`;
+    const timeoutMs = options?.timeout ?? 60000;
 
     const generationConfig: Record<string, unknown> = {
       temperature: options?.temperature ?? 0.7,
@@ -50,29 +51,37 @@ export class GeminiProvider extends BaseAIProvider {
       generationConfig,
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Gemini API error (${response.status}): ${error}`);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Gemini API error (${response.status}): ${error}`);
+      }
+
+      const data = await response.json();
+      const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      return {
+        content,
+        model: this.model,
+        usage: data.usageMetadata
+          ? {
+              promptTokens: data.usageMetadata.promptTokenCount || 0,
+              completionTokens: data.usageMetadata.candidatesTokenCount || 0,
+              totalTokens: data.usageMetadata.totalTokenCount || 0,
+            }
+          : undefined,
+      };
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = await response.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    return {
-      content,
-      model: this.model,
-      usage: data.usageMetadata
-        ? {
-            promptTokens: data.usageMetadata.promptTokenCount || 0,
-            completionTokens: data.usageMetadata.candidatesTokenCount || 0,
-            totalTokens: data.usageMetadata.totalTokenCount || 0,
-          }
-        : undefined,
-    };
   }
 }

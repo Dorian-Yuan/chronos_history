@@ -12,10 +12,12 @@ import type {
   CourtDebateSession,
   SandTableState,
   SandTableFactionUpdate,
+  SandTableFaction,
 } from "@/types";
 import { INITIAL_GAME_STATE, clampStat } from "@/types";
 import { getAppConfig } from "@/config";
 import { normalizeAttitude } from "./utils";
+import { assignFactionColors } from "@/lib/sand-table/engine";
 
 export type GameAction =
   | { type: "ENTER_SELECTION" }
@@ -208,6 +210,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         currentAdvisors: initialAdvisors,
         pendingAdvisors: [],
         identityChangeCount: { nation_name: 0, leader_title: 0 },
+        sandTableState: null,
       };
     }
 
@@ -457,7 +460,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "UPDATE_SAND_TABLE": {
       if (!state.sandTableState) return state;
-      const updatedFactions = state.sandTableState.factions.map((f) => {
+      let updatedFactions = [...state.sandTableState.factions];
+
+      updatedFactions = updatedFactions.map((f) => {
         const update = action.factionUpdates.find((u) => u.name === f.name);
         if (!update || f.dead) return f;
         let newTarget = f.targetPower + update.power_delta;
@@ -465,6 +470,58 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         if (newTarget > 6.0) newTarget = 6.0;
         return { ...f, targetPower: newTarget };
       });
+
+      for (const update of action.factionUpdates) {
+        if (update.conquered_by) {
+          const conqueredIdx = updatedFactions.findIndex(
+            (f) => f.name === update.name && !f.dead,
+          );
+          const conquerorIdx = updatedFactions.findIndex(
+            (f) => f.name === update.conquered_by && !f.dead,
+          );
+          if (conqueredIdx >= 0 && conquerorIdx >= 0) {
+            const conquered = updatedFactions[conqueredIdx];
+            const conqueror = updatedFactions[conquerorIdx];
+            updatedFactions[conquerorIdx] = {
+              ...conqueror,
+              nodes: [...conqueror.nodes, ...conquered.nodes],
+              targetPower: Math.min(
+                conqueror.targetPower + conquered.power * 0.5,
+                6.0,
+              ),
+            };
+            updatedFactions[conqueredIdx] = {
+              ...conquered,
+              dead: true,
+              targetPower: 0.1,
+              power: 0.1,
+            };
+          }
+        }
+      }
+
+      for (const update of action.factionUpdates) {
+        if (update.is_new_faction && update.nodes && update.nodes.length > 0) {
+          const exists = updatedFactions.some((f) => f.name === update.name);
+          if (!exists) {
+            const newFaction: SandTableFaction = {
+              id: `NEW_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: update.name,
+              nodes: update.nodes,
+              power: Math.max(0.1, update.power_delta),
+              targetPower: Math.max(0.1, update.power_delta),
+              rgb: [0, 0, 0],
+              isPlayer: false,
+              dead: false,
+              direction: update.direction || "北",
+            };
+            updatedFactions = assignFactionColors(
+              updatedFactions.concat(newFaction),
+            );
+          }
+        }
+      }
+
       return {
         ...state,
         sandTableState: {

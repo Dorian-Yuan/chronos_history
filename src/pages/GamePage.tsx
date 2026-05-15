@@ -44,6 +44,7 @@ import {
 import { useUIStore, useSettingsStore } from "@/stores";
 import {
   generateSandTableMap,
+  generateDeterministicSandTableMap,
   updateSandTable,
 } from "@/lib/sand-table/sand-table-ai";
 
@@ -101,8 +102,12 @@ export function GamePage() {
   >("chronicle");
   const [showSaveManager, setShowSaveManager] = useState(false);
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
+  // showSandTable 在此处还未能计算（scenario 是后面才声明的），
+  // 所以 isSandTableLoading 的初始值就用 false，effect 立即设置为 true
   const [isSandTableLoading, setIsSandTableLoading] = useState(false);
-  const sandTableLoadingRef = useRef(false);
+  const [sandTableError, setSandTableError] = useState<string | null>(null);
+  const [sandTableRetryTrigger, setSandTableRetryTrigger] = useState(0);
+  const sandTableScenarioIdRef = useRef<string | null>(null);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
   const experimentalMode = useSettingsStore((s) => s.experimentalMode);
 
@@ -141,6 +146,10 @@ export function GamePage() {
     universe === "history" &&
     (scenario?.play_style === "Conquest" ||
       scenario?.play_style === "Survival");
+
+  // 派生 loading 状态：展示条件满足且尚无沙盘数据时就是 loading（不依赖 useEffect 的异步 setState）
+  const sandTableIsActuallyLoading =
+    showSandTable && (!state.sandTableState || isSandTableLoading);
 
   const TAB_CONFIG = useMemo(() => {
     const config: Record<
@@ -213,19 +222,54 @@ export function GamePage() {
   }, [state.turnCount, state.stats, scenario, state]);
 
   useEffect(() => {
-    if (
-      !showSandTable ||
-      !scenario ||
-      state.sandTableState ||
-      sandTableLoadingRef.current
-    )
+    if (!showSandTable || !scenario) return;
+
+    if (sandTableScenarioIdRef.current !== scenario.id) {
+      console.log("[SandTable] 检测到新场景，重置跟踪:", scenario.title);
+      sandTableScenarioIdRef.current = scenario.id;
+    }
+
+    if (state.sandTableState) {
+      console.log("[SandTable] 沙盘数据已存在，跳过生成");
       return;
+    }
+
+    console.log(
+      "[SandTable] useEffect触发，开始沙盘生成流程，showSandTable:",
+      showSandTable,
+      "scenario:",
+      scenario.title,
+    );
+
     let cancelled = false;
-    sandTableLoadingRef.current = true;
     setIsSandTableLoading(true);
-    generateSandTableMap(scenario, state.stats)
-      .then((sandTableResult) => {
-        if (cancelled) return;
+    setSandTableError(null);
+
+    const currentStats = state.stats;
+    const currentTurnCount = state.turnCount;
+
+    const attemptGenerate = async (retriesLeft: number): Promise<void> => {
+      try {
+        console.log(
+          "[SandTable] 开始生成初始沙盘，场景:",
+          scenario.title,
+          "剩余重试:",
+          retriesLeft,
+        );
+        const sandTableResult = await generateSandTableMap(
+          scenario,
+          currentStats,
+        );
+        if (cancelled) {
+          console.log("[SandTable] 生成完成但已取消，跳过dispatch");
+          return;
+        }
+        console.log(
+          "[SandTable] AI生成成功，势力数:",
+          sandTableResult.factions?.length,
+          "区域数:",
+          sandTableResult.regions?.length,
+        );
         dispatch({
           type: "SET_SAND_TABLE",
           sandTableState: {
@@ -233,28 +277,76 @@ export function GamePage() {
             regions: sandTableResult.regions,
             mapWidth: 360,
             mapHeight: 480,
-            lastUpdateTurn: state.turnCount,
+            lastUpdateTurn: currentTurnCount,
           },
         });
-      })
-      .catch((e) => {
-        console.error("Sand table initialization failed:", e);
-      })
-      .finally(() => {
-        sandTableLoadingRef.current = false;
-        if (!cancelled) setIsSandTableLoading(false);
-      });
+        setSandTableError(null);
+      } catch (e) {
+        if (cancelled) {
+          console.log("[SandTable] 生成失败但已取消，跳过处理");
+          return;
+        }
+        console.error("[SandTable] AI生成失败，剩余重试:", retriesLeft, e);
+        if (retriesLeft > 0) {
+          await new Promise((r) => setTimeout(r, 2000));
+          if (cancelled) return;
+          return attemptGenerate(retriesLeft - 1);
+        }
+        console.error("[SandTable] AI全部失败，使用确定性降级生成");
+        try {
+          const fallbackResult = generateDeterministicSandTableMap(
+            scenario,
+            currentStats,
+          );
+          if (!cancelled) {
+            console.log(
+              "[SandTable] 降级生成成功，势力数:",
+              fallbackResult.factions?.length,
+            );
+            dispatch({
+              type: "SET_SAND_TABLE",
+              sandTableState: fallbackResult,
+            });
+            setSandTableError("fallback");
+          }
+        } catch (fallbackErr) {
+          console.error("[SandTable] 降级生成也失败:", fallbackErr);
+          if (!cancelled) setSandTableError("failed");
+        }
+      }
+    };
+
+    attemptGenerate(1).finally(() => {
+      console.log(
+        "[SandTable] attemptGenerate完成，清除loading状态，cancelled:",
+        cancelled,
+      );
+      setIsSandTableLoading(false);
+    });
+
     return () => {
+      console.log("[SandTable] useEffect cleanup，设置cancelled=true");
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     showSandTable,
-    scenario,
+    scenario?.id,
     state.sandTableState,
-    state.turnCount,
-    state.stats,
-    dispatch,
+    sandTableRetryTrigger,
   ]);
+
+  const handleSandTableRetry = useCallback(() => {
+    setSandTableError(null);
+    setSandTableRetryTrigger((v) => v + 1);
+  }, []);
+
+  useEffect(() => {
+    if (state.sandTableState && (sandTableError || isSandTableLoading)) {
+      setSandTableError(null);
+      setIsSandTableLoading(false);
+    }
+  }, [state.sandTableState, sandTableError, isSandTableLoading]);
 
   const handleSubmit = useCallback(
     async (action: string) => {
@@ -311,6 +403,8 @@ export function GamePage() {
                 power: f.power,
                 dead: f.dead,
                 isPlayer: f.isPlayer,
+                direction: f.direction,
+                nodes: f.nodes,
               })),
               result.stats_delta,
               {
@@ -330,6 +424,18 @@ export function GamePage() {
               },
               action,
               state.turnCount + 1,
+              result.factions_update
+                ?.filter((fu) => fu.is_destroyed)
+                .map((fu) => ({
+                  name: fu.name,
+                  conquered_by: undefined,
+                })),
+              result.factions_update
+                ?.filter((fu) => fu.is_new)
+                .map((fu) => ({
+                  name: fu.name,
+                  direction: fu.direction,
+                })),
             );
             dispatch({
               type: "UPDATE_SAND_TABLE",
@@ -714,8 +820,10 @@ export function GamePage() {
             ) : mobileTab === "sandTable" && showSandTable ? (
               <SandTablePanel
                 sandTableState={state.sandTableState}
-                isLoading={isSandTableLoading}
+                isLoading={sandTableIsActuallyLoading}
                 universe={universe}
+                error={sandTableError}
+                onRetry={handleSandTableRetry}
               />
             ) : (
               <IntelligencePanel
@@ -820,8 +928,10 @@ export function GamePage() {
               >
                 <SandTablePanel
                   sandTableState={state.sandTableState}
-                  isLoading={isSandTableLoading}
+                  isLoading={sandTableIsActuallyLoading}
                   universe={universe}
+                  error={sandTableError}
+                  onRetry={handleSandTableRetry}
                 />
               </div>
             )}

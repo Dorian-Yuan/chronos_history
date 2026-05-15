@@ -100,7 +100,7 @@ export function checkConquest(
 ): { conqueror: string; conquered: string } | null {
   for (let idDefend = 0; idDefend < factions.length; idDefend++) {
     const fDefend = factions[idDefend];
-    if (fDefend.dead) continue;
+    if (fDefend.dead || fDefend.nodes.length === 0) continue;
 
     const capX = fDefend.nodes[0].x;
     const capY = fDefend.nodes[0].y;
@@ -136,8 +136,20 @@ export function renderSandTableToImageData(
   simH: number,
   factions: SandTableFaction[],
   terrainMap: Float32Array,
+  isDark: boolean = true,
 ): void {
   const pixels = imageData.data;
+
+  const baseR = isDark ? 210 : 235;
+  const baseG = isDark ? 200 : 230;
+  const baseB = isDark ? 180 : 220;
+
+  const borderR = isDark ? 40 : 100;
+  const borderG = isDark ? 35 : 90;
+  const borderB = isDark ? 30 : 80;
+
+  const BORDER_THRESHOLD = 0.92;
+  const BORDER_FADE_END = 0.95;
 
   for (let y = 0; y < simH; y++) {
     for (let x = 0; x < simW; x++) {
@@ -167,9 +179,6 @@ export function renderSandTableToImageData(
       }
 
       let r: number, g: number, b: number;
-      const baseR = 210;
-      const baseG = 200;
-      const baseB = 180;
       const nx = x * 0.05;
       const ny = y * 0.05;
       const noise =
@@ -182,10 +191,24 @@ export function renderSandTableToImageData(
 
       if (minCost1 < 100) {
         const faction = factions[ownerId];
-        if (minCost1 / minCost2 > 0.95 && minCost2 < 120) {
-          r = 20;
-          g = 20;
-          b = 20;
+        const ratio = minCost1 / minCost2;
+
+        if (ratio > BORDER_THRESHOLD && minCost2 < 120) {
+          const factionR = faction.rgb[0] * 0.7 + sR * 0.3;
+          const factionG = faction.rgb[1] * 0.7 + sG * 0.3;
+          const factionB = faction.rgb[2] * 0.7 + sB * 0.3;
+
+          if (ratio > BORDER_FADE_END) {
+            r = borderR;
+            g = borderG;
+            b = borderB;
+          } else {
+            const blend =
+              (ratio - BORDER_THRESHOLD) / (BORDER_FADE_END - BORDER_THRESHOLD);
+            r = factionR * (1 - blend) + borderR * blend;
+            g = factionG * (1 - blend) + borderG * blend;
+            b = factionB * (1 - blend) + borderB * blend;
+          }
         } else {
           r = faction.rgb[0] * 0.7 + sR * 0.3;
           g = faction.rgb[1] * 0.7 + sG * 0.3;
@@ -210,7 +233,11 @@ export function drawFactionLabels(
   ctx: CanvasRenderingContext2D,
   factions: SandTableFaction[],
   scale: number,
+  isDark: boolean = true,
 ): void {
+  const strokeStyle = isDark ? "#000" : "#fff";
+  const fillStyle = isDark ? "#fff" : "#2c2820";
+
   for (const f of factions) {
     if (f.dead) continue;
     for (let nodeIdx = 0; nodeIdx < f.nodes.length; nodeIdx++) {
@@ -227,14 +254,28 @@ export function drawFactionLabels(
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = "900 16px 'Noto Serif SC', serif";
+        ctx.font = "bold 16px 'Noto Sans SC', 'Noto Serif SC', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "#000";
-        ctx.strokeText(f.name, realX, realY - 26);
-        ctx.fillStyle = "#fff";
-        ctx.fillText(f.name, realX, realY - 26);
+
+        ctx.shadowColor = isDark
+          ? "rgba(0, 0, 0, 0.6)"
+          : "rgba(255, 255, 255, 0.6)";
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = strokeStyle;
+        ctx.strokeText(f.name, realX, realY - 28);
+
+        ctx.fillStyle = fillStyle;
+        ctx.fillText(f.name, realX, realY - 28);
+
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
       } else {
         ctx.arc(realX, realY, 4, 0, Math.PI * 2);
         ctx.fillStyle = `rgb(${f.rgb.join(",")})`;
@@ -251,11 +292,12 @@ export function drawDirectionLabels(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
+  isDark: boolean = true,
 ): void {
-  ctx.font = "700 14px 'Noto Serif SC', serif";
+  ctx.font = "600 15px 'Noto Sans SC', 'Noto Serif SC', sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "rgba(224, 224, 224, 0.5)";
+  ctx.fillStyle = isDark ? "rgba(224, 224, 224, 0.5)" : "rgba(44, 40, 32, 0.4)";
 
   ctx.fillText("北", width / 2, 14);
   ctx.fillText("南", width / 2, height - 14);

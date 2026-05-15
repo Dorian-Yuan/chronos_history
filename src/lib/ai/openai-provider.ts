@@ -33,6 +33,7 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
     options?: AISendOptions,
   ): Promise<AIResponse> {
     const url = `${this.baseUrl}/chat/completions`;
+    const timeoutMs = options?.timeout ?? 60000;
 
     const body: Record<string, unknown> = {
       model: options?.model || this.model,
@@ -57,31 +58,39 @@ export class OpenAICompatibleProvider extends BaseAIProvider {
       }
     }
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenAI API error (${response.status}): ${error}`);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`OpenAI API error (${response.status}): ${error}`);
+      }
+
+      const data = await response.json();
+      return {
+        content: data.choices[0]?.message?.content || "",
+        model: data.model || this.model,
+        usage: data.usage
+          ? {
+              promptTokens: data.usage.prompt_tokens,
+              completionTokens: data.usage.completion_tokens,
+              totalTokens: data.usage.total_tokens,
+            }
+          : undefined,
+      };
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = await response.json();
-    return {
-      content: data.choices[0]?.message?.content || "",
-      model: data.model || this.model,
-      usage: data.usage
-        ? {
-            promptTokens: data.usage.prompt_tokens,
-            completionTokens: data.usage.completion_tokens,
-            totalTokens: data.usage.total_tokens,
-          }
-        : undefined,
-    };
   }
 }

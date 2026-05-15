@@ -21,6 +21,10 @@ export interface SandTableRegion {
 export interface SandTableFactionUpdate {
   name: string;
   power_delta: number;
+  conquered_by?: string;
+  is_new_faction?: boolean;
+  direction?: string;
+  nodes?: { x: number; y: number }[];
 }
 
 export interface SandTableTurnUpdate {

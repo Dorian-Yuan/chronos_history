@@ -31,6 +31,7 @@ export interface AISendOptions {
   maxTokens?: number;
   responseFormat?: "text" | "json";
   responseSchema?: Record<string, unknown>;
+  timeout?: number;
 }
 
 export interface AIResponse {
