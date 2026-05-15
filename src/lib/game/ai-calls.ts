@@ -239,7 +239,11 @@ function fixInitialStats(
 }
 
 function fixInternalFactions(scenario: ScenarioData): ScenarioData {
-  if (scenario.play_style !== "Conquest" || !Array.isArray(scenario.factions)) {
+  if (
+    (scenario.play_style !== "Conquest" &&
+      scenario.play_style !== "Survival") ||
+    !Array.isArray(scenario.factions)
+  ) {
     return scenario;
   }
 
@@ -300,19 +304,18 @@ function fixInternalFactions(scenario: ScenarioData): ScenarioData {
 
   const internalFactions = scenario.factions.filter(isInternalFaction);
 
-  if (internalFactions.length <= 1) return scenario;
+  if (internalFactions.length === 0) return scenario;
 
-  const firstInternalName = internalFactions[0].name;
-  const fixedFactions = scenario.factions.filter((f) => {
-    if (f.name === firstInternalName) return true;
-    return !isInternalFaction(f);
-  });
+  const fixedFactions = scenario.factions.filter((f) => !isInternalFaction(f));
 
   console.log(
-    `[fixInternalFactions] Conquest模式内部势力${internalFactions.length}个超限，保留首个"${firstInternalName}"，修复后派系数=${fixedFactions.length}`,
+    `[fixInternalFactions] ${scenario.play_style}模式内部势力${internalFactions.length}个，全部移除，修复后派系数=${fixedFactions.length}`,
   );
 
-  return { ...scenario, factions: fixedFactions };
+  return {
+    ...scenario,
+    factions: fixedFactions.length >= 3 ? fixedFactions : scenario.factions,
+  };
 }
 
 function fixExternalFactions(scenario: ScenarioData): ScenarioData {
@@ -678,7 +681,7 @@ function validateScenario(data: ScenarioData, universe: GameUniverse): void {
 
   if (
     universe === "history" &&
-    data.play_style === "Conquest" &&
+    (data.play_style === "Conquest" || data.play_style === "Survival") &&
     Array.isArray(data.factions)
   ) {
     const internalKeywords = [
@@ -736,14 +739,14 @@ function validateScenario(data: ScenarioData, universe: GameUniverse): void {
         `${f.name} ${f.description} ${f.attitude}`.includes(kw),
       );
     });
-    if (internalFactions.length > 1) {
+    if (internalFactions.length > 0) {
       errors.push(
-        `征服模式内部势力过多（${internalFactions.length}个，外部仅${externalFactions.length}个）`,
+        `${data.play_style === "Conquest" ? "征服" : "绝境"}模式禁止内部势力（发现${internalFactions.length}个）`,
       );
     }
     if (externalFactions.length < 3) {
       errors.push(
-        `征服模式外部势力不足（仅${externalFactions.length}个，需至少3个）`,
+        `${data.play_style === "Conquest" ? "征服" : "绝境"}模式外部势力不足（仅${externalFactions.length}个，需至少3个）`,
       );
     }
   }
@@ -946,7 +949,7 @@ export async function generateScenario(
 
       return parseResponse<Partial<ScenarioData>>(response.content, provider);
     },
-    { maxRetries: 3 },
+    { maxRetries: 5 },
   );
 
   console.log("[generateScenario] Stage 1 core:", {
@@ -991,12 +994,13 @@ export async function generateScenario(
 4. 派系名真实可信，禁止奇幻风格
 5. 2-3个initial_decision_options
 6. 派系构成须严格符合基调：
-   - Conquest：4个派系中至少3个外部敌对势力，内部至多1个。禁止以内部政治派系为主
+   - Conquest：全部为外部势力，禁止任何内部势力，至少3个外部势力
    - Prosperity：经济利益集团和贸易伙伴/竞争对手为主，禁止纯军事入侵者
    - Reform：改革vs保守内部力量为主（至少3个内部），外部至多1-2个
-   - Survival：至少2个内部+至少1个外部，内外交困
+   - Survival：全部为外部势力，禁止任何内部势力，至少3个外部势力
 7. 每个派系必须正确标注is_external字段（true=外国/外部势力，false=内部势力），此字段用于约束验证，标注错误将导致剧本无效
 8. 派系attitude只能取以下5个值之一：敌对、求和、中立、友好、臣服。禁止使用其他任何值（如"归顺""敌视"等均不合法）
+9. 臣服判定：当故事中出现势力被击败投降、被吞并归顺、主动称臣纳贡等情形时，该势力attitude必须设为"臣服"，禁止设为"友好"或"中立"
 
 【生成后自检——返回前必须逐项确认】
 1. 是否恰好5个顾问且5个角色齐全（General/Diplomat/Intel/Scholar/Merchant）？
@@ -1130,7 +1134,7 @@ export async function generateScenario(
 
       return fixedScenario;
     },
-    { maxRetries: 3 },
+    { maxRetries: 5 },
   );
 
   console.log("[generateScenario] Stage 2 details:", {

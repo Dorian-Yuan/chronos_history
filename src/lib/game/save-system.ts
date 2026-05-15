@@ -3,6 +3,7 @@ import type {
   SaveData,
   HistoryRecord,
   CompendiumEntry,
+  SimilarFigureEntry,
   FullExportData,
 } from "@/types";
 import { SAVE_VERSION, FULL_EXPORT_VERSION } from "@/types";
@@ -12,6 +13,7 @@ const SAVE_KEY_PREFIX = "chronos_save_";
 const HISTORY_KEY = "chronos_history";
 const COMPENDIUM_PERSONA_KEY = "chronos_compendium_persona";
 const COMPENDIUM_HISTORY_KEY = "chronos_compendium_history";
+const COMPENDIUM_SIMILAR_FIGURE_KEY = "chronos_compendium_similar_figure";
 
 function saveToLocalStorage(key: string, data: unknown): void {
   try {
@@ -129,6 +131,7 @@ export function exportAllData(): string {
     compendium: {
       persona: getPersonaCompendium(),
       history: getHistoryCompendium(),
+      similarFigure: getSimilarFigureCompendium(),
     },
   };
   return JSON.stringify(data, null, 2);
@@ -206,6 +209,15 @@ export function importAllData(jsonString: string): boolean {
       ...newHistoryComp,
     ]);
 
+    const existingSimilarFigure = getSimilarFigureCompendium();
+    const newSimilarFigure = (data.compendium?.similarFigure || []).filter(
+      (ne) => !existingSimilarFigure.some((ee) => ee.name === ne.name),
+    );
+    saveToLocalStorage(COMPENDIUM_SIMILAR_FIGURE_KEY, [
+      ...existingSimilarFigure,
+      ...newSimilarFigure,
+    ]);
+
     return true;
   } catch {
     return false;
@@ -250,4 +262,30 @@ export function getPersonaCompendium(): CompendiumEntry[] {
 
 export function getHistoryCompendium(): CompendiumEntry[] {
   return loadFromLocalStorage<CompendiumEntry[]>(COMPENDIUM_HISTORY_KEY) || [];
+}
+
+export function addToSimilarFigureCompendium(figureName: string): void {
+  const entries =
+    loadFromLocalStorage<SimilarFigureEntry[]>(COMPENDIUM_SIMILAR_FIGURE_KEY) ||
+    [];
+  const existing = entries.find((e) => e.name === figureName);
+  if (existing) {
+    existing.count += 1;
+  } else {
+    entries.push({
+      id: `similar_figure_${Date.now()}`,
+      name: figureName,
+      count: 1,
+      firstTimestamp: Date.now(),
+    });
+  }
+  entries.sort((a, b) => b.count - a.count);
+  saveToLocalStorage(COMPENDIUM_SIMILAR_FIGURE_KEY, entries);
+}
+
+export function getSimilarFigureCompendium(): SimilarFigureEntry[] {
+  return (
+    loadFromLocalStorage<SimilarFigureEntry[]>(COMPENDIUM_SIMILAR_FIGURE_KEY) ||
+    []
+  );
 }

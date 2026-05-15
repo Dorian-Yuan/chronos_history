@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import type { CompendiumEntry, HistoryRecord, GameUniverse } from "@/types";
+import type {
+  CompendiumEntry,
+  HistoryRecord,
+  SimilarFigureEntry,
+  GameUniverse,
+} from "@/types";
 import {
   getPersonaCompendium,
   getHistoryCompendium,
   getHistoryRecords,
+  getSimilarFigureCompendium,
 } from "@/lib/game";
-import { X, Crown, ScrollText, ClipboardList } from "lucide-react";
+import { X, Crown, ScrollText, ClipboardList, Users } from "lucide-react";
 import { getTerminology } from "@/config/terminology";
 
 interface EndingCompendiumProps {
@@ -13,7 +19,7 @@ interface EndingCompendiumProps {
   universe?: GameUniverse;
 }
 
-type CompendiumTab = "records" | "persona" | "history";
+type CompendiumTab = "records" | "persona" | "history" | "similarFigure";
 
 export function EndingCompendium({
   onClose,
@@ -26,6 +32,9 @@ export function EndingCompendium({
   );
   const [historyEntries] = useState<CompendiumEntry[]>(() =>
     getHistoryCompendium(),
+  );
+  const [similarFigures] = useState<SimilarFigureEntry[]>(() =>
+    getSimilarFigureCompendium(),
   );
   const modalRef = useRef<HTMLDivElement>(null);
   const term = useMemo(() => getTerminology(universe), [universe]);
@@ -64,6 +73,11 @@ export function EndingCompendium({
       label: "真实历史",
       icon: ScrollText,
       colorVar: "--color-accent-info",
+    },
+    similarFigure: {
+      label: "相似人物",
+      icon: Users,
+      colorVar: "--color-accent-warning",
     },
   };
 
@@ -244,12 +258,42 @@ export function EndingCompendium({
               )}
             </>
           )}
+
+          {tab === "similarFigure" && (
+            <>
+              {similarFigures.length === 0 ? (
+                <div className="text-center py-12 text-sm text-text-tertiary font-serif">
+                  尚未收集任何相似人物
+                  <p className="text-xs mt-2 text-text-tertiary/60">
+                    完成游戏后自动收录
+                  </p>
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {similarFigures.map((figure) => (
+                    <li
+                      key={figure.id}
+                      className="rounded-lg border border-border bg-bg-card px-4 py-3 flex items-center justify-between"
+                    >
+                      <span className="text-sm font-serif font-bold text-text-primary">
+                        {figure.name}
+                      </span>
+                      <span className="badge bg-bg-tertiary text-text-tertiary">
+                        ×{figure.count}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
         </div>
 
         <div className="modal-footer text-center">
           <span className="text-xs text-text-tertiary font-serif">
             已进行 {records.length} 局游戏 · 收集 {personaEntries.length} 个画像
-            · {historyEntries.length} 个历史事件
+            · {historyEntries.length} 个历史事件 · {similarFigures.length}{" "}
+            个相似人物
           </span>
         </div>
       </div>

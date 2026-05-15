@@ -38,4 +38,6 @@ export {
   addToHistoryCompendium,
   getPersonaCompendium,
   getHistoryCompendium,
+  addToSimilarFigureCompendium,
+  getSimilarFigureCompendium,
 } from "./save-system";

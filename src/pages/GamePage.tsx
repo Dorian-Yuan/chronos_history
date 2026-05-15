@@ -7,6 +7,7 @@ import {
   addHistoryRecord,
   addToPersonaCompendium,
   addToHistoryCompendium,
+  addToSimilarFigureCompendium,
 } from "@/lib/game";
 import {
   ChroniclePanel,
@@ -216,7 +217,7 @@ export function GamePage() {
   );
 
   useEffect(() => {
-    if (state.turnCount > 1 && scenario) {
+    if (state.turnCount >= 1 && scenario) {
       autoSave(state);
     }
   }, [state.turnCount, state.stats, scenario, state]);
@@ -321,7 +322,7 @@ export function GamePage() {
       }
     };
 
-    attemptGenerate(1).finally(() => {
+    attemptGenerate(5).finally(() => {
       console.log(
         "[SandTable] attemptGenerate完成，清除loading状态，cancelled:",
         cancelled,
@@ -512,6 +513,10 @@ export function GamePage() {
               scenario.hidden_real_event,
               analysis.real_outcome_summary,
             );
+
+            if (analysis.similar_historical_figure) {
+              addToSimilarFigureCompendium(analysis.similar_historical_figure);
+            }
           } catch (e) {
             console.error("Failed to generate game analysis:", e);
           }
@@ -590,6 +595,10 @@ export function GamePage() {
         scenario.hidden_real_event,
         analysis.real_outcome_summary,
       );
+
+      if (analysis.similar_historical_figure) {
+        addToSimilarFigureCompendium(analysis.similar_historical_figure);
+      }
     } catch (e) {
       console.error("Failed to end game:", e);
       const msg = e instanceof Error ? e.message : term.endGameError;
@@ -837,6 +846,12 @@ export function GamePage() {
                   universe={universe}
                   error={sandTableError}
                   onRetry={handleSandTableRetry}
+                  currentDateDisplay={
+                    turnResults.length > 0
+                      ? turnResults[turnResults.length - 1].date_display
+                      : scenario?.start_date
+                  }
+                  turnCount={state.turnCount}
                 />
               </div>
             )}
@@ -956,6 +971,12 @@ export function GamePage() {
                   universe={universe}
                   error={sandTableError}
                   onRetry={handleSandTableRetry}
+                  currentDateDisplay={
+                    turnResults.length > 0
+                      ? turnResults[turnResults.length - 1].date_display
+                      : scenario?.start_date
+                  }
+                  turnCount={state.turnCount}
                 />
               </div>
             )}

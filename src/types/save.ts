@@ -33,6 +33,13 @@ export interface CompendiumEntry {
   timestamp: number;
 }
 
+export interface SimilarFigureEntry {
+  id: string;
+  name: string;
+  count: number;
+  firstTimestamp: number;
+}
+
 export const SAVE_VERSION = 1;
 export const FULL_EXPORT_VERSION = 1;
 
@@ -47,5 +54,6 @@ export interface FullExportData {
   compendium: {
     persona: CompendiumEntry[];
     history: CompendiumEntry[];
+    similarFigure: SimilarFigureEntry[];
   };
 }

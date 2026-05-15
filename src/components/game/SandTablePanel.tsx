@@ -17,6 +17,8 @@ interface SandTablePanelProps {
   universe?: GameUniverse;
   error?: string | null;
   onRetry?: () => void;
+  currentDateDisplay?: string;
+  turnCount?: number;
 }
 
 function isDarkMode(): boolean {
@@ -32,6 +34,8 @@ export function SandTablePanel({
   universe = "history",
   error,
   onRetry,
+  currentDateDisplay,
+  turnCount,
 }: SandTablePanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offscreenRef = useRef<HTMLCanvasElement | null>(null);
@@ -206,11 +210,9 @@ export function SandTablePanel({
       <div className="rounded-lg border border-border bg-bg-card flex-1 flex flex-col min-h-0">
         <div className="flex items-center justify-between px-4 py-2 border-b border-border">
           <span className="text-xs font-serif text-text-secondary">
-            {((term as Record<string, unknown>).sandTableTurnLabel as string) ||
-              "沙盘"}{" "}
-            ·{" "}
-            {((term as Record<string, unknown>).turnLabel as string) || "回合"}{" "}
-            {sandTableState.lastUpdateTurn}
+            第{turnCount ?? sandTableState.lastUpdateTurn}
+            {term.turnLabel}
+            {currentDateDisplay && <> · {currentDateDisplay}</>}
           </span>
           {isLoading ? (
             <div className="flex items-center gap-1">
