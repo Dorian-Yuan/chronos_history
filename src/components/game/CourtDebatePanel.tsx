@@ -31,6 +31,7 @@ interface CourtDebatePanelProps {
   advisors: AdvisorData[];
   courtDebateSessions: CourtDebateSession[];
   universe?: GameUniverse;
+  visible?: boolean;
 }
 
 const ROLE_STATIC: Record<
@@ -72,6 +73,7 @@ export function CourtDebatePanel({
   advisors,
   courtDebateSessions,
   universe = "history",
+  visible = true,
 }: CourtDebatePanelProps) {
   const dispatch = useGameDispatch();
   const term = useMemo(() => getTerminology(universe), [universe]);
@@ -109,13 +111,23 @@ export function CourtDebatePanel({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+      if (textarea.scrollHeight > 0) {
+        textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+      }
     }
   }, []);
 
   useEffect(() => {
     adjustHeight();
-  }, [input, adjustHeight]);
+  }, [input, isDebating, adjustHeight]);
+
+  useEffect(() => {
+    if (visible) {
+      // Small delay to ensure the display: none has been removed
+      const timer = setTimeout(adjustHeight, 10);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, adjustHeight]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -147,10 +159,6 @@ export function CourtDebatePanel({
 
     const localMessages: CourtDebateMessage[] = [userMessage];
 
-    const previousDebateMessages = courtDebateSessions.flatMap(
-      (s) => s.messages,
-    );
-
     setInput("");
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -167,7 +175,7 @@ export function CourtDebatePanel({
           currentSituation,
           currentDateDisplay,
           advisors,
-          [...previousDebateMessages, ...localMessages],
+          [...localMessages],
           remainingRounds,
           universe,
         );
@@ -209,7 +217,6 @@ export function CourtDebatePanel({
     advisors,
     dispatch,
     turnCount,
-    courtDebateSessions,
     universe,
     term,
   ]);
@@ -438,7 +445,11 @@ export function CourtDebatePanel({
               aria-label={`${term.courtDebateLabel}输入`}
               rows={1}
               className="flex-1 resize-none bg-transparent text-sm font-serif text-text-primary placeholder:text-text-tertiary/50 focus:outline-none leading-relaxed"
-              style={{ maxHeight: "120px", overflowY: "auto" }}
+              style={{
+                minHeight: "1.5rem",
+                maxHeight: "120px",
+                overflowY: "auto",
+              }}
               disabled={isLoading || isDebating}
             />
           </div>

@@ -1,7 +1,7 @@
 {
   "name": "chronos_history",
   "private": true,
-  "version": "1.13.9",
+  "version": "1.14.1",
   "type": "module",
   "scripts": {
     "dev": "vite",

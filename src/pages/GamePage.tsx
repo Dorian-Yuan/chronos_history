@@ -793,7 +793,7 @@ export function GamePage() {
           <div
             className={`flex-1 flex-col overflow-y-auto md:hidden ${mobileTab === "chronicle" ? "hidden" : "flex"}`}
           >
-            {mobileTab === "cabinet" ? (
+            <div className={mobileTab === "cabinet" ? "contents" : "hidden"}>
               <CabinetPanel
                 advisors={currentAdvisors}
                 scenario={scenario}
@@ -806,7 +806,10 @@ export function GamePage() {
                 }
                 universe={universe}
               />
-            ) : mobileTab === "courtDebate" ? (
+            </div>
+            <div
+              className={mobileTab === "courtDebate" ? "contents" : "hidden"}
+            >
               <CourtDebatePanel
                 scenario={scenario}
                 stats={state.stats}
@@ -821,23 +824,38 @@ export function GamePage() {
                 advisors={currentAdvisors}
                 courtDebateSessions={state.courtDebateSessions}
                 universe={universe}
+                visible={mobileTab === "courtDebate"}
               />
-            ) : mobileTab === "sandTable" && showSandTable ? (
-              <SandTablePanel
-                sandTableState={state.sandTableState}
-                isLoading={sandTableIsActuallyLoading}
-                universe={universe}
-                error={sandTableError}
-                onRetry={handleSandTableRetry}
-              />
-            ) : (
+            </div>
+            {showSandTable && (
+              <div
+                className={mobileTab === "sandTable" ? "contents" : "hidden"}
+              >
+                <SandTablePanel
+                  sandTableState={state.sandTableState}
+                  isLoading={sandTableIsActuallyLoading}
+                  universe={universe}
+                  error={sandTableError}
+                  onRetry={handleSandTableRetry}
+                />
+              </div>
+            )}
+            <div
+              className={
+                mobileTab !== "cabinet" &&
+                mobileTab !== "courtDebate" &&
+                mobileTab !== "sandTable"
+                  ? "contents"
+                  : "hidden"
+              }
+            >
               <IntelligencePanel
                 factions={currentFactions}
                 universe={universe}
                 superior={superiorInfo}
                 favor={favorValue}
               />
-            )}
+            </div>
           </div>
         </div>
 
@@ -911,6 +929,7 @@ export function GamePage() {
                 advisors={currentAdvisors}
                 courtDebateSessions={state.courtDebateSessions}
                 universe={universe}
+                visible={sideTab === "courtDebate"}
               />
             </div>
             <div

@@ -1560,7 +1560,7 @@ export async function courtDebate(
   const userContent =
     debateHistory.length === 0
       ? `{leader_title}提出议题："${topic}"\n\n请选择最合适的${isLife ? "同僚" : "内阁成员"}率先回应。`
-      : `请根据${isLife ? "议事" : "辩论"}历史，选择下一位最合适的${isLife ? "同僚" : "内阁成员"}回应（不可与上一位发言者相同）。`;
+      : `请根据${isLife ? "议事" : "辩论"}历史，选择下一位最合适的${isLife ? "同僚" : "内阁成员"}继续讨论议题（可回应他人观点，不可与上一位发言者相同，但之前已发言过的成员隔轮后可再次发言）。`;
 
   const messages: AIMessage[] = [
     { role: "system", content: fullSystemPrompt },
