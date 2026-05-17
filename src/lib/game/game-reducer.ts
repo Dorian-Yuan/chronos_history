@@ -303,6 +303,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             ...(playerContextUpdate.superior_name && {
               superior_name: playerContextUpdate.superior_name,
             }),
+            ...(playerContextUpdate.leader_label && {
+              leader_label: playerContextUpdate.leader_label,
+            }),
+            ...(playerContextUpdate.court_term && {
+              court_term: playerContextUpdate.court_term,
+            }),
+            ...(playerContextUpdate.ministers_term && {
+              ministers_term: playerContextUpdate.ministers_term,
+            }),
           };
           if (playerContextUpdate.nation_name)
             newIdentityChangeCount.nation_name++;

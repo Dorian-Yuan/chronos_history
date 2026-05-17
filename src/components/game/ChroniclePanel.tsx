@@ -84,11 +84,17 @@ export function ChroniclePanel({
 
               <div className="border-l-[3px] border-accent-primary pl-3">
                 <div className="font-serif text-sm text-text-secondary leading-relaxed">
-                  {term.chroniclePrompt.replace(
-                    "{title}",
-                    scenario.player_context?.leader_title ||
-                      term.defaultLeaderTitle,
-                  )}
+                  {term.chroniclePrompt
+                    .replace(
+                      "{honorific_prefix}",
+                      scenario.player_context?.leader_label ||
+                        term.defaultHonorificPrefix,
+                    )
+                    .replace(
+                      "{title}",
+                      scenario.player_context?.leader_title ||
+                        term.defaultLeaderTitle,
+                    )}
                 </div>
               </div>
             </div>

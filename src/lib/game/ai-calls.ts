@@ -26,6 +26,8 @@ import {
 import { checkObjectForSensitiveContent } from "./sensitive-content";
 import { HISTORY_PROMPTS } from "./ai-prompts/history-prompts";
 import { LIFE_PROMPTS } from "./ai-prompts/life-prompts";
+import { HISTORY_TERMINOLOGY } from "@/config/history-terminology";
+import { LIFE_TERMINOLOGY } from "@/config/life-terminology";
 import { normalizeAttitude } from "./utils";
 
 const CHINA_HISTORY_POOL = [
@@ -191,6 +193,23 @@ const REQUIRED_ADVISOR_ROLES: AdvisorRole[] = [
 
 function getPrompts(universe: GameUniverse) {
   return universe === "life" ? LIFE_PROMPTS : HISTORY_PROMPTS;
+}
+
+function getTerminology(universe: GameUniverse) {
+  return universe === "life" ? LIFE_TERMINOLOGY : HISTORY_TERMINOLOGY;
+}
+
+function getDynamicTitleVars(scenario: ScenarioData, universe: GameUniverse) {
+  const term = getTerminology(universe);
+  return {
+    leader_label:
+      scenario.player_context.leader_label || term.defaultLeaderLabel,
+    court_term: scenario.player_context.court_term || term.defaultCourtTerm,
+    ministers_term:
+      scenario.player_context.ministers_term || term.defaultMinistersTerm,
+    honorific_prefix:
+      scenario.player_context.leader_label || term.defaultHonorificPrefix,
+  };
 }
 
 function getScenarioCoreSchema(universe: GameUniverse) {
@@ -542,7 +561,8 @@ function fixMissingLifeFields(scenario: ScenarioData): ScenarioData {
   }
 
   if (!fixed.player_context.superior_title?.trim()) {
-    fixed.player_context.superior_title = "皇帝";
+    fixed.player_context.superior_title =
+      LIFE_TERMINOLOGY.defaultLeaderLabel === "大人" ? "皇帝" : "统治者";
     console.log("[fixMissingLifeFields] 自动补充superior_title");
   }
   if (!fixed.player_context.superior_name?.trim()) {
@@ -1024,7 +1044,7 @@ export async function generateScenario(
   const detailsUserContent = `核心设定：
 - 标题：${coreResult.title}
 - ${isLife ? "衙门" : "国家"}：${coreResult.player_context?.nation_name}
-- ${isLife ? "大人" : "领袖"}头衔：${coreResult.player_context?.leader_title}
+- ${isLife ? getTerminology("life").defaultLeaderLabel : "领袖"}头衔：${coreResult.player_context?.leader_title}
 - 背景：${coreResult.player_context?.background_summary}
 - ${styleLabel}：${styleValue}
 - 描述：${coreResult.description}${officialdomInfo}
@@ -1201,7 +1221,19 @@ export async function counselAdvisor(
     )
     .replace("{situation_update}", currentSituation || "暂无特别局势变化")
     .replace("{recent_history}", recentHistory)
-    .replace(/{leader_title}/g, scenario.player_context.leader_title);
+    .replace(/{leader_title}/g, scenario.player_context.leader_title)
+    .replace(
+      /{leader_label}/g,
+      getDynamicTitleVars(scenario, universe).leader_label,
+    )
+    .replace(
+      /{court_term}/g,
+      getDynamicTitleVars(scenario, universe).court_term,
+    )
+    .replace(
+      /{ministers_term}/g,
+      getDynamicTitleVars(scenario, universe).ministers_term,
+    );
 
   const fullSystemPrompt = provider.supportsStructuredOutput()
     ? systemPrompt
@@ -1265,9 +1297,17 @@ export async function evaluateTurn(
   const prompts = getPrompts(universe);
   const isLife = universe === "life";
 
-  const systemPrompt = provider.supportsStructuredOutput()
-    ? prompts.TURN_SYSTEM_PROMPT
-    : prompts.TURN_SYSTEM_PROMPT + prompts.TURN_SCHEMA_PROMPT;
+  const systemPrompt = (
+    provider.supportsStructuredOutput()
+      ? prompts.TURN_SYSTEM_PROMPT
+      : prompts.TURN_SYSTEM_PROMPT + prompts.TURN_SCHEMA_PROMPT
+  )
+    .replace(/{superior_title}/g, scenario.player_context.superior_title || "")
+    .replace(/{superior_name}/g, scenario.player_context.superior_name || "")
+    .replace(
+      /{ministers_term}/g,
+      getDynamicTitleVars(scenario, universe).ministers_term,
+    );
 
   const recentActionsSection =
     recentPlayerActions && recentPlayerActions.length > 0
@@ -1555,16 +1595,30 @@ export async function courtDebate(
     .replace("{topic}", topic)
     .replace("{debate_history}", debateHistoryText)
     .replace("{last_speaker}", lastSpeaker)
-    .replace("{remaining_rounds}", String(remainingRounds));
+    .replace("{remaining_rounds}", String(remainingRounds))
+    .replace(
+      /{leader_label}/g,
+      getDynamicTitleVars(scenario, universe).leader_label,
+    )
+    .replace(
+      /{court_term}/g,
+      getDynamicTitleVars(scenario, universe).court_term,
+    )
+    .replace(
+      /{ministers_term}/g,
+      getDynamicTitleVars(scenario, universe).ministers_term,
+    );
 
   const fullSystemPrompt = provider.supportsStructuredOutput()
     ? systemPrompt
     : systemPrompt + prompts.COURT_DEBATE_SCHEMA_PROMPT;
 
+  const titleVars = getDynamicTitleVars(scenario, universe);
+
   const userContent =
     debateHistory.length === 0
-      ? `{leader_title}提出议题："${topic}"\n\n请选择最合适的${isLife ? "同僚" : "内阁成员"}率先回应。`
-      : `请根据${isLife ? "议事" : "辩论"}历史，选择下一位最合适的${isLife ? "同僚" : "内阁成员"}继续讨论议题（可回应他人观点，不可与上一位发言者相同，但之前已发言过的成员隔轮后可再次发言）。`;
+      ? `{leader_title}提出议题："${topic}"\n\n请选择最合适的${titleVars.ministers_term}率先回应。`
+      : `请根据${isLife ? "议事" : "辩论"}历史，选择下一位最合适的${titleVars.ministers_term}继续讨论议题（可回应他人观点，不可与上一位发言者相同，但之前已发言过的成员隔轮后可再次发言）。`;
 
   const messages: AIMessage[] = [
     { role: "system", content: fullSystemPrompt },

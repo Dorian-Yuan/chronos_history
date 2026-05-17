@@ -25,6 +25,21 @@ export const scenarioCoreSchema = {
           type: "string" as const,
           description: "背景简介",
         },
+        leader_label: {
+          type: "string" as const,
+          description:
+            "对玩家的通用称呼标签（如中国朝代用'国君'，罗马用'执政官'，欧洲用'陛下'等，需与leader_title和文明类型匹配）",
+        },
+        court_term: {
+          type: "string" as const,
+          description:
+            "议事场所名称（如中国朝代用'朝堂'，罗马用'元老院'，欧洲用'议会'等）",
+        },
+        ministers_term: {
+          type: "string" as const,
+          description:
+            "臣僚统称（如中国朝代用'群臣'，罗马用'元老们'，欧洲用'议员们'等）",
+        },
       },
       required: ["nation_name", "leader_title", "background_summary"],
     },
@@ -94,6 +109,21 @@ export const scenarioSchema = {
         background_summary: {
           type: "string" as const,
           description: "背景简介",
+        },
+        leader_label: {
+          type: "string" as const,
+          description:
+            "对玩家的通用称呼标签（如中国朝代用'国君'，罗马用'执政官'，欧洲用'陛下'等）",
+        },
+        court_term: {
+          type: "string" as const,
+          description:
+            "议事场所名称（如中国朝代用'朝堂'，罗马用'元老院'，欧洲用'议会'等）",
+        },
+        ministers_term: {
+          type: "string" as const,
+          description:
+            "臣僚统称（如中国朝代用'群臣'，罗马用'元老们'，欧洲用'议员们'等）",
         },
       },
       required: ["nation_name", "leader_title", "background_summary"],
@@ -510,6 +540,20 @@ export const lifeScenarioCoreSchema = {
         superior_name: {
           type: "string" as const,
           description: "上位者姓名",
+        },
+        leader_label: {
+          type: "string" as const,
+          description:
+            "对玩家的通用称呼标签（如中国官场用'大人'，西方官场用'阁下'等，需与文明类型匹配）",
+        },
+        court_term: {
+          type: "string" as const,
+          description:
+            "议事场所名称（如中国官场用'议事厅'或'衙门'，西方用'议事堂'等）",
+        },
+        ministers_term: {
+          type: "string" as const,
+          description: "同僚统称（如中国官场用'同僚'，西方用'同僚们'等）",
         },
       },
       required: [

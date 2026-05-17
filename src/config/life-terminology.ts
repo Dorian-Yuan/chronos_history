@@ -38,8 +38,8 @@ export const LIFE_TERMINOLOGY = {
   } as const,
   statAriaLabel: "仕途属性",
 
-  chroniclePrompt: "大人，身为{title}，您打算如何行事？",
-  courtDebatePrompt: "{title}，可提出议题，与同僚议事",
+  chroniclePrompt: "{honorific_prefix}，身为{title}，您打算如何行事？",
+  courtDebatePrompt: "{title}，可提出议题，与{ministers_term}议事",
   inputPlaceholder: "上书言事...（奏请、结交、上表等）",
   counselLabel: "私议",
   counselPrivateLabel: "私下密议",
@@ -151,10 +151,10 @@ export const LIFE_TERMINOLOGY = {
     supplement: "补充",
   } as const,
 
-  debateEmptyPrompt: "{title}，可提出议题，与同僚议事",
+  debateEmptyPrompt: "{title}，可提出议题，与{ministers_term}议事",
   debateResultHint: "议事结果仅供决策参考",
-  debateDiscussing: "同僚商议中...",
-  debatePreparing: "同僚准备发言...",
+  debateDiscussing: "{ministers_term}商议中...",
+  debatePreparing: "{ministers_term}准备发言...",
   debateFinished: "议事已结束 · 共{rounds}轮",
   debateInProgress: "议事进行中 · 第{current}/{total}轮",
   debateInProgressShort: "议事进行中...",
@@ -166,6 +166,10 @@ export const LIFE_TERMINOLOGY = {
 
   defaultNationName: "未知衙门",
   defaultLeaderTitle: "大人",
+  defaultLeaderLabel: "大人",
+  defaultCourtTerm: "议事厅",
+  defaultMinistersTerm: "同僚",
+  defaultHonorificPrefix: "大人",
   defaultScenarioTitle: "未知仕途",
   defaultStyleName: "自定义仕途",
 

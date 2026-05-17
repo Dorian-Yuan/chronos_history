@@ -27,6 +27,9 @@ export interface PlayerContext {
   official_rank?: OfficialRank;
   superior_title?: string;
   superior_name?: string;
+  leader_label?: string;
+  court_term?: string;
+  ministers_term?: string;
 }
 
 export interface AdvisorData {

@@ -320,11 +320,22 @@ export function CourtDebatePanel({
             <div className="flex flex-col items-center justify-center py-10 text-text-tertiary">
               <MessageCircle size={24} className="mb-2 opacity-30" />
               <p className="text-xs font-serif">
-                {term.debateEmptyPrompt.replace(
-                  "{title}",
-                  scenario.player_context?.leader_title ||
-                    term.defaultLeaderTitle,
-                )}
+                {term.debateEmptyPrompt
+                  .replace(
+                    "{court_term}",
+                    scenario.player_context?.court_term ||
+                      term.defaultCourtTerm,
+                  )
+                  .replace(
+                    "{ministers_term}",
+                    scenario.player_context?.ministers_term ||
+                      term.defaultMinistersTerm,
+                  )
+                  .replace(
+                    "{title}",
+                    scenario.player_context?.leader_title ||
+                      term.defaultLeaderTitle,
+                  )}
               </p>
               <p className="text-[10px] mt-1 text-text-tertiary/60 font-serif">
                 {term.debateResultHint}
@@ -365,8 +376,16 @@ export function CourtDebatePanel({
                     <div className="rounded-lg px-3 py-2 bg-bg-tertiary">
                       <span className="text-[10px] text-text-tertiary font-serif">
                         {session.currentRound > 0
-                          ? term.debateDiscussing
-                          : term.debatePreparing}
+                          ? term.debateDiscussing.replace(
+                              "{ministers_term}",
+                              scenario.player_context?.ministers_term ||
+                                term.defaultMinistersTerm,
+                            )
+                          : term.debatePreparing.replace(
+                              "{ministers_term}",
+                              scenario.player_context?.ministers_term ||
+                                term.defaultMinistersTerm,
+                            )}
                       </span>
                     </div>
                     <div

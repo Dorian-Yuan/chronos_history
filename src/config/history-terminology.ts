@@ -38,8 +38,9 @@ export const HISTORY_TERMINOLOGY = {
   } as const,
   statAriaLabel: "国家属性",
 
-  chroniclePrompt: "阁下，作为{title}，您的第一道政令是什么？",
-  courtDebatePrompt: "{title}，可在朝堂上提出议题，令群臣廷议",
+  chroniclePrompt: "{honorific_prefix}，作为{title}，您的第一道政令是什么？",
+  courtDebatePrompt:
+    "{title}，可在{court_term}上提出议题，令{ministers_term}廷议",
   inputPlaceholder: "下达指令...（外交、经济、军事等）",
   counselLabel: "密谈",
   counselPrivateLabel: "私下密谈",
@@ -149,10 +150,11 @@ export const HISTORY_TERMINOLOGY = {
     supplement: "补充",
   } as const,
 
-  debateEmptyPrompt: "{title}，可在朝堂上提出议题，令群臣廷议",
+  debateEmptyPrompt:
+    "{title}，可在{court_term}上提出议题，令{ministers_term}廷议",
   debateResultHint: "廷议结果仅供决策参考",
-  debateDiscussing: "群臣商议中...",
-  debatePreparing: "群臣准备陈词...",
+  debateDiscussing: "{ministers_term}商议中...",
+  debatePreparing: "{ministers_term}准备陈词...",
   debateFinished: "廷议已结束 · 共{rounds}轮",
   debateInProgress: "廷议进行中 · 第{current}/{total}轮",
   debateInProgressShort: "廷议进行中...",
@@ -164,6 +166,10 @@ export const HISTORY_TERMINOLOGY = {
 
   defaultNationName: "未知国家",
   defaultLeaderTitle: "统治者",
+  defaultLeaderLabel: "国君",
+  defaultCourtTerm: "朝堂",
+  defaultMinistersTerm: "群臣",
+  defaultHonorificPrefix: "阁下",
   defaultScenarioTitle: "未知剧本",
   defaultStyleName: "自定义剧本",
 

@@ -27,6 +27,9 @@ export interface PlayerContextUpdate {
   official_rank?: OfficialRank;
   superior_title?: string;
   superior_name?: string;
+  leader_label?: string;
+  court_term?: string;
+  ministers_term?: string;
   previous_nation_name?: string;
   previous_leader_title?: string;
   previous_official_rank?: OfficialRank;

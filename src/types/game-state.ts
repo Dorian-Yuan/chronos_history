@@ -254,15 +254,14 @@ function determineLifeConditionalOutcome(
         base: "victory",
         title: "只手遮天",
         description:
-          "你已位极人臣，权倾朝野。天下大事，皆决于你一人之手，连上位者也要仰你鼻息。",
+          "你已位极人臣，权倾一时。天下大事，皆决于你一人之手，连上位者也要仰你鼻息。",
       };
     }
     if (stats.stability >= 75 && stats.international_standing >= 75) {
       return {
         base: "victory",
         title: "位极人臣",
-        description:
-          "威望与圣眷并重，你已成为朝堂之上举足轻重的人物，名垂青史。",
+        description: "威望与圣眷并重，你已成为举足轻重的人物，名垂青史。",
       };
     }
     if (
@@ -293,7 +292,7 @@ function determineLifeConditionalOutcome(
         base: "victory",
         title: "朝堂砥柱",
         description:
-          "朝堂之上，你稳如磐石。同僚敬服，上位者倚重，你的仕途堪称典范。",
+          "身居要职，你稳如磐石。同僚敬服，上位者倚重，你的仕途堪称典范。",
       };
     }
     return {
@@ -308,8 +307,7 @@ function determineLifeConditionalOutcome(
     return {
       base: "neutral",
       title: "中流砥柱",
-      description:
-        "身居高位，虽非权倾朝野，却也稳如泰山。你是朝堂上不可或缺的柱石。",
+      description: "身居高位，虽非权倾一时，却也稳如泰山。你是不可或缺的柱石。",
     };
   }
   if (stats.international_standing >= 60 && stats.stability < 40) {
